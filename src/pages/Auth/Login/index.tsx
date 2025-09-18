@@ -1,9 +1,23 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import type { LoginForm } from '../../../entities/Form'
+import { Login } from '../../../features/Login'
 
 const LoginPage = () => {
   const [accountName, setAccountName] = useState('')
   const [password, setPassword] = useState('')
+  const navigate = useNavigate();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault() ;
+    const loginData : LoginForm = {
+      userName: accountName,
+      password: password
+    }
+    const result = await Login(loginData);
+    if(result) 
+      navigate('/');
+  }
 
   return (
     <div className='bg-[#739EC9] min-h-screen flex justify-center items-center inset-0 fixed'>
@@ -27,7 +41,7 @@ const LoginPage = () => {
             </Link>
           </p>
 
-          <form className='flex flex-col gap-4' >
+          <form className='flex flex-col gap-4' onSubmit={handleLogin}>
             <input
               type='text'
               placeholder='Account Name'
