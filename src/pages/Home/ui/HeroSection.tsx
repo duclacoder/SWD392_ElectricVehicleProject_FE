@@ -19,7 +19,9 @@ export const HeroSection: React.FC = () => {
                         <span className="text-green-600">Lên xe điện</span> cùng chúng tôi
                     </h1>
 
-                    {/* Content + Subtitle */}
+
+                    {/* Subtitle */}
+
                     <p className="text-lg md:text-xl text-gray-600 max-w-xl mx-auto md:mx-0">
                         Trợ giá lên đến{" "}
                         <span className="font-semibold text-green-700">140 triệu đồng</span>{" "}
@@ -27,7 +29,8 @@ export const HeroSection: React.FC = () => {
                         Số lượng có hạn – đừng bỏ lỡ!
                     </p>
 
-                    {/* Button */}
+
+                    {/* CTA */}
                     <div className="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
                         <button className="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold shadow hover:bg-green-700 transition">
                             Nhận ưu đãi ngay
