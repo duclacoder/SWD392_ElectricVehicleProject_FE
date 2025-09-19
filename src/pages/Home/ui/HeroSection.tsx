@@ -19,13 +19,16 @@ export const HeroSection: React.FC = () => {
                         <span className="text-green-600">Lên xe điện</span> cùng chúng tôi
                     </h1>
 
+
                     {/* Subtitle */}
+
                     <p className="text-lg md:text-xl text-gray-600 max-w-xl mx-auto md:mx-0">
                         Trợ giá lên đến{" "}
                         <span className="font-semibold text-green-700">140 triệu đồng</span>{" "}
                         cho khách hàng tiên phong chuyển đổi.
                         Số lượng có hạn – đừng bỏ lỡ!
                     </p>
+
 
                     {/* CTA */}
                     <div className="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
