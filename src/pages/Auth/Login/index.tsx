@@ -9,13 +9,13 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault() ;
-    const loginData : LoginForm = {
+    e.preventDefault();
+    const loginData: LoginForm = {
       userName: accountName,
       password: password
     }
     const result = await Login(loginData);
-    if(result) 
+    if (result)
       navigate('/');
   }
 
@@ -76,7 +76,7 @@ const LoginPage = () => {
             </button>
             <button className='py-2 px-4 bg-[#1DA1F2] rounded text-white hover:opacity-90'>
               Twitter
-            </button>            
+            </button>
           </div>
         </div>
       </div>
@@ -85,3 +85,4 @@ const LoginPage = () => {
 }
 
 export default LoginPage
+// !!!!
