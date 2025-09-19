@@ -87,13 +87,12 @@ export const Header: FC = () => {
         </nav>
 
         <div className="flex items-center space-x-6">
-          <button
-            onClick={() => setIsAuthModalOpen(true)}
-            className="flex items-center space-x-2 text-gray-700 font-medium hover:text-blue-600 transition"
-          >
-            <User className="w-5 h-5" />
-            <span>Tài khoản</span>
-          </button>
+          <Link to="/login" className="hidden md:flex items-center space-x-2">
+            <User className="w-5 h-5 text-gray-600" />
+            <span className="text-gray-700 font-medium hover:text-blue-600 transition">
+              Đăng nhập
+            </span>
+          </Link>
 
           <div className="flex items-center space-x-2">
             <Phone className="w-5 h-5 text-gray-600" />
