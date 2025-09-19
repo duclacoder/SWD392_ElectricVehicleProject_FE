@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Car, Eye, EyeOff, Lock, ShoppingBag } from "lucide-react";
+import { Book, Car, Eye, EyeOff, Hammer, Lock, ShoppingBag } from "lucide-react";
 import logo from "../../../shared/assets/logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import type { LoginForm } from "../../../entities/Form";
@@ -187,10 +187,10 @@ const LoginPage = () => {
                 <p className="text-xs text-white/80">Secure</p>
               </div>
               <div className="space-y-2">
-                <div className="w-8 h-8 bg-orange-500 rounded-full mx-auto flex items-center justify-center ">
-                  <Lock className="w-4 h-4 text-white" />
+                <div className="w-8 h-8 bg-rose-500 rounded-full mx-auto flex items-center justify-center ">
+                  <Book className="w-4 h-4 text-white" />
                 </div>
-                <p className="text-xs text-white/80">Secure</p>
+                <p className="text-xs text-white/80">Auction</p>
               </div>
             </div>
           </div>
