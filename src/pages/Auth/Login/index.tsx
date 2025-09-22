@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Book, Car, Eye, EyeOff, Hammer, Lock, ShoppingBag } from "lucide-react";
+import { Book, Car, Eye, EyeOff, Lock, ShoppingBag } from "lucide-react";
 import logo from "../../../shared/assets/logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import type { LoginForm } from "../../../entities/Form";
@@ -14,10 +14,11 @@ const LoginPage = () => {
 
   const handleLogin = async () => {
     const loginData: LoginForm = {
-      userName: email,
+      email: email,
       password: password
     };
-    const result = await Login(loginData);
+    const result : boolean = await Login(loginData);
+    console.log(result);
     if (result) {
       navigate("/");
     }
@@ -195,19 +196,6 @@ const LoginPage = () => {
             </div>
           </div>
         </div>
-
-        <style jsx>{`
-          @keyframes carMove {
-            0% { transform: translateX(-10px) rotate(-1deg); }
-            50% { transform: translateX(5px) rotate(0deg); }
-            100% { transform: translateX(-5px) rotate(1deg); }
-          }
-          
-          @keyframes roadLine {
-            0% { transform: translateX(-40px); }
-            100% { transform: translateX(0px); }
-          }
-        `}</style>
       </div>
     </div>
   );
