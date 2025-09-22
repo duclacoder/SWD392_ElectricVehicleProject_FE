@@ -11,14 +11,13 @@ export const Login = async (LoginForm: LoginForm): Promise<boolean> => {
     if (data.isSuccess) {
       localStorage.setItem("userName", data.result.userName);
       localStorage.setItem("token", data.result.token);
-      console.log(data.isSuccess);
     } else {
       message.error(data.message);
     }
-    console.log(data.isSuccess);
     return data.isSuccess;
   } catch (error) {
     message.error(error?.response?.data?.message || "Login failed");
     console.error(error?.response?.data);
+    return false;
   }
 };
