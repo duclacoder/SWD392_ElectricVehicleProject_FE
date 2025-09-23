@@ -17,8 +17,7 @@ const LoginPage = () => {
       email: email,
       password: password,
     };
-    const result: boolean = await Login(loginData);
-    console.log(result);
+    const result : boolean = await Login(loginData);
     if (result) {
       navigate("/");
     }
