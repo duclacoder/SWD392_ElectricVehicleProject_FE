@@ -6,7 +6,7 @@ import type { User } from "../../entities/User";
 
 export const Login = async (LoginForm: LoginForm): Promise<boolean> => {
   try {
-    const response = await api.post("User/Login", LoginForm);
+    const response = await api.post("Auth/Login", LoginForm);
     const data : ResponseDTO<User> = response.data;
     if (data.isSuccess) {
       localStorage.setItem("userName", data.result.userName);
