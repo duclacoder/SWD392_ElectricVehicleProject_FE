@@ -30,7 +30,7 @@ export const Header: FC = () => {
   }, []);
 
   const navItems = [
-    { name: "Mua xe", href: "/#" },
+    { name: "Mua xe", href: "/auction" },
     { name: "Bán xe", href: "/#", hasDropdown: true },
     { name: "Thông tin & Sự kiện", href: "/#" },
   ];
@@ -90,12 +90,12 @@ export const Header: FC = () => {
         </nav>
 
         <div className="flex items-center space-x-2">
-            <Phone className="w-5 h-5 text-gray-600" />
-            <div className="text-right">
-              <div className="text-sm text-gray-500">Hotline:</div>
-              <div className="text-blue-600 font-bold">1800 0000</div>
-            </div>
+          <Phone className="w-5 h-5 text-gray-600" />
+          <div className="text-right">
+            <div className="text-sm text-gray-500">Hotline:</div>
+            <div className="text-blue-600 font-bold">1800 0000</div>
           </div>
+        </div>
 
         <div className="flex items-center space-x-6">
           {!token && (
