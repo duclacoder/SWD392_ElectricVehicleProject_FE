@@ -1,0 +1,61 @@
+import { Car, Home, LayoutDashboard, LogOut, Users } from "lucide-react";
+import type { FC } from "react";
+import { Link, useLocation } from "react-router-dom";
+import logo from "../../shared/assets/logo.png";
+
+const navLinks = [
+  { name: "Dashboard", href: "/admin", icon: <LayoutDashboard size={20} /> },
+  { name: "Users", href: "/admin/users", icon: <Users size={20} /> },
+  { name: "Products", href: "/admin/products", icon: <Car size={20} /> },
+];
+
+const bottomLinks = [
+  { name: "Homepage", href: "/", icon: <Home size={20} /> },
+  { name: "Logout", href: "/login", icon: <LogOut size={20} /> },
+];
+
+export const Sidebar: FC = () => {
+  const location = useLocation();
+
+  const linkClasses = (href: string) =>
+    `flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors ${
+      location.pathname === href
+        ? "bg-sky-600 text-white"
+        : "text-gray-600 hover:bg-gray-100"
+    }`;
+
+  return (
+    <aside className="w-64 bg-white shadow-md flex flex-col p-4">
+      <div className="flex items-center gap-3 mb-8 px-4">
+        <img src={logo} alt="Logo" className="h-10 w-10" />
+        <span className="text-xl font-bold text-gray-800">Adminator</span>
+      </div>
+
+      <nav className="flex-1 space-y-2">
+        {navLinks.map((link) => (
+          <Link
+            key={link.name}
+            to={link.href}
+            className={linkClasses(link.href)}
+          >
+            {link.icon}
+            <span className="font-medium">{link.name}</span>
+          </Link>
+        ))}
+      </nav>
+
+      <div className="space-y-2">
+        {bottomLinks.map((link) => (
+          <Link
+            key={link.name}
+            to={link.href}
+            className={linkClasses(link.href)}
+          >
+            {link.icon}
+            <span className="font-medium">{link.name}</span>
+          </Link>
+        ))}
+      </div>
+    </aside>
+  );
+};

@@ -2,15 +2,23 @@ import { message } from "antd";
 import type { LoginForm } from "../../entities/Form";
 import api from "../../shared/api/axios";
 import type { ResponseDTO } from "../../entities/Response";
-import type { User } from "../../entities/User";
+import { jwtDecode } from "jwt-decode";
+import type { JwtTokenDecode } from "../../entities/Decode";
 
 export const Login = async (LoginForm: LoginForm): Promise<boolean> => {
   try {
     const response = await api.post("Auth/Login", LoginForm);
-    const data : ResponseDTO<User> = response.data;
+    const data : ResponseDTO<string> = response.data;
     if (data.isSuccess) {
-      localStorage.setItem("userName", data.result.userName);
-      localStorage.setItem("token", data.result.token);
+      const token = data.result;      
+      const userData = jwtDecode<JwtTokenDecode>(token);
+      localStorage.setItem("token", token);
+      localStorage.setItem("userName", userData.userName);
+      localStorage.setItem("fullName", userData.fullName);
+      localStorage.setItem("role", userData.role);
+      localStorage.setItem("userId", userData.sub);
+      localStorage.setItem("email", userData.email);
+      localStorage.setItem("imageUrl", userData.imageUrl);
     } else {
       message.error(data.message);
     }
