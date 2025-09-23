@@ -5,6 +5,7 @@ import LoginPage from "../../pages/Auth/Login";
 import Register from "../../pages/Auth/Register";
 import HomePage from "../../pages/Home";
 import { AdminLayout } from "../layouts/AdminLayout";
+import AuctionPage from "../../pages/Auction";
 
 export const AppRoutes = () => {
   return (
@@ -28,6 +29,8 @@ export const AppRoutes = () => {
           </AdminLayout>
         }
       />
+      <Route path="/auction" element={<AuctionPage />} />
+
     </Routes>
   );
 };

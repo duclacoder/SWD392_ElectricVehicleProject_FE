@@ -26,7 +26,7 @@ export const Header: FC = () => {
   }, []);
 
   const navItems = [
-    { name: "Mua xe", href: "/#" },
+    { name: "Mua xe", href: "/auction" },
     { name: "Bán xe", href: "/#", hasDropdown: true },
     { name: "Thông tin & Sự kiện", href: "/#" },
   ];
@@ -41,7 +41,7 @@ export const Header: FC = () => {
         <nav className="hidden md:flex items-center space-x-8 text-gray-700 font-medium">
           {navItems.map((item, index) => (
             <div key={index} className="relative group">
-              <a
+              {/* <a
                 href={item.href}
                 className="flex items-center hover:text-blue-600 transition"
                 onClick={(e) => {
@@ -54,12 +54,29 @@ export const Header: FC = () => {
                 {item.name}
                 {item.hasDropdown && (
                   <ChevronDown
-                    className={`w-4 h-4 ml-1 transition-transform ${
-                      dropdownOpen ? "rotate-180" : ""
-                    }`}
+                    className={`w-4 h-4 ml-1 transition-transform ${dropdownOpen ? "rotate-180" : ""
+                      }`}
                   />
                 )}
-              </a>
+              </a> */}
+              <Link
+                to={item.href}
+                className="flex items-center hover:text-blue-600 transition"
+                onClick={(e) => {
+                  if (item.hasDropdown) {
+                    e.preventDefault();
+                    setDropdownOpen(!dropdownOpen);
+                  }
+                }}
+              >
+                {item.name}
+                {item.hasDropdown && (
+                  <ChevronDown
+                    className={`w-4 h-4 ml-1 transition-transform ${dropdownOpen ? "rotate-180" : ""
+                      }`}
+                  />
+                )}
+              </Link>
               {item.hasDropdown && dropdownOpen && (
                 <div
                   ref={dropdownRef}
@@ -94,12 +111,13 @@ export const Header: FC = () => {
             </span>
           </Link>
 
-          <div className="flex items-center space-x-2">
+          <div className="flex flex-row items-center space-x-2">
+
+
             <Phone className="w-5 h-5 text-gray-600" />
-            <div className="text-right">
-              <div className="text-sm text-gray-500">Hotline:</div>
-              <div className="text-blue-600 font-bold">1800 0000</div>
-            </div>
+            <div className="text-sm text-gray-500">Hotline:</div>
+            <div className="text-blue-600 font-bold">1800 0000</div>
+
           </div>
         </div>
       </div>
