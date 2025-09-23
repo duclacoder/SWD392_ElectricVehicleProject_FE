@@ -30,9 +30,9 @@ api.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(
-      error instanceof Error ? error : new Error(String(error)),
+      error instanceof Error ? error : new Error(String(error))
     );
-  },
+  }
 );
 
 let isRefreshing = false;
@@ -93,7 +93,7 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  },
+  }
 );
 
 // Hàm xử lý refresh token
@@ -108,7 +108,7 @@ const handleTokenRefresh = async (originalRequest: any) => {
       })
       .catch((err) => {
         return Promise.reject(
-          err instanceof Error ? err : new Error(String(err)),
+          err instanceof Error ? err : new Error(String(err))
         );
       });
   }
@@ -123,7 +123,7 @@ const handleTokenRefresh = async (originalRequest: any) => {
       {
         withCredentials: true,
         timeout: 10000, //10s
-      },
+      }
     );
     const { accessToken: newAccessToken } = refreshResponse.data.value ?? {};
     if (!newAccessToken) {
@@ -131,8 +131,7 @@ const handleTokenRefresh = async (originalRequest: any) => {
     }
 
     localStorage.setItem("jwtToken", newAccessToken);
-    api.defaults.headers.common["Authorization"] =
-      `Bearer ${newAccessToken}`;
+    api.defaults.headers.common["Authorization"] = `Bearer ${newAccessToken}`;
     originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
 
     processQueue(null, newAccessToken);
@@ -145,7 +144,7 @@ const handleTokenRefresh = async (originalRequest: any) => {
     return Promise.reject(
       refreshError instanceof Error
         ? refreshError
-        : new Error(String(refreshError)),
+        : new Error(String(refreshError))
     );
   } finally {
     isRefreshing = false;

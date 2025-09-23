@@ -1,101 +1,111 @@
+import { ChevronDown, Phone, User } from "lucide-react";
 import type { FC } from "react";
-import { useState, useRef, useEffect } from "react";
-import logo from "../../shared/assets/logo.png";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-
+import AuthModal from "../../features/AuthModal";
+import logo from "../../shared/assets/logo.png";
 
 export const Header: FC = () => {
-    const [open, setOpen] = useState(false);
-    const dropdownRef = useRef<HTMLDivElement>(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-    // Đóng dropdown khi click ra ngoài
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (
-                dropdownRef.current &&
-                !dropdownRef.current.contains(event.target as Node)
-            ) {
-                setOpen(false);
-            }
-        };
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, []);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
-    return (
-        <header className="w-full shadow-md bg-blue-50">
-            <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
-                {/* Logo */}
-                <div className="flex items-center space-x-2">
-                    <img src={logo} alt="Logo" className="h-8 w-auto" />
-                    <span className="text-xl font-bold text-gray-800">EVCMS</span>
+  const navItems = [
+    { name: "Mua xe", href: "/#" },
+    { name: "Bán xe", href: "/#", hasDropdown: true },
+    { name: "Thông tin & Sự kiện", href: "/#" },
+  ];
+
+  return (
+    <header className="w-full bg-white shadow-sm sticky top-0 z-40">
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
+        <Link to="/" className="flex items-center">
+          <img src={logo} alt="logo" className="h-9 w-auto" />
+        </Link>
+
+        <nav className="hidden md:flex items-center space-x-8 text-gray-700 font-medium">
+          {navItems.map((item, index) => (
+            <div key={index} className="relative group">
+              <a
+                href={item.href}
+                className="flex items-center hover:text-blue-600 transition"
+                onClick={(e) => {
+                  if (item.hasDropdown) {
+                    e.preventDefault();
+                    setDropdownOpen(!dropdownOpen);
+                  }
+                }}
+              >
+                {item.name}
+                {item.hasDropdown && (
+                  <ChevronDown
+                    className={`w-4 h-4 ml-1 transition-transform ${
+                      dropdownOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                )}
+              </a>
+              {item.hasDropdown && dropdownOpen && (
+                <div
+                  ref={dropdownRef}
+                  className="absolute left-0 bg-white shadow-lg mt-2 rounded-md py-2 w-48 z-10"
+                >
+                  <a href="/#" className="block px-4 py-2 hover:bg-gray-100">
+                    Sản phẩm
+                  </a>
+                  <a href="/#" className="block px-4 py-2 hover:bg-gray-100">
+                    Dịch vụ
+                  </a>
                 </div>
-
-                {/* Navigation */}
-                <nav className="flex items-center space-x-6 text-gray-700 font-medium">
-                    <a href="#" className="hover:text-blue-600 transition">
-                        Trang chủ
-                    </a>
-                    <a href="#" className="hover:text-blue-600 transition">
-                        Bán xe
-                    </a>
-                    <a href="#" className="hover:text-blue-600 transition">
-                        Mua xe
-                    </a>
-                    <a href="#" className="hover:text-blue-600 transition">
-                        Đăng tin bán xe
-                    </a>
-                    <div className="relative">
-                        <button className="hover:text-sky-600">Thông tin & sự kiện ▾</button>
-                        <div className="absolute hidden group-hover:block bg-white shadow-lg mt-2 rounded-md py-2 w-48">
-                            <a href="#" className="block px-4 py-2 hover:bg-gray-100">
-                                Tin tức
-                            </a>
-                            <a href="#" className="block px-4 py-2 hover:bg-gray-100">
-                                Sự kiện
-                            </a>
-                        </div>
-                    </div>
-                </nav>
-
-                {/* Account + Hotline */}
-                <div className="flex items-center space-x-6">
-                    {/* Dropdown Account */}
-                    <div className="relative" ref={dropdownRef}>
-                        <button
-                            onClick={() => setOpen(!open)}
-                            className="flex items-center space-x-1 border rounded px-3 py-1 bg-white hover:bg-gray-50 shadow-sm"
-                        >
-                            <span>Tài khoản ▾</span>
-                        </button>
-                        {open && (
-                            <div className="absolute right-0 bg-white shadow-lg mt-2 rounded-md py-2 w-40 border border-gray-200 z-50">
-                                <Link
-                                    to="/login"
-                                    className="block px-4 py-2 hover:bg-gray-100 text-gray-700"
-                                >
-                                    Đăng nhập
-                                </Link>
-
-                                <Link
-                                    to="/Register"
-                                    className="block px-4 py-2 hover:bg-gray-100 text-gray-700"
-                                >
-                                    Đăng ký
-                                </Link>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Hotline */}
-                    <div className="text-right">
-                        <div className="text-sm text-gray-500">Hotline:</div>
-                        <div className="text-sky-600 font-bold">1800 000 000</div>
-                    </div>
-                </div>
+              )}
             </div>
-        </header>
-    );
+          ))}
+          <a
+            href="/#"
+            className="flex items-center bg-blue-100 text-blue-600 font-semibold px-4 py-2 rounded-lg hover:bg-blue-200 transition"
+          >
+            Bán xe xăng - Lên xe điện
+            <span className="ml-2 px-2 py-0.5 text-xs bg-blue-600 text-white rounded-md font-bold">
+              MỚI
+            </span>
+          </a>
+        </nav>
+
+        <div className="flex items-center space-x-6">
+          <Link to="/login" className="hidden md:flex items-center space-x-2">
+            <User className="w-5 h-5 text-gray-600" />
+            <span className="text-gray-700 font-medium hover:text-blue-600 transition">
+              Đăng nhập
+            </span>
+          </Link>
+
+          <div className="flex items-center space-x-2">
+            <Phone className="w-5 h-5 text-gray-600" />
+            <div className="text-right">
+              <div className="text-sm text-gray-500">Hotline:</div>
+              <div className="text-blue-600 font-bold">1800 0000</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {isAuthModalOpen && (
+        <AuthModal onClose={() => setIsAuthModalOpen(false)} />
+      )}
+    </header>
+  );
 };

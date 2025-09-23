@@ -29,7 +29,9 @@ const Register: React.FC = () => {
         {/* Logo + Title */}
         <div className="flex flex-col items-center mb-6">
           <img src={logo} alt="Logo" className="h-12 mb-2" />
-          <h1 className="text-2xl font-bold text-gray-800">Đăng ký tài khoản</h1>
+          <h1 className="text-2xl font-bold text-gray-800">
+            Đăng ký tài khoản
+          </h1>
           <p className="text-gray-500 text-sm">Tạo tài khoản để tiếp tục</p>
         </div>
 
