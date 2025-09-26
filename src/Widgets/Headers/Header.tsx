@@ -165,8 +165,10 @@ export const Header: FC = () => {
                   {/* Menu Items */}
                   <div className="py-1">
                     <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150">
-                      <User className="w-4 h-4 mr-3 text-gray-400" />
-                      Hồ sơ cá nhân
+                      <Link to="/profile" className="flex items-center mb-8">
+                        <User className="w-4 h-4 mr-3 text-gray-400" />
+                        Hồ sơ cá nhân
+                      </Link>
                     </button>
 
                     <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150">

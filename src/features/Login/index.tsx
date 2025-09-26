@@ -19,6 +19,7 @@ export const Login = async (LoginForm: LoginForm): Promise<boolean> => {
       localStorage.setItem("userId", userData.sub);
       localStorage.setItem("email", userData.email);
       localStorage.setItem("imageUrl", userData.imageUrl);
+      localStorage.setItem("phone", userData.phone);
     } else {
       message.error(data.message);
     }
