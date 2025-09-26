@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import type { LoginForm } from "../../../entities/Form";
 import { Login } from "../../../features/Login";
 import logo from "../../../shared/assets/logo.png";
+import { Button } from "antd";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -53,7 +54,14 @@ const LoginPage = () => {
           </div>
 
           {/* Login Form */}
-          <div className="space-y-6">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault(); // tránh reload page
+              handleLogin();
+            }}
+            className="space-y-6"
+          >
+            {/* Email */}
             <div>
               <div className="block text-gray-700 text-sm font-medium mb-2">
                 Email
@@ -67,6 +75,7 @@ const LoginPage = () => {
               />
             </div>
 
+            {/* Password */}
             <div>
               <div className="block text-gray-700 text-sm font-medium mb-2">
                 Password
@@ -89,6 +98,7 @@ const LoginPage = () => {
               </div>
             </div>
 
+            {/* Remember me + forgot password */}
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <input
@@ -100,6 +110,7 @@ const LoginPage = () => {
                 <span className="ml-2 text-sm text-gray-600">Remember me</span>
               </div>
               <button
+                type="button"
                 onClick={() => console.log("Forgot password")}
                 className="text-sm text-sky-600 hover:text-sky-700"
               >
@@ -107,13 +118,15 @@ const LoginPage = () => {
               </button>
             </div>
 
+            {/* Submit */}
             <button
-              onClick={handleLogin}
+              type="submit"
               className="w-full bg-sky-700 text-white py-3 px-4 rounded-lg hover:bg-sky-800 transition-colors duration-200 font-medium"
             >
-              Log in
+              <span className="text-sm text-white">Log In</span>
             </button>
-          </div>
+          </form>
+
 
           {/* Divider */}
           <div className="my-6 flex items-center">
@@ -158,12 +171,11 @@ const LoginPage = () => {
 
           <p className="mt-6 text-center text-sm text-gray-600">
             Don't have an account?{" "}
-            <button
-              onClick={() => console.log("Sign up")}
+            <Link to="/register"
               className="text-sky-600 hover:text-sky-700 font-medium"
             >
               Sign Up
-            </button>
+            </Link>
           </p>
         </div>
       </div>
