@@ -3,6 +3,7 @@ import AdminDashboardPage from "../../pages/Admin/Dashboard";
 import AdminUserPage from "../../pages/Admin/Users";
 import LoginPage from "../../pages/Auth/Login";
 import Register from "../../pages/Auth/Register";
+import OtpConfirm from "../../pages/Auth/Register/OtpConfirm";
 import HomePage from "../../pages/Home";
 import { AdminLayout } from "../layouts/AdminLayout";
 import AuctionPage from "../../pages/Auction";
@@ -14,6 +15,7 @@ export const AppRoutes = () => {
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/otp-confirm" element={<OtpConfirm />} />
       <Route
         path="/admin"
         element={
