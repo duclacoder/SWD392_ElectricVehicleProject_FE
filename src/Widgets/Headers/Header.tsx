@@ -3,8 +3,8 @@ import type { FC } from "react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import AuthModal from "../../features/AuthModal";
-import logo from "../../shared/assets/logo.png";
 import { Logout } from "../../features/Logout";
+import logo from "../../shared/assets/logo.png";
 
 export const Header: FC = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
