@@ -10,3 +10,13 @@ export interface RegisterForm {
   email: string;
   fullName: string;
 }
+
+export interface UserFormData {
+  userName: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  password?: string;
+  roleId: number;
+  status?: boolean;
+}

@@ -3,8 +3,8 @@ import type { FC } from "react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import AuthModal from "../../features/AuthModal";
-import logo from "../../shared/assets/logo.png";
 import { Logout } from "../../features/Logout";
+import logo from "../../shared/assets/logo.png";
 
 export const Header: FC = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -12,7 +12,9 @@ export const Header: FC = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const token = localStorage.getItem("token");
-  const [userImageUrl, setUserImageUrl] = useState(localStorage.getItem("imageUrl") || null);
+  const [userImageUrl, setUserImageUrl] = useState(
+    localStorage.getItem("imageUrl") || null
+  );
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -58,8 +60,9 @@ export const Header: FC = () => {
                 {item.name}
                 {item.hasDropdown && (
                   <ChevronDown
-                    className={`w-4 h-4 ml-1 transition-transform ${dropdownOpen ? "rotate-180" : ""
-                      }`}
+                    className={`w-4 h-4 ml-1 transition-transform ${
+                      dropdownOpen ? "rotate-180" : ""
+                    }`}
                   />
                 )}
               </a>
@@ -104,7 +107,8 @@ export const Header: FC = () => {
               <span className="text-gray-700 font-medium hover:text-blue-600 transition">
                 Đăng nhập
               </span>
-            </Link>)}
+            </Link>
+          )}
 
           {token && (
             <div>
@@ -124,9 +128,12 @@ export const Header: FC = () => {
                     <User className="w-8 h-8 text-gray-400" />
                   )}
                   <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
-
                 </div>
-                <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown
+                  className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
+                    isOpen ? "rotate-180" : ""
+                  }`}
+                />
               </button>
 
               {/* Dropdown Menu */}
@@ -148,23 +155,21 @@ export const Header: FC = () => {
                         <p className="text-sm font-semibold text-gray-900">
                           Xin chào, {localStorage.getItem("userName")}!
                         </p>
-                        <p className="text-xs text-gray-500">Chào mừng bạn trở lại</p>
+                        <p className="text-xs text-gray-500">
+                          Chào mừng bạn trở lại
+                        </p>
                       </div>
                     </div>
                   </div>
 
                   {/* Menu Items */}
                   <div className="py-1">
-                    <button
-                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
-                    >
+                    <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150">
                       <User className="w-4 h-4 mr-3 text-gray-400" />
                       Hồ sơ cá nhân
                     </button>
 
-                    <button
-                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
-                    >
+                    <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150">
                       <Settings className="w-4 h-4 mr-3 text-gray-400" />
                       Cài đặt
                     </button>
@@ -185,8 +190,6 @@ export const Header: FC = () => {
               )}
             </div>
           )}
-
-
         </div>
       </div>
       {isAuthModalOpen && (
