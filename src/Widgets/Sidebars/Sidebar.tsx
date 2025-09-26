@@ -1,6 +1,7 @@
 import { Car, Home, LayoutDashboard, LogOut, Users } from "lucide-react";
 import type { FC } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { Logout } from "../../features/Logout";
 import logo from "../../shared/assets/logo.png";
 
 const navLinks = [
@@ -11,7 +12,11 @@ const navLinks = [
 
 const bottomLinks = [
   { name: "Homepage", href: "/", icon: <Home size={20} /> },
-  { name: "Logout", href: "/login", icon: <LogOut size={20} /> },
+  {
+    name: "Logout",
+    icon: <LogOut size={20} />,
+    onClick: Logout,
+  },
 ];
 
 export const Sidebar: FC = () => {
@@ -45,16 +50,27 @@ export const Sidebar: FC = () => {
       </nav>
 
       <div className="space-y-2">
-        {bottomLinks.map((link) => (
-          <Link
-            key={link.name}
-            to={link.href}
-            className={linkClasses(link.href)}
-          >
-            {link.icon}
-            <span className="font-medium">{link.name}</span>
-          </Link>
-        ))}
+        {bottomLinks.map((link) =>
+          link.href ? (
+            <Link
+              key={link.name}
+              to={link.href}
+              className={linkClasses(link.href)}
+            >
+              {link.icon}
+              <span className="font-medium">{link.name}</span>
+            </Link>
+          ) : (
+            <button
+              key={link.name}
+              onClick={link.onClick}
+              className={`${linkClasses("")} w-full text-left`}
+            >
+              {link.icon}
+              <span className="font-medium">{link.name}</span>
+            </button>
+          )
+        )}
       </div>
     </aside>
   );

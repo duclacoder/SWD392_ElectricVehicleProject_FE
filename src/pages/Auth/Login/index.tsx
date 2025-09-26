@@ -17,9 +17,13 @@ const LoginPage = () => {
       email: email,
       password: password,
     };
-    const result : boolean = await Login(loginData);
+    const result: boolean = await Login(loginData);
     if (result) {
-      navigate("/");
+      if (localStorage.getItem("role") === "Admin") {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
     }
   };
 
