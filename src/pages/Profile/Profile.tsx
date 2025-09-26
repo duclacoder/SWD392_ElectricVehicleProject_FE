@@ -43,6 +43,7 @@ const ProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [form] = Form.useForm();
+  const [backupProfile, setBackupProfile] = useState<UserProfile | null>(null);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -139,6 +140,9 @@ const ProfilePage = () => {
     );
   }
 
+  const hasValidImage =
+    userProfile.imageUrl && userProfile.imageUrl.startsWith("http");
+
   return (
     <>
       <Header />
@@ -172,7 +176,7 @@ const ProfilePage = () => {
               marginBottom: "20px",
             }}
           >
-            {userProfile.imageUrl ? (
+            {hasValidImage ? (
               <Avatar
                 size={80}
                 src={userProfile.imageUrl}
@@ -344,13 +348,23 @@ const ProfilePage = () => {
                 >
                   Save Changes
                 </Button>
-                <Button onClick={() => setIsEditing(false)}>Cancel</Button>
+                <Button
+                  onClick={() => {
+                    if (backupProfile) setUserProfile(backupProfile); // restore backup
+                    setIsEditing(false);
+                  }}
+                >
+                  Cancel
+                </Button>
               </>
             ) : (
               <>
                 <Button
                   type="primary"
-                  onClick={() => setIsEditing(true)}
+                  onClick={() => {
+                    setBackupProfile({ ...userProfile }); // save current snapshot
+                    setIsEditing(true);
+                  }}
                   style={{ marginRight: "10px" }}
                 >
                   Update Profile
