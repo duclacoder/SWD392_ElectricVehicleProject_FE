@@ -1,0 +1,5 @@
+---
+description: Only ADD/DELETE/UPDATE code when asked, otherwise DO NOT do it
+globs:
+alwaysApply: true
+---

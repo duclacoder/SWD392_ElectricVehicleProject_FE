@@ -6,6 +6,7 @@ import Register from "../../pages/Auth/Register";
 import HomePage from "../../pages/Home";
 import { AdminLayout } from "../layouts/AdminLayout";
 import AuctionPage from "../../pages/Auction";
+import ProfilePage from "../../pages/Profile/Profile";
 
 export const AppRoutes = () => {
   return (
@@ -21,6 +22,7 @@ export const AppRoutes = () => {
           </AdminLayout>
         }
       />
+      <Route path="/profile" element={<ProfilePage />} />
       <Route
         path="/admin/users"
         element={
@@ -30,7 +32,6 @@ export const AppRoutes = () => {
         }
       />
       <Route path="/auction" element={<AuctionPage />} />
-
     </Routes>
   );
 };
