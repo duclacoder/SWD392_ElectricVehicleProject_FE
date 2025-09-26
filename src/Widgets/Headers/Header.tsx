@@ -2,7 +2,6 @@ import { ChartArea, ChevronDown, LogOut, Phone, Settings, User } from "lucide-re
 import type { FC } from "react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import AuthModal from "../../features/AuthModal";
 import { Logout } from "../../features/Logout";
 import logo from "../../shared/assets/logo.png";
 
@@ -150,7 +149,7 @@ export const Header: FC = () => {
                         <User className="w-8 h-8 text-gray-400" />
                       )}
                       <div>
-                        Xin chào, {localStorage.getItem("userName")}!
+                        Xin chào, {localStorage.getItem("email")}!
                       </div>
                     </div>
                   </div>
