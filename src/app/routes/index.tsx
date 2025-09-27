@@ -8,6 +8,10 @@ import HomePage from "../../pages/Home";
 import { AdminLayout } from "../layouts/AdminLayout";
 import AuctionPage from "../../pages/Auction";
 import ProfilePage from "../../pages/Profile/Profile";
+import AddCar from "../../pages/Profile/AddCar";
+import TransactionHistory from "../../pages/Profile/TransactionHistory";
+import ViewBattery from "../../pages/Profile/ViewBattery";
+import ViewCar from "../../pages/Profile/ViewCar";
 
 export const AppRoutes = () => {
   return (
@@ -25,6 +29,10 @@ export const AppRoutes = () => {
         }
       />
       <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/AddCar" element={<AddCar />} />
+      <Route path="/TransactionHistory" element={<TransactionHistory />} />
+      <Route path="/ViewBattery" element={<ViewBattery />} />
+      <Route path="/ViewCar" element={<ViewCar />} />
       <Route
         path="/admin/users"
         element={
