@@ -1,10 +1,9 @@
-import { ChevronDown, LogOut, Phone, Settings, User } from "lucide-react";
+import { ChartArea, ChevronDown, LogOut, Phone, Settings, User } from "lucide-react";
 import type { FC } from "react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import AuthModal from "../../features/AuthModal";
-import logo from "../../shared/assets/logo.png";
 import { Logout } from "../../features/Logout";
+import logo from "../../shared/assets/logo.png";
 
 export const Header: FC = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -12,7 +11,9 @@ export const Header: FC = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const token = localStorage.getItem("token");
-  const [userImageUrl, setUserImageUrl] = useState(localStorage.getItem("imageUrl") || null);
+  const [userImageUrl, setUserImageUrl] = useState(
+    localStorage.getItem("imageUrl") || null
+  );
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -104,7 +105,8 @@ export const Header: FC = () => {
               <span className="text-gray-700 font-medium hover:text-blue-600 transition">
                 Đăng nhập
               </span>
-            </Link>)}
+            </Link>
+          )}
 
           {token && (
             <div>
@@ -124,17 +126,19 @@ export const Header: FC = () => {
                     <User className="w-8 h-8 text-gray-400" />
                   )}
                   <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
-
                 </div>
-                <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown
+                  className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
+                    }`}
+                />
               </button>
 
               {/* Dropdown Menu */}
               {isOpen && (
-                <div className="absolute right-10 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                <div className="absolute right-10 mt-2 w-[270px] bg-white rounded-lg shadow-lg border border-gray-200 py-2 px-2 z-50">
                   {/* User Info Header */}
-                  <div className="px-4 py-3 border-b border-gray-100">
-                    <div className="flex items-center space-x-3">
+                  <div className="px-4 py-3 border-b border-gray-100 ">
+                    <div className="flex items-center space-x-3 ">
                       {userImageUrl ? (
                         <img
                           src={localStorage.getItem("imageUrl") || ""}
@@ -145,38 +149,38 @@ export const Header: FC = () => {
                         <User className="w-8 h-8 text-gray-400" />
                       )}
                       <div>
-                        <p className="text-sm font-semibold text-gray-900">
-                          Xin chào, {localStorage.getItem("userName")}!
-                        </p>
-                        <p className="text-xs text-gray-500">Chào mừng bạn trở lại</p>
+                        Xin chào, {localStorage.getItem("email")}!
                       </div>
                     </div>
                   </div>
 
                   {/* Menu Items */}
                   <div className="py-1">
-                    <button
-                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
-                    >
-                      <User className="w-4 h-4 mr-3 text-gray-400" />
-                      Hồ sơ cá nhân
-                    </button>
+                    {localStorage.getItem("role") === "Admin" && (
+                      <Link to="/admin" className="flex items-center w-full px-4 py-2 text-sm  hover:bg-gray-100 transition-colors duration-150 rounded-lg mb-1">
+                        <ChartArea className="w-4 h-4 mr-3 " />
+                        Admin
+                      </Link>
+                      )}
 
-                    <button
-                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
-                    >
-                      <Settings className="w-4 h-4 mr-3 text-gray-400" />
+                    <Link to="/profile" className="flex items-center w-full px-4 py-2 text-sm  hover:bg-gray-100 transition-colors duration-150 rounded-lg mb-1">
+                      <User className="w-4 h-4 mr-3 " />
+                      Hồ sơ cá nhân
+                    </Link>
+
+                    <Link to="" className="flex items-center w-full px-4 py-2 text-sm  hover:bg-gray-100 transition-colors duration-150 rounded-lg ">
+                      <Settings className="w-4 h-4 mr-3 " />
                       Cài đặt
-                    </button>
+                    </Link>
                   </div>
 
                   {/* Divider */}
-                  <div className="border-t border-gray-100 my-1"></div>
+                  <div className="border-t border-gray-100 mb-1"></div>
 
                   {/* Logout */}
                   <button
                     onClick={Logout}
-                    className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150"
+                    className="flex items-center w-full px-4 py-2 text-sm hover:bg-gray-100 transition-colors duration-150 rounded-lg"
                   >
                     <LogOut className="w-4 h-4 mr-3" />
                     Đăng xuất
@@ -185,8 +189,6 @@ export const Header: FC = () => {
               )}
             </div>
           )}
-
-
         </div>
       </div>
       {isAuthModalOpen && (

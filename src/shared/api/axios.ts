@@ -21,7 +21,7 @@ const refreshAxios = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("jwtToken");
+    const token = localStorage.getItem("token");
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -97,7 +97,10 @@ api.interceptors.response.use(
 );
 
 // Hàm xử lý refresh token
-const handleTokenRefresh = async (originalRequest: any) => {
+const handleTokenRefresh = async (
+  originalRequest: any,
+  error: AxiosError<unknown, any>
+) => {
   if (isRefreshing) {
     return new Promise(function (resolve, reject) {
       failedQueue.push({ resolve, reject });

@@ -6,14 +6,10 @@ export interface User {
   phone: string;
   password: string;
   imageUrl: string;
-  role: Role;
+  roleId: number;
+  roleName: string;
   createdAt: string;
   updatedAt: string;
   status: boolean;
   token: string;
-}
-
-export interface Role {
-  rolesId: number;
-  name: string;
 }

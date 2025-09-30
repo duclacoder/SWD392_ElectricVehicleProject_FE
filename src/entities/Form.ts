@@ -4,9 +4,17 @@ export interface LoginForm {
 }
 
 export interface RegisterForm {
-  userName: string;
+  email: string;
   password: string;
   confirmPassword: string;
-  email: string;
+}
+
+export interface UserFormData {
+  userName: string;
   fullName: string;
+  email: string;
+  phone: string;
+  password?: string;
+  roleId: number;
+  status?: boolean;
 }
