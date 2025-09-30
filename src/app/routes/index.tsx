@@ -12,6 +12,8 @@ import AddCar from "../../pages/Profile/AddCar";
 import TransactionHistory from "../../pages/Profile/TransactionHistory";
 import ViewBattery from "../../pages/Profile/ViewBattery";
 import ViewCar from "../../pages/Profile/ViewCar";
+import ViewCarDetails from "../../pages/Profile/ViewCarDetails.tsx";
+import UpdateCar from "../../pages/Profile/UpdateCar.tsx";
 
 export const AppRoutes = () => {
   return (
@@ -33,6 +35,11 @@ export const AppRoutes = () => {
       <Route path="/TransactionHistory" element={<TransactionHistory />} />
       <Route path="/ViewBattery" element={<ViewBattery />} />
       <Route path="/ViewCar" element={<ViewCar />} />
+      <Route
+        path="/ViewCarDetails/:userId/:vehicleId"
+        element={<ViewCarDetails />}
+      />
+      <Route path="/UpdateCar/:userId/:vehicleId" element={<UpdateCar />} />
       <Route
         path="/admin/users"
         element={
