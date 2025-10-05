@@ -14,6 +14,7 @@ import ViewBattery from "../../pages/Profile/ViewBattery";
 import ViewCar from "../../pages/Profile/ViewCar";
 import ViewCarDetails from "../../pages/Profile/ViewCarDetails.tsx";
 import UpdateCar from "../../pages/Profile/UpdateCar.tsx";
+import AuctionDetail from "../../pages/Auction/UI/AuctionDetailPage.tsx";
 
 export const AppRoutes = () => {
   return (
@@ -49,6 +50,7 @@ export const AppRoutes = () => {
         }
       />
       <Route path="/auction" element={<AuctionPage />} />
+      <Route path="/auction/:id" element={<AuctionDetail />} />
     </Routes>
   );
 };
