@@ -48,9 +48,7 @@ const AuctionPage: React.FC = () => {
         try {
             setLoading(true);
             setError(null);
-            console.log("🔄 Bắt đầu fetch auctions...");
 
-            // ✅ API Auctions: /api/Auctions (có /api/)
             const response = await api.get("/Auctions", {
                 params: {
                     page: 1,
@@ -58,13 +56,10 @@ const AuctionPage: React.FC = () => {
                 }
             });
 
-            console.log("📊 API Response:", response.data);
 
             if (response.data && response.data.isSuccess && response.data.result) {
                 const pagedResult: PaginatedResult<AuctionCustom> = response.data.result;
                 const fetchedAuctions: AuctionCustom[] = pagedResult.items;
-
-                console.log(`✅ Nhận được ${fetchedAuctions.length} auctions`);
 
                 if (fetchedAuctions.length === 0) {
                     setCombinedData([]);
@@ -77,7 +72,7 @@ const AuctionPage: React.FC = () => {
                 throw new Error(response.data?.message || "Failed to fetch auctions");
             }
         } catch (err: any) {
-            console.error("❌ Lỗi fetch auctions:", err);
+            console.error("Lỗi fetch auctions:", err);
             setError(err.message || "Không thể tải danh sách đấu giá");
             setLoading(false);
         }
@@ -85,19 +80,13 @@ const AuctionPage: React.FC = () => {
 
     const fetchVehiclesForAuctions = async (fetchedAuctions: AuctionCustom[]) => {
         try {
-            console.log("🔄 Bắt đầu fetch vehicles...");
-
             const vehiclePromises = fetchedAuctions.map(async (auction) => {
                 try {
-                    console.log(`🔄 Fetching vehicle ${auction.vehicleId}...`);
-
                     // ✅ API Vehicle: /vehicle/{id} (KHÔNG có /api/)
                     const vehicleResponse = await fetchVehicleDirectly(auction.vehicleId);
 
                     if (vehicleResponse) {
                         const vehicle: AuctionVehicleDetails = vehicleResponse;
-
-                        console.log(`✅ Nhận vehicle ${vehicle.vehiclesId}: ${vehicle.vehicleName}`);
 
                         // Tính currentPrice từ bids nếu có
                         const currentPrice = auction.bids && auction.bids.length > 0
@@ -115,11 +104,11 @@ const AuctionPage: React.FC = () => {
                             vehicle
                         } as CombinedData;
                     } else {
-                        console.warn(`⚠️ Không nhận được vehicle data cho vehicleId: ${auction.vehicleId}`);
+                        console.warn(`Không nhận được vehicle data cho vehicleId: ${auction.vehicleId}`);
                         return null;
                     }
                 } catch (vehicleError) {
-                    console.error(`❌ Lỗi fetch vehicle ${auction.vehicleId}:`, vehicleError);
+                    console.error(`Lỗi fetch vehicle ${auction.vehicleId}:`, vehicleError);
                     return null;
                 }
             });
@@ -131,19 +120,17 @@ const AuctionPage: React.FC = () => {
             setCombinedData(validCombined);
 
         } catch (err: any) {
-            console.error("❌ Lỗi fetch vehicles:", err);
+            console.error("Lỗi fetch vehicles:", err);
             setError(err.message || "Không thể tải thông tin xe");
         } finally {
             setLoading(false);
         }
     };
 
-    // ✅ HÀM MỚI: Fetch vehicle trực tiếp đến /vehicle/{id}
     const fetchVehicleDirectly = async (vehicleId: number): Promise<AuctionVehicleDetails | null> => {
         try {
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-            // ✅ Sử dụng fetch trực tiếp đến endpoint /vehicle/{id} (không có /api/)
             const response = await fetch(`${API_BASE_URL}vehicle/${vehicleId}`, {
                 method: 'GET',
                 headers: {
@@ -166,34 +153,7 @@ const AuctionPage: React.FC = () => {
                 return null;
             }
         } catch (error) {
-            console.error(`❌ Lỗi fetch vehicle ${vehicleId}:`, error);
-            return null;
-        }
-    };
-
-    // ✅ HOẶC: Sử dụng axios instance mới không có baseURL cho vehicle
-    const fetchVehicleWithAxios = async (vehicleId: number): Promise<AuctionVehicleDetails | null> => {
-        try {
-            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
-            // Tạo axios instance mới không có baseURL
-            const response = await axios.get(`/vehicle/${vehicleId}`, {
-                baseURL: API_BASE_URL, // Ghi đè baseURL
-                withCredentials: true,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-
-            if (response.data && response.data.isSuccess && response.data.result) {
-                return response.data.result;
-            } else {
-                console.warn(`Vehicle API returned no data for ID: ${vehicleId}`);
-                return null;
-            }
-        } catch (error) {
-            console.error(`❌ Lỗi fetch vehicle ${vehicleId}:`, error);
+            console.error(`Lỗi fetch vehicle ${vehicleId}:`, error);
             return null;
         }
     };
@@ -242,7 +202,6 @@ const AuctionPage: React.FC = () => {
         }
     });
 
-    // Stats từ real data
     const activeAuctionsCount = combinedData.filter(item =>
         item.auction.status.toLowerCase() === "active"
     ).length;
@@ -251,7 +210,6 @@ const AuctionPage: React.FC = () => {
         sum + (item.auction.bids?.length || 0), 0
     );
 
-    // Dynamic filters từ data thực tế
     const availableBrands = Array.from(new Set(combinedData.map(item => item.vehicle.brand)))
         .filter(brand => brand)
         .sort();

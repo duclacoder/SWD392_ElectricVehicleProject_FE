@@ -1,145 +1,3 @@
-// import React from "react";
-// import type { Auction } from "../../../entities/Auction.ts";
-// import type { Vehicle } from "../../../entities/Vehicle.ts";
-// import { Clock, Gauge, Calendar } from "lucide-react";
-// import { Link } from "react-router-dom";
-
-// type AuctionCardProps = {
-//     auctions: {
-//         auction: Auction;
-//         vehicle: Vehicle;
-//     }[];
-// };
-
-// export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions }) => {
-//     const formatPrice = (price: number) =>
-//         new Intl.NumberFormat("vi-VN").format(price);
-
-//     const getStatusBadge = (status: string) => {
-//         switch (status) {
-//             case "active":
-//                 return "bg-green-500 text-white";
-//             case "pending":
-//                 return "bg-blue-500 text-white";
-//             case "ended":
-//                 return "bg-gray-400 text-white";
-//             default:
-//                 return "bg-gray-300 text-black";
-//         }
-//     };
-
-//     const getStatusText = (status: string) => {
-//         switch (status) {
-//             case "active":
-//                 return "Đang diễn ra";
-//             case "pending":
-//                 return "Sắp diễn ra";
-//             case "ended":
-//                 return "Đã kết thúc";
-//             default:
-//                 return "Không xác định";
-//         }
-//     };
-
-//     const calculateTimeLeft = (endTime: string) => {
-//         const timeLeft = new Date(endTime).getTime() - Date.now();
-//         const hours = Math.max(0, Math.floor(timeLeft / (1000 * 60 * 60)));
-//         const minutes = Math.max(0, Math.floor((timeLeft / (1000 * 60)) % 60));
-//         return { hours, minutes };
-//     };
-
-//     if (!auctions || auctions.length === 0) {
-//         return (
-//             <div className="text-center py-8 text-gray-500">
-//                 Không có dữ liệu đấu giá
-//             </div>
-//         );
-//     }
-
-//     return (
-//         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-//             {auctions.map(({ auction, vehicle }) => {
-//                 const { hours, minutes } = calculateTimeLeft(auction.end_time);
-
-//                 return (
-//                     <article
-//                         key={auction.id}
-//                         className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all overflow-hidden group"
-//                     >
-//                         {/* Vehicle image */}
-//                         <div className="relative">
-//                             <img
-//                                 src={vehicle.images?.[0] || "/images/default-car.jpg"}
-//                                 alt={vehicle.title}
-//                                 className="h-56 w-full object-cover transform group-hover:scale-105 transition duration-500"
-//                                 loading="lazy"
-//                             />
-//                             <span
-//                                 className={`absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full shadow-md ${getStatusBadge(auction.status)}`}
-//                                 aria-label={`Trạng thái đấu giá: ${auction.status}`}
-//                             >
-//                                 {getStatusText(auction.status)}
-//                             </span>
-//                         </div>
-
-//                         {/* Content */}
-//                         <div className="p-5 space-y-3">
-//                             <h3
-//                                 className="text-xl font-bold text-gray-900 line-clamp-1"
-//                                 title={vehicle.title}
-//                             >
-//                                 {vehicle.title}
-//                             </h3>
-
-//                             <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-//                                 <span className="flex items-center gap-1" aria-label="Năm sản xuất">
-//                                     <Calendar className="w-4 h-4" /> {vehicle.year}
-//                                 </span>
-//                                 <span className="flex items-center gap-1" aria-label="Số km đã đi">
-//                                     <Gauge className="w-4 h-4" /> {vehicle.km.toLocaleString()} km
-//                                 </span>
-//                             </div>
-
-//                             <div className="flex justify-between items-center bg-gray-50 rounded-xl px-4 py-2">
-//                                 <span className="text-emerald-600 font-bold text-lg" aria-label="Giá hiện tại">
-//                                     {formatPrice(auction.current_price || auction.start_price)} VNĐ
-//                                 </span>
-//                                 {auction.status === "active" && (
-//                                     <span
-//                                         className="flex items-center gap-1 text-red-500 text-sm font-medium"
-//                                         aria-live="polite"
-//                                         aria-atomic="true"
-//                                     >
-//                                         <Clock className="w-4 h-4" />
-//                                         Còn lại: {hours}h {minutes}m
-//                                     </span>
-//                                 )}
-//                             </div>
-
-//                             <div className="flex gap-3 pt-2">
-//                                 <button
-//                                     className="flex-1 bg-blue-600 text-white font-semibold py-2 rounded-xl hover:bg-blue-700 transition"
-//                                     aria-label="Tham gia đấu giá"
-//                                 >
-//                                     Tham gia đấu giá
-//                                 </button>
-//                                 <Link
-//                                     to={`/auction/${auction.id}`}
-//                                     className="flex-1 border border-blue-600 text-blue-600 font-semibold py-2 rounded-xl text-center hover:bg-blue-50 transition"
-//                                     aria-label="Xem chi tiết"
-//                                 >
-//                                     Xem chi tiết
-//                                 </Link>
-//                             </div>
-
-//                         </div>
-//                     </article>
-//                 );
-//             })}
-//         </div>
-//     );
-// };
-
 import React from "react";
 import type { Auction } from "../../../entities/Auction.ts";
 import type { Vehicle } from "../../../entities/Vehicle.ts";
@@ -203,18 +61,18 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions }) => {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {auctions.map(({ auction, vehicle }) => {
-                const { hours, minutes } = calculateTimeLeft(auction.endTime);
-                const currentPrice = auction.currentPrice ?? auction.startPrice ?? 0;
+                const { hours, minutes } = calculateTimeLeft(auction.end_time);
+                const currentPrice = auction.start_price ?? 0;
 
                 return (
                     <article
-                        key={auction.auctionId}
+                        key={auction.id}
                         className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all overflow-hidden group"
                     >
                         {/* Vehicle image */}
                         <div className="relative">
                             <img
-                                src={vehicle.vehicleImages?.[0] || "/images/default-car.jpg"}
+                                src={vehicle.images?.[0] || "/images/default-car.jpg"}
                                 alt={vehicle.vehicleName}
                                 className="h-56 w-full object-cover transform group-hover:scale-105 transition duration-500"
                                 loading="lazy"
@@ -266,7 +124,7 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions }) => {
                                     Tham gia đấu giá
                                 </button>
                                 <Link
-                                    to={`/auction/${auction.auctionId}`}
+                                    to={`/auction/${auction.id}`}
                                     className="flex-1 border border-blue-600 text-blue-600 font-semibold py-2 rounded-xl text-center hover:bg-blue-50 transition"
                                 >
                                     Xem chi tiết
