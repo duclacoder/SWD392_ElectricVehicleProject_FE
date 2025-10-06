@@ -66,7 +66,7 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions }) => {
 
                 return (
                     <article
-                        key={auction.id}
+                        key={auction.auctionId}
                         className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all overflow-hidden group"
                     >
                         {/* Vehicle image */}
@@ -124,7 +124,7 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions }) => {
                                     Tham gia đấu giá
                                 </button>
                                 <Link
-                                    to={`/auction/${auction.id}`}
+                                    to={`/auction/${auction.auctionId}`}
                                     className="flex-1 border border-blue-600 text-blue-600 font-semibold py-2 rounded-xl text-center hover:bg-blue-50 transition"
                                 >
                                     Xem chi tiết
