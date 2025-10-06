@@ -220,13 +220,6 @@ const AuctionDetail: React.FC = () => {
             <Header />
             <main className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30">
                 <div className="max-w-7xl mx-auto px-4 py-8">
-                    <div className={`mb-4 p-3 rounded-lg text-sm font-medium ${connectionStatus === "Connected"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
-                        }`}>
-                        Trạng thái kết nối: {connectionStatus}
-                    </div>
-
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         {/* Ảnh xe */}
                         <div>
