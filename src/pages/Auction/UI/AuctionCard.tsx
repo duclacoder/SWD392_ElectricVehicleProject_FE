@@ -2,6 +2,7 @@ import React from "react";
 import type { Auction } from "../../../entities/Auction.ts";
 import type { Vehicle } from "../../../entities/Vehicle.ts";
 import { Clock, Gauge, Calendar } from "lucide-react";
+import { Link } from "react-router-dom";
 
 type AuctionCardProps = {
     auctions: {
@@ -11,11 +12,11 @@ type AuctionCardProps = {
 };
 
 export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions }) => {
-    const formatPrice = (price: number) =>
-        new Intl.NumberFormat("vi-VN").format(price);
+    const formatPrice = (price?: number) =>
+        price ? new Intl.NumberFormat("vi-VN").format(price) : "0";
 
     const getStatusBadge = (status: string) => {
-        switch (status) {
+        switch (status.toLowerCase()) {
             case "active":
                 return "bg-green-500 text-white";
             case "pending":
@@ -28,7 +29,7 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions }) => {
     };
 
     const getStatusText = (status: string) => {
-        switch (status) {
+        switch (status.toLowerCase()) {
             case "active":
                 return "Đang diễn ra";
             case "pending":
@@ -41,9 +42,11 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions }) => {
     };
 
     const calculateTimeLeft = (endTime: string) => {
-        const timeLeft = new Date(endTime).getTime() - Date.now();
-        const hours = Math.max(0, Math.floor(timeLeft / (1000 * 60 * 60)));
-        const minutes = Math.max(0, Math.floor((timeLeft / (1000 * 60)) % 60));
+        const end = new Date(endTime).getTime();
+        const now = Date.now();
+        const timeLeft = Math.max(0, end - now);
+        const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+        const minutes = Math.floor((timeLeft / (1000 * 60)) % 60);
         return { hours, minutes };
     };
 
@@ -59,6 +62,7 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {auctions.map(({ auction, vehicle }) => {
                 const { hours, minutes } = calculateTimeLeft(auction.end_time);
+                const currentPrice = auction.start_price ?? 0;
 
                 return (
                     <article
@@ -69,13 +73,12 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions }) => {
                         <div className="relative">
                             <img
                                 src={vehicle.images?.[0] || "/images/default-car.jpg"}
-                                alt={vehicle.title}
+                                alt={vehicle.vehicleName}
                                 className="h-56 w-full object-cover transform group-hover:scale-105 transition duration-500"
                                 loading="lazy"
                             />
                             <span
                                 className={`absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full shadow-md ${getStatusBadge(auction.status)}`}
-                                aria-label={`Trạng thái đấu giá: ${auction.status}`}
                             >
                                 {getStatusText(auction.status)}
                             </span>
@@ -85,30 +88,29 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions }) => {
                         <div className="p-5 space-y-3">
                             <h3
                                 className="text-xl font-bold text-gray-900 line-clamp-1"
-                                title={vehicle.title}
+                                title={vehicle.vehicleName}
                             >
-                                {vehicle.title}
+                                {vehicle.vehicleName}
                             </h3>
 
                             <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-                                <span className="flex items-center gap-1" aria-label="Năm sản xuất">
+                                <span className="flex items-center gap-1">
                                     <Calendar className="w-4 h-4" /> {vehicle.year}
                                 </span>
-                                <span className="flex items-center gap-1" aria-label="Số km đã đi">
-                                    <Gauge className="w-4 h-4" /> {vehicle.km.toLocaleString()} km
-                                </span>
+                                {vehicle.km !== undefined && (
+                                    <span className="flex items-center gap-1">
+                                        <Gauge className="w-4 h-4" /> {vehicle.km.toLocaleString()} km
+                                    </span>
+                                )}
                             </div>
 
                             <div className="flex justify-between items-center bg-gray-50 rounded-xl px-4 py-2">
-                                <span className="text-emerald-600 font-bold text-lg" aria-label="Giá hiện tại">
-                                    {formatPrice(auction.current_price || auction.start_price)} VNĐ
+                                <span className="text-emerald-600 font-bold text-lg">
+                                    {formatPrice(currentPrice)} VNĐ
                                 </span>
-                                {auction.status === "active" && (
-                                    <span
-                                        className="flex items-center gap-1 text-red-500 text-sm font-medium"
-                                        aria-live="polite"
-                                        aria-atomic="true"
-                                    >
+
+                                {auction.status.toLowerCase() === "active" && (
+                                    <span className="flex items-center gap-1 text-red-500 text-sm font-medium">
                                         <Clock className="w-4 h-4" />
                                         Còn lại: {hours}h {minutes}m
                                     </span>
@@ -118,16 +120,15 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions }) => {
                             <div className="flex gap-3 pt-2">
                                 <button
                                     className="flex-1 bg-blue-600 text-white font-semibold py-2 rounded-xl hover:bg-blue-700 transition"
-                                    aria-label="Tham gia đấu giá"
                                 >
                                     Tham gia đấu giá
                                 </button>
-                                <button
-                                    className="flex-1 border border-blue-600 text-blue-600 font-semibold py-2 rounded-xl hover:bg-blue-50 transition"
-                                    aria-label="Xem chi tiết"
+                                <Link
+                                    to={`/auction/${auction.id}`}
+                                    className="flex-1 border border-blue-600 text-blue-600 font-semibold py-2 rounded-xl text-center hover:bg-blue-50 transition"
                                 >
                                     Xem chi tiết
-                                </button>
+                                </Link>
                             </div>
                         </div>
                     </article>
