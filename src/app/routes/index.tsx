@@ -14,6 +14,8 @@ import ViewBattery from "../../pages/Profile/ViewBattery";
 import ViewCar from "../../pages/Profile/ViewCar";
 import ViewCarDetails from "../../pages/Profile/ViewCarDetails.tsx";
 import UpdateCar from "../../pages/Profile/UpdateCar.tsx";
+import InspectionFee from "../../pages/Profile/InspectionFee.tsx";
+import ViewInspectionFee from "../../pages/Profile/ViewInspectionFee.tsx";
 
 export const AppRoutes = () => {
   return (
@@ -38,6 +40,12 @@ export const AppRoutes = () => {
       <Route
         path="/ViewCarDetails/:userId/:vehicleId"
         element={<ViewCarDetails />}
+      />
+
+      <Route path="/InspectionFee" element={<InspectionFee />} />
+      <Route
+        path="/ViewInspectionFee/:inspectionFeeId"
+        element={<ViewInspectionFee />}
       />
       <Route path="/UpdateCar/:userId/:vehicleId" element={<UpdateCar />} />
       <Route
