@@ -7,27 +7,82 @@ import type {
     GetAllUserPostRequestDTO
 } from "../../entities/UserPost.ts";
 
+// export const getAllUserPosts = async (
+//     params: GetAllUserPostRequestDTO
+// ): Promise<PaginatedResult<UserPostCustom> | null> => {
+//     try {
+//         const response = await api.get("/UserPost", { params });
+//         const data: ResponseDTO<PaginatedResult<UserPostCustom>> = response.data;
+
+//         if (data.isSuccess) {
+//             return data.result;
+//         } else {
+//             message.error(data.message || "Failed to fetch user posts");
+//             return null;
+//         }
+//     } catch (error: any) {
+//         message.error(
+//             error?.response?.data?.message || "An unexpected error occurred while fetching user posts."
+//         );
+//         console.error(error);
+//         return null;
+//     }
+// };
+
+// export const getAllUserPosts = async (
+//     params: { page: number; pageSize: number }
+// ): Promise<PaginatedResult<UserPostCustom> | null> => {
+//     try {
+//         const response = await api.get("/UserPost", {
+//             params: {
+//                 Page: params.page,
+//                 PageSize: params.pageSize
+//             }
+//         });
+//         const data: ResponseDTO<PaginatedResult<UserPostCustom>> = response.data;
+
+//         if (data.isSuccess) return data.result;
+//         else {
+//             message.error(data.message || "Failed to fetch user posts");
+//             return null;
+//         }
+//     } catch (error: any) {
+//         message.error("An unexpected error occurred while fetching user posts.");
+//         console.error(error);
+//         return null;
+//     }
+// };
+
+
 export const getAllUserPosts = async (
-    params: GetAllUserPostRequestDTO
+    params: { page: number; pageSize: number; userName?: string }
 ): Promise<PaginatedResult<UserPostCustom> | null> => {
     try {
-        const response = await api.get("/UserPost", { params });
+        const response = await api.get("/UserPost", {
+            params: {
+                Page: params.page,
+                PageSize: params.pageSize,
+                UserName: params.userName || undefined
+            },
+        });
+
         const data: ResponseDTO<PaginatedResult<UserPostCustom>> = response.data;
 
-        if (data.isSuccess) {
-            return data.result;
-        } else {
+        if (data.isSuccess) return data.result;
+        else {
             message.error(data.message || "Failed to fetch user posts");
             return null;
         }
     } catch (error: any) {
         message.error(
-            error?.response?.data?.message || "An unexpected error occurred while fetching user posts."
+            error?.response?.data?.message ||
+            "An unexpected error occurred while fetching user posts."
         );
         console.error(error);
         return null;
     }
 };
+
 
 export const getUserPostById = async (
     id: number

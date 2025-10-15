@@ -19,6 +19,7 @@ import ViewInspectionFee from "../../pages/Profile/ViewInspectionFee.tsx";
 import AuctionDetail from "../../pages/Auction/UI/AuctionDetailPage.tsx";
 import PostVehicleSale from "../../pages/Post/index.tsx";
 import PostList from "../../pages/Post/PostList.tsx";
+import PostDetail from "../../pages/Post/DetailPost.tsx";
 
 export const AppRoutes = () => {
   return (
@@ -63,7 +64,7 @@ export const AppRoutes = () => {
       <Route path="/auction/:id" element={<AuctionDetail />} />
       <Route path="/post" element={<PostVehicleSale />} />
       <Route path="/posts" element={< PostList />} />
-
+      <Route path="/userpost/:id" element={<PostDetail />} />
     </Routes>
   );
 };
