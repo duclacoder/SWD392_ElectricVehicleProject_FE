@@ -41,6 +41,7 @@ export const LoginGoogle = async (loginData: GoogleLoginForm): Promise<boolean> 
         const token = data.result.token;
         const userData = jwtDecode<JwtTokenDecode>(token);
         localStorage.setItem("token", token);
+        localStorage.setItem("userId", userData.sub);
         localStorage.setItem("role", userData.role);
         localStorage.setItem("email", userData.email);
         localStorage.setItem("imageUrl", userData.imageUrl);
