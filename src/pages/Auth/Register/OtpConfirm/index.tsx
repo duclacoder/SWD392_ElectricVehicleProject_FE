@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import AuthLayout from "../../../../Widgets/Layouts/Auth";
 import { ReloadOutlined } from "@ant-design/icons";
 import type { RegisterForm } from "../../../../entities/Form";
-import { confirm_OTP, resend_OTP } from "../../../../features/Register";
+import { confirm_OTP_Register, resend_OTP } from "../../../../features/Register";
 import { message } from "antd";
 
 const ConfirmOTPPage: React.FC = () => {
@@ -92,10 +92,11 @@ const ConfirmOTPPage: React.FC = () => {
     setError("");
 
     try {
-      const result :boolean = await confirm_OTP(registerData, otpString)
+      const result :boolean = await confirm_OTP_Register(registerData, otpString)
       if (result){
         navigate("/login");
-        sessionStorage.removeItem("registerData");
+        sessionStorage.clear();
+        message.success("Tài khoản của bạn đã được tạo thành công! Vui lòng đăng nhập.");
       }
       else {
         setOtp(["", "", "", "", "", ""]);
