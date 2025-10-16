@@ -20,6 +20,7 @@ import AuctionDetail from "../../pages/Auction/UI/AuctionDetailPage.tsx";
 import PostVehicleSale from "../../pages/Post/index.tsx";
 import PostList from "../../pages/Post/PostList.tsx";
 import PostDetail from "../../pages/Post/DetailPost.tsx";
+import GoogleInfo from "../../pages/Auth/Register/GoogleInfo";
 
 export const AppRoutes = () => {
   return (
@@ -28,6 +29,7 @@ export const AppRoutes = () => {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<Register />} />
       <Route path="/otp-confirm" element={<OtpConfirm />} />
+      <Route path="/google-info" element={<GoogleInfo />} />
       <Route
         path="/admin"
         element={
