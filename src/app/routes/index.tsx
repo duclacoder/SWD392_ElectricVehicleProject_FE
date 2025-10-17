@@ -14,10 +14,13 @@ import ViewBattery from "../../pages/Profile/ViewBattery";
 import ViewCar from "../../pages/Profile/ViewCar";
 import ViewCarDetails from "../../pages/Profile/ViewCarDetails.tsx";
 import UpdateCar from "../../pages/Profile/UpdateCar.tsx";
+import InspectionFee from "../../pages/Profile/InspectionFee.tsx";
+import ViewInspectionFee from "../../pages/Profile/ViewInspectionFee.tsx";
 import AuctionDetail from "../../pages/Auction/UI/AuctionDetailPage.tsx";
 import PostVehicleSale from "../../pages/Post/index.tsx";
 import PostList from "../../pages/Post/PostList.tsx";
 import PostDetail from "../../pages/Post/DetailPost.tsx";
+import GoogleInfo from "../../pages/Auth/Register/GoogleInfo";
 
 export const AppRoutes = () => {
   return (
@@ -26,6 +29,7 @@ export const AppRoutes = () => {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<Register />} />
       <Route path="/otp-confirm" element={<OtpConfirm />} />
+      <Route path="/google-info" element={<GoogleInfo />} />
       <Route
         path="/admin"
         element={
@@ -42,6 +46,12 @@ export const AppRoutes = () => {
       <Route
         path="/ViewCarDetails/:userId/:vehicleId"
         element={<ViewCarDetails />}
+      />
+
+      <Route path="/InspectionFee" element={<InspectionFee />} />
+      <Route
+        path="/ViewInspectionFee/:inspectionFeeId"
+        element={<ViewInspectionFee />}
       />
       <Route path="/UpdateCar/:userId/:vehicleId" element={<UpdateCar />} />
       <Route

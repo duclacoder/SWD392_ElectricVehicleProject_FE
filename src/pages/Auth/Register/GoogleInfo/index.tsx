@@ -1,30 +1,46 @@
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import type { RegisterForm } from "../../../entities/Form";
-import AuthLayout from "../../../Widgets/Layouts/Auth";
-import { register } from "../../../features/Register";
+import AuthLayout from "../../../../Widgets/Layouts/Auth";
+import type { GoogleLoginForm, RegisterForm } from "../../../../entities/Form";
+import { LoginGoogle } from "../../../../features/Login";
+import type { JwtTokenDecode } from "../../../../entities/Decode";
+import { jwtDecode } from "jwt-decode";
+import { message } from "antd";
+import { resend_OTP } from "../../../../features/Register";
 
-const RegisterPage = () => {
-  const [email, setEmail] = useState("");
+
+const RegisterGooglePage = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
-  const handleRegister = async () => {
-    if (sessionStorage.getItem("email") == null)
-      sessionStorage.setItem("email", email);
+  const handleRegisterGoogle = async () => {
+    if (password !== confirmPassword) {
+      message.error("Password and Confirm Password do not match");
+      return;
+    }
+    const tokenId = sessionStorage.getItem("tokenId") || "";
+    const googleData = jwtDecode<JwtTokenDecode>(tokenId);
 
-    const registerData: RegisterForm = {
-      email: sessionStorage.getItem("email") || "",
+    const googleLoginData: GoogleLoginForm = {
+      tokenId: tokenId,
       password: password,
       confirmPassword: confirmPassword,
     };
-    sessionStorage.setItem("registerData", JSON.stringify(registerData));        
-    if(await register(registerData))
+    const result : boolean = await LoginGoogle(googleLoginData);
+    if (!result) {
+      const registerData: RegisterForm = {
+        email: googleData.email || "",
+        password: password,
+        confirmPassword: confirmPassword,
+      };
+      resend_OTP(registerData.email);
+      sessionStorage.setItem("registerData", JSON.stringify(registerData));
       navigate("/otp-confirm");
+    }
   };
 
   return (
@@ -34,26 +50,12 @@ const RegisterPage = () => {
           Wellcome!
         </h1>
         <p className="text-gray-600 text-sm">
-          Please enter register details below
+          Please enter register details to complete your account
         </p>
       </div>
 
       {/* Login Form */}
       <div className="space-y-6">
-        <div>
-          <div className="block text-gray-700 text-sm font-medium mb-2">
-            Email
-          </div>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your mail"
-            className="w-full px-3 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent text-sm"
-
-          />
-        </div>
-
         <div>
           <div className="block text-gray-700 text-sm font-medium mb-2">
             Password
@@ -99,10 +101,10 @@ const RegisterPage = () => {
         </div>
 
         <button
-          onClick={handleRegister}
+          onClick={handleRegisterGoogle}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
-              handleRegister();
+              handleRegisterGoogle();
             }
           }}
           className="w-full bg-sky-700 px-4 rounded-lg hover:bg-sky-800 transition-colors duration-200 font-medium"
@@ -114,4 +116,4 @@ const RegisterPage = () => {
   );
 };
 
-export default RegisterPage;
+export default RegisterGooglePage;

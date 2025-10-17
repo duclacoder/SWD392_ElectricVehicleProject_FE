@@ -20,9 +20,9 @@ export const register =  async (registerData: RegisterForm) => {
   }
 }
 
-export const confirm_OTP =  async (registerData: RegisterForm, OTPcode : string) : Promise<boolean> => {
+export const confirm_OTP_Register =  async (registerData: RegisterForm, OTPcode : string) : Promise<boolean> => {
   try {
-    const response  = await api.post(`Auth/Confirm_OTP?otpCode=${OTPcode}`, registerData);
+    const response  = await api.post(`Auth/Confirm_OTP_Register?otpCode=${OTPcode}`, registerData);
     const data : ResponseDTO<string> = response.data;
     console.log(data);
     if (data.isSuccess) {
