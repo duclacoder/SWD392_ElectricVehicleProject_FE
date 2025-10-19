@@ -46,7 +46,6 @@ const AuctionDetail: React.FC = () => {
 
             conn.on("BidRejected", (message) => alert(`Đặt giá thất bại: ${message}`));
         } catch (err) {
-            console.error("❌ Lỗi kết nối SignalR:", err);
             setConnectionStatus("Error");
         }
     };
