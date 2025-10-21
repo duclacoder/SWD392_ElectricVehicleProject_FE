@@ -1,14 +1,13 @@
+import { message } from "antd";
+import { jwtDecode } from "jwt-decode";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthLayout from "../../../../Widgets/Layouts/Auth";
+import type { JwtTokenDecode } from "../../../../entities/Decode";
 import type { GoogleLoginForm, RegisterForm } from "../../../../entities/Form";
 import { LoginGoogle } from "../../../../features/Login";
-import type { JwtTokenDecode } from "../../../../entities/Decode";
-import { jwtDecode } from "jwt-decode";
-import { message } from "antd";
 import { resend_OTP } from "../../../../features/Register";
-
 
 const RegisterGooglePage = () => {
   const [password, setPassword] = useState("");
@@ -30,7 +29,7 @@ const RegisterGooglePage = () => {
       password: password,
       confirmPassword: confirmPassword,
     };
-    const result : boolean = await LoginGoogle(googleLoginData);
+    const result: boolean = await LoginGoogle(googleLoginData);
     if (!result) {
       const registerData: RegisterForm = {
         email: googleData.email || "",
@@ -46,9 +45,7 @@ const RegisterGooglePage = () => {
   return (
     <AuthLayout>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">
-          Wellcome!
-        </h1>
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">Wellcome!</h1>
         <p className="text-gray-600 text-sm">
           Please enter register details to complete your account
         </p>

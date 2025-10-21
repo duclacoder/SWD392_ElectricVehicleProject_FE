@@ -1,4 +1,11 @@
-import { ChartArea, ChevronDown, LogOut, Phone, Settings, User } from "lucide-react";
+import {
+  ChartArea,
+  ChevronDown,
+  LogOut,
+  Phone,
+  Settings,
+  User,
+} from "lucide-react";
 import type { FC } from "react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
@@ -59,8 +66,9 @@ export const Header: FC = () => {
                 {item.name}
                 {item.hasDropdown && (
                   <ChevronDown
-                    className={`w-4 h-4 ml-1 transition-transform ${dropdownOpen ? "rotate-180" : ""
-                      }`}
+                    className={`w-4 h-4 ml-1 transition-transform ${
+                      dropdownOpen ? "rotate-180" : ""
+                    }`}
                   />
                 )}
               </a>
@@ -128,8 +136,9 @@ export const Header: FC = () => {
                   <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
                 </div>
                 <ChevronDown
-                  className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
-                    }`}
+                  className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
+                    isOpen ? "rotate-180" : ""
+                  }`}
                 />
               </button>
 
@@ -148,27 +157,34 @@ export const Header: FC = () => {
                       ) : (
                         <User className="w-8 h-8 text-gray-400" />
                       )}
-                      <div>
-                        Xin chào, {localStorage.getItem("email")}!
-                      </div>
+                      <div>Xin chào, {localStorage.getItem("email")}!</div>
                     </div>
                   </div>
 
                   {/* Menu Items */}
                   <div className="py-1">
                     {localStorage.getItem("role") === "Admin" && (
-                      <Link to="/admin" className="flex items-center w-full px-4 py-2 text-sm  hover:bg-gray-100 transition-colors duration-150 rounded-lg mb-1">
+                      <Link
+                        to="/admin"
+                        className="flex items-center w-full px-4 py-2 text-sm  hover:bg-gray-100 transition-colors duration-150 rounded-lg mb-1"
+                      >
                         <ChartArea className="w-4 h-4 mr-3 " />
                         Admin
                       </Link>
-                      )}
+                    )}
 
-                    <Link to="/profile" className="flex items-center w-full px-4 py-2 text-sm  hover:bg-gray-100 transition-colors duration-150 rounded-lg mb-1">
+                    <Link
+                      to="/profile"
+                      className="flex items-center w-full px-4 py-2 text-sm  hover:bg-gray-100 transition-colors duration-150 rounded-lg mb-1"
+                    >
                       <User className="w-4 h-4 mr-3 " />
                       Hồ sơ cá nhân
                     </Link>
 
-                    <Link to="" className="flex items-center w-full px-4 py-2 text-sm  hover:bg-gray-100 transition-colors duration-150 rounded-lg ">
+                    <Link
+                      to=""
+                      className="flex items-center w-full px-4 py-2 text-sm  hover:bg-gray-100 transition-colors duration-150 rounded-lg "
+                    >
                       <Settings className="w-4 h-4 mr-3 " />
                       Cài đặt
                     </Link>
