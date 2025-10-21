@@ -1,18 +1,18 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { Typography, Card, Row, Col, Tag, Image, Spin, message } from "antd";
 import {
+  CarOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
   CloseCircleOutlined,
-  CarOutlined,
   DollarOutlined,
-  ThunderboltOutlined,
-  RocketOutlined,
   FieldTimeOutlined,
+  RocketOutlined,
+  ThunderboltOutlined,
 } from "@ant-design/icons";
-import { Header } from "../../Widgets/Headers/Header";
+import { Card, Col, Image, Row, Spin, Tag, Typography, message } from "antd";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { Footer } from "../../Widgets/Footers/Footer";
+import { Header } from "../../Widgets/Headers/Header";
 import UserSidebar from "../../Widgets/UserSidebar/UserSidebar";
 
 const { Title, Paragraph } = Typography;

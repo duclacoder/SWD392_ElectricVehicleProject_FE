@@ -13,6 +13,7 @@ export const Login = async (LoginForm: LoginForm): Promise<boolean> => {
       const token = data.result;
       const userData = jwtDecode<JwtTokenDecode>(token);
       localStorage.setItem("token", token);
+      localStorage.setItem("userId", userData.sub);
       localStorage.setItem("role", userData.role);
       localStorage.setItem("email", userData.email);
       localStorage.setItem("imageUrl", userData.imageUrl);
@@ -27,12 +28,17 @@ export const Login = async (LoginForm: LoginForm): Promise<boolean> => {
   }
 };
 
-export const LoginGoogle = async (loginData: GoogleLoginForm): Promise<boolean> => {
+export const LoginGoogle = async (
+  loginData: GoogleLoginForm
+): Promise<boolean> => {
   try {
-    const response = await api.post(`Auth/Login-Google?tokenId=${loginData.tokenId}`, {
-      password: loginData.password,
-      confirmPassword: loginData.confirmPassword
-    });
+    const response = await api.post(
+      `Auth/Login-Google?tokenId=${loginData.tokenId}`,
+      {
+        password: loginData.password,
+        confirmPassword: loginData.confirmPassword,
+      }
+    );
     console.log(response);
     const data: ResponseDTO<string> = response.data;
     if (data.isSuccess) {

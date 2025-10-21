@@ -1,26 +1,26 @@
 import {
-  Typography,
-  Card,
-  Row,
-  Col,
-  Tag,
-  Space,
-  Button,
-  Pagination,
-  Image,
-  message,
-} from "antd";
-import {
-  DollarOutlined,
   CalendarOutlined,
   CheckCircleOutlined,
+  DollarOutlined,
   InfoCircleOutlined,
 } from "@ant-design/icons";
-import { Header } from "../../Widgets/Headers/Header.tsx";
-import { Footer } from "../../Widgets/Footers/Footer.tsx";
-import UserSidebar from "../../Widgets/UserSidebar/UserSidebar.tsx";
+import {
+  Button,
+  Card,
+  Col,
+  Image,
+  message,
+  Pagination,
+  Row,
+  Space,
+  Tag,
+  Typography,
+} from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Footer } from "../../Widgets/Footers/Footer.tsx";
+import { Header } from "../../Widgets/Headers/Header.tsx";
+import UserSidebar from "../../Widgets/UserSidebar/UserSidebar.tsx";
 
 const { Title, Paragraph } = Typography;
 

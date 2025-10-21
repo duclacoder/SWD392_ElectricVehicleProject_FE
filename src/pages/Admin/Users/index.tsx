@@ -11,7 +11,6 @@ import {
   Button,
   Dropdown,
   Input,
-  Menu,
   Modal,
   Space,
   Table,
@@ -177,27 +176,26 @@ const AdminUserPage = () => {
       title: "Actions",
       key: "actions",
       align: "center",
-      render: (_, record) => (
-        <Dropdown
-          overlay={
-            <Menu>
-              <Menu.Item key="edit" onClick={() => handleShowEditModal(record)}>
-                Edit
-              </Menu.Item>
-              <Menu.Item
-                key="delete"
-                danger
-                onClick={() => handleDelete(record)}
-              >
-                Delete
-              </Menu.Item>
-            </Menu>
-          }
-          trigger={["click"]}
-        >
-          <Button type="text" icon={<MoreOutlined />} />
-        </Dropdown>
-      ),
+      render: (_, record) => {
+        const menuItems = [
+          {
+            key: "1",
+            label: "Edit",
+            onClick: () => handleShowEditModal(record),
+          },
+          {
+            key: "2",
+            label: "Delete",
+            onClick: () => handleDelete(record),
+          },
+        ];
+
+        return (
+          <Dropdown menu={{ items: menuItems }}>
+            <Button icon={<MoreOutlined />} />
+          </Dropdown>
+        );
+      },
     },
   ];
 
