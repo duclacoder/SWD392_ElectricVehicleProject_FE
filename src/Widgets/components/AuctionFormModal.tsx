@@ -19,8 +19,6 @@ import type { AuctionsFee } from "../../entities/AuctionsFee";
 import { getAllAuctionsFees } from "../../features/Admin/api/adminAuctionsFeeApi";
 import { getAllAdminVehicles } from "../../features/Admin/api/adminVehicleApi";
 
-//hihi
-
 const { Option } = Select;
 
 interface AuctionFormModalProps {
