@@ -1,28 +1,27 @@
 import {
-  Typography,
-  Card,
+  CarOutlined,
+  CrownOutlined,
+  IdcardOutlined,
+  LockOutlined,
+  MailOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
+import {
   Avatar,
+  Button,
+  Card,
   Descriptions,
+  Form,
+  Input,
+  message,
+  Modal,
   Space,
   Tag,
-  Input,
-  Button,
-  Modal,
-  Form,
-  message,
-  // Removed Ant Design Layout and Menu components as their roles are replaced by HTML divs with Tailwind classes
+  Typography,
 } from "antd";
-import { Header } from "../../Widgets/Headers/Header.tsx";
-import {
-  UserOutlined,
-  MailOutlined,
-  IdcardOutlined,
-  CrownOutlined,
-  CarOutlined,
-  LockOutlined,
-} from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { Footer } from "../../Widgets/Footers/Footer.tsx";
+import { Header } from "../../Widgets/Headers/Header.tsx";
 import UserSidebar from "../../Widgets/UserSidebar/UserSidebar.tsx";
 
 const { Title, Paragraph } = Typography;

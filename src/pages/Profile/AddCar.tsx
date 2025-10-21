@@ -1,19 +1,19 @@
+import { CarOutlined, PlusOutlined } from "@ant-design/icons";
 import {
-  Typography,
+  Button,
+  Card,
   Form,
   Input,
   InputNumber,
-  Select,
-  Switch,
-  Button,
   message,
-  Card,
+  Select,
   Space,
+  Switch,
+  Typography,
 } from "antd";
-import { Header } from "../../Widgets/Headers/Header.tsx";
 import { Footer } from "../../Widgets/Footers/Footer.tsx";
+import { Header } from "../../Widgets/Headers/Header.tsx";
 import UserSidebar from "../../Widgets/UserSidebar/UserSidebar.tsx";
-import { CarOutlined, PlusOutlined } from "@ant-design/icons";
 
 const { Title, Paragraph } = Typography;
 const { Option } = Select;

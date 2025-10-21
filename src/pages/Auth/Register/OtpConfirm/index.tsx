@@ -1,10 +1,13 @@
-import React, { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import AuthLayout from "../../../../Widgets/Layouts/Auth";
 import { ReloadOutlined } from "@ant-design/icons";
-import type { RegisterForm } from "../../../../entities/Form";
-import { confirm_OTP_Register, resend_OTP } from "../../../../features/Register";
 import { message } from "antd";
+import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import type { RegisterForm } from "../../../../entities/Form";
+import {
+  confirm_OTP_Register,
+  resend_OTP,
+} from "../../../../features/Register";
+import AuthLayout from "../../../../Widgets/Layouts/Auth";
 
 const ConfirmOTPPage: React.FC = () => {
   const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
@@ -15,7 +18,9 @@ const ConfirmOTPPage: React.FC = () => {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const navigate = useNavigate();
 
-  const registerData = JSON.parse(sessionStorage.getItem("registerData") || "{}") as RegisterForm;
+  const registerData = JSON.parse(
+    sessionStorage.getItem("registerData") || "{}"
+  ) as RegisterForm;
 
   useEffect(() => {
     if (countdown > 0) {
@@ -92,13 +97,17 @@ const ConfirmOTPPage: React.FC = () => {
     setError("");
 
     try {
-      const result :boolean = await confirm_OTP_Register(registerData, otpString)
-      if (result){
+      const result: boolean = await confirm_OTP_Register(
+        registerData,
+        otpString
+      );
+      if (result) {
         navigate("/login");
         sessionStorage.clear();
-        message.success("Tài khoản của bạn đã được tạo thành công! Vui lòng đăng nhập.");
-      }
-      else {
+        message.success(
+          "Tài khoản của bạn đã được tạo thành công! Vui lòng đăng nhập."
+        );
+      } else {
         setOtp(["", "", "", "", "", ""]);
         inputRefs.current[0]?.focus();
         setError("Mã OTP không đúng. Vui lòng thử lại.");
@@ -119,7 +128,7 @@ const ConfirmOTPPage: React.FC = () => {
     setError("");
 
     try {
-      const result :boolean = await resend_OTP(registerData.email)
+      const result: boolean = await resend_OTP(registerData.email);
       if (result) {
         message.success("Mã OTP đã được gửi lại đến email của bạn.");
         setCountdown(60);
@@ -142,7 +151,7 @@ const ConfirmOTPPage: React.FC = () => {
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   // Mask email for display
@@ -153,16 +162,30 @@ const ConfirmOTPPage: React.FC = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-sky-500  rounded-full mb-4">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            <svg
+              className="w-8 h-8 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+              />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Xác thực OTP</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Xác thực OTP
+          </h1>
           <p className="text-gray-600 text-sm">
             Chúng tôi đã gửi mã xác thực đến
           </p>
           {registerData.email && (
-            <p className="text-sky-600 font-medium text-sm mt-1">{registerData.email}</p>
+            <p className="text-sky-600 font-medium text-sm mt-1">
+              {registerData.email}
+            </p>
           )}
         </div>
 
@@ -182,13 +205,18 @@ const ConfirmOTPPage: React.FC = () => {
                   className={`
                     w-12 h-14 text-center text-lg font-bold border-2 rounded-xl
                     transition-all duration-200 outline-none
-                    ${error
-                      ? 'border-red-400 bg-red-50 text-red-600 animate-shake'
-                      : digit
-                        ? 'border-sky-500 bg-blue-50 text-sky-700 shadow-lg scale-105'
-                        : 'border-gray-300 bg-white hover:border-gray-400 focus:border-sky-500 focus:bg-blue-50'
+                    ${
+                      error
+                        ? "border-red-400 bg-red-50 text-red-600 animate-shake"
+                        : digit
+                        ? "border-sky-500 bg-blue-50 text-sky-700 shadow-lg scale-105"
+                        : "border-gray-300 bg-white hover:border-gray-400 focus:border-sky-500 focus:bg-blue-50"
                     }
-                    ${isLoading ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}
+                    ${
+                      isLoading
+                        ? "opacity-60 cursor-not-allowed"
+                        : "cursor-pointer"
+                    }
                   `}
                   disabled={isLoading}
                   autoComplete="one-time-code"
@@ -212,7 +240,9 @@ const ConfirmOTPPage: React.FC = () => {
           <div className="w-full bg-gray-200 rounded-full h-1 mb-4">
             <div
               className="bg-sky-500 h-1 rounded-full transition-all duration-300"
-              style={{ width: `${(otp.filter(digit => digit).length / 6) * 100}%` }}
+              style={{
+                width: `${(otp.filter((digit) => digit).length / 6) * 100}%`,
+              }}
             ></div>
           </div>
         </div>
@@ -221,8 +251,16 @@ const ConfirmOTPPage: React.FC = () => {
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
             <div className="flex items-center">
-              <svg className="w-5 h-5 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              <svg
+                className="w-5 h-5 text-red-500 mr-2"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                  clipRule="evenodd"
+                />
               </svg>
               <span className="text-red-700 text-sm font-medium">{error}</span>
             </div>
@@ -235,8 +273,18 @@ const ConfirmOTPPage: React.FC = () => {
             <div className="space-y-2">
               <p className="text-gray-600 text-sm">Mã có hiệu lực trong</p>
               <div className="inline-flex items-center px-4 py-2 bg-gray-100 rounded-full">
-                <svg className="w-4 h-4 text-gray-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg
+                  className="w-4 h-4 text-gray-500 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
                 <span className="font-mono font-bold text-lg text-gray-700">
                   {formatTime(countdown)}
@@ -245,7 +293,9 @@ const ConfirmOTPPage: React.FC = () => {
             </div>
           ) : (
             <div className="p-4 rounded-xl mb-4">
-              <p className="text-rose-800 font-bold text-lg mb-3">Mã OTP đã hết hạn</p>
+              <p className="text-rose-800 font-bold text-lg mb-3">
+                Mã OTP đã hết hạn
+              </p>
               <button
                 onClick={handleResendOTP}
                 disabled={isLoading}
@@ -261,8 +311,18 @@ const ConfirmOTPPage: React.FC = () => {
         {/* Help Text */}
         <div className="text-center space-y-3 pt-6 border-t border-gray-100">
           <div className="flex items-center justify-center text-xs text-gray-500">
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="w-4 h-4 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
             Mã sẽ tự động xác thực khi nhập đủ 6 số
           </div>

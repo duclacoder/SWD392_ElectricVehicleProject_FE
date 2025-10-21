@@ -1,4 +1,12 @@
-import { Car, Home, LayoutDashboard, LogOut, Users } from "lucide-react";
+import {
+  Car,
+  DollarSign,
+  Gavel,
+  Home,
+  LayoutDashboard,
+  LogOut,
+  Users,
+} from "lucide-react";
 import type { FC } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Logout } from "../../features/Logout";
@@ -7,7 +15,13 @@ import logo from "../../shared/assets/logo.png";
 const navLinks = [
   { name: "Dashboard", href: "/admin", icon: <LayoutDashboard size={20} /> },
   { name: "Users", href: "/admin/users", icon: <Users size={20} /> },
-  { name: "Products", href: "/admin/products", icon: <Car size={20} /> },
+  { name: "Vehicles", href: "/admin/vehicles", icon: <Car size={20} /> },
+  {
+    name: "Auctions Fee",
+    href: "/admin/auctions-fee",
+    icon: <DollarSign size={20} />,
+  },
+  { name: "Auctions", href: "/admin/auctions", icon: <Gavel size={20} /> },
 ];
 
 const bottomLinks = [
