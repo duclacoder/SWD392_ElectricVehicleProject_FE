@@ -2,8 +2,8 @@ import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { RegisterForm } from "../../../entities/Form";
-import AuthLayout from "../../../Widgets/Layouts/Auth";
 import { register } from "../../../features/Register";
+import AuthLayout from "../../../Widgets/Layouts/Auth";
 
 const RegisterPage = () => {
   const [email, setEmail] = useState("");
@@ -22,17 +22,14 @@ const RegisterPage = () => {
       password: password,
       confirmPassword: confirmPassword,
     };
-    sessionStorage.setItem("registerData", JSON.stringify(registerData));        
-    if(await register(registerData))
-      navigate("/otp-confirm");
+    sessionStorage.setItem("registerData", JSON.stringify(registerData));
+    if (await register(registerData)) navigate("/otp-confirm");
   };
 
   return (
     <AuthLayout>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">
-          Wellcome!
-        </h1>
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">Wellcome!</h1>
         <p className="text-gray-600 text-sm">
           Please enter register details below
         </p>
@@ -50,7 +47,6 @@ const RegisterPage = () => {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your mail"
             className="w-full px-3 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent text-sm"
-
           />
         </div>
 
