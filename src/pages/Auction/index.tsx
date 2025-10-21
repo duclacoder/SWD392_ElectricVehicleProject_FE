@@ -42,11 +42,9 @@ const AuctionPage: React.FC = () => {
                 await startConnection();
                 const conn = getConnection();
                 console.log("SignalR state:", conn.state);
-                console.log("SignalR connectionId:", conn.connectionId);
-                // message.success("Kết nối SignalR thành công!");
+                // console.log("SignalR connectionId:", conn.connectionId);
             } catch (error) {
                 console.error("SignalR connection failed:", error);
-                // message.error("Kết nối SignalR thất bại. Tính năng cập nhật thời gian thực có thể bị ảnh hưởng.");
             }
         }
         initSignalR();
@@ -78,8 +76,9 @@ const AuctionPage: React.FC = () => {
 
             setCombinedData(combinedResults);
         } catch (err: any) {
+            console.error("Lỗi fetch vehicles:", err);
             setError(err.message || "Không thể tải thông tin xe");
-            message.error("Đã xảy ra lỗi khi tải thông tin chi tiết xe.");
+            // message.error("Đã xảy ra lỗi khi tải thông tin chi tiết xe.");
         }
     }, []);
 
@@ -100,7 +99,6 @@ const AuctionPage: React.FC = () => {
 
                 await fetchVehiclesForAuctions(fetchedAuctions);
             } else if (pagedResult === null) {
-                // auctionApi.getAllAuctions đã hiển thị lỗi, chỉ cần cập nhật state
                 setError("Lỗi tải danh sách đấu giá chính.");
             } else {
                 throw new Error("Failed to fetch auctions: No items returned.");
@@ -131,7 +129,6 @@ const AuctionPage: React.FC = () => {
         message.info("Đã đặt lại tất cả bộ lọc.");
     };
 
-    // --- Memoized Filtering and Sorting (No change) ---
     const filteredData = useMemo(() => {
         return combinedData.filter(({ auction, vehicle }) => {
             const normalizedStatus = auction.status.toLowerCase();

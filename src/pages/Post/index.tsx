@@ -64,7 +64,7 @@ const PostVehicleSale: React.FC = () => {
 
             const result = await createUserPost(postData);
             if (result) {
-                message.success("🎉 Bài đăng bán xe đã được tạo thành công!");
+                // message.success("🎉 Bài đăng bán xe đã được tạo thành công!");
                 form.resetFields();
                 navigate("/");
             }
