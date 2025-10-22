@@ -24,6 +24,9 @@ import ViewCar from "../../pages/Profile/ViewCar";
 import ViewCarDetails from "../../pages/Profile/ViewCarDetails.tsx";
 import ViewInspectionFee from "../../pages/Profile/ViewInspectionFee.tsx";
 import { AdminLayout } from "../layouts/AdminLayout";
+import PostPackagePage from "../../pages/Admin/PostPackage/index.tsx";
+import PackageStore from "../../pages/Packages/index.tsx";
+import PackagePricingPage from "../../pages/Packages/index.tsx";
 
 export const AppRoutes = () => {
   return (
@@ -94,6 +97,17 @@ export const AppRoutes = () => {
           </AdminLayout>
         }
       />
+
+      <Route
+        path="/admin/postPackages"
+        element={
+          <AdminLayout>
+            <PostPackagePage />
+          </AdminLayout>
+        }
+      />
+      <Route path="/packages" element={<PackagePricingPage />} />
+
     </Routes>
   );
 };

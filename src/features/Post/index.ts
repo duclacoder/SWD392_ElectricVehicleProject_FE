@@ -7,16 +7,17 @@ import type {
 import api from "../../shared/api/axios.ts";
 
 export const getAllUserPosts = async (
-    params: { page: number; pageSize: number; userName?: string }
+  params: { page: number; pageSize: number; userName?: string }
 ): Promise<PaginatedResult<UserPostCustom> | null> => {
-    try {
-        const response = await api.get("/UserPost", {
-            params: {
-                Page: params.page,
-                PageSize: params.pageSize,
-                UserName: params.userName || undefined
-            },
-        });
+  try {
+    const response = await api.get("/UserPost", {
+      params: {
+        Page: params.page,
+        PageSize: params.pageSize,
+        UserName: params.userName || undefined
+      },
+    });
+    const data: ResponseDTO<PaginatedResult<UserPostCustom>> = response.data;
 
     if (data.isSuccess) return data.result;
     else {
@@ -26,7 +27,7 @@ export const getAllUserPosts = async (
   } catch (error: any) {
     message.error(
       error?.response?.data?.message ||
-        "An unexpected error occurred while fetching user posts."
+      "An unexpected error occurred while fetching user posts."
     );
     console.error(error);
     return null;
@@ -49,7 +50,7 @@ export const getUserPostById = async (
   } catch (error: any) {
     message.error(
       error?.response?.data?.message ||
-        "An unexpected error occurred while fetching user post."
+      "An unexpected error occurred while fetching user post."
     );
     console.error(error);
     return null;
@@ -73,7 +74,7 @@ export const createUserPost = async (
   } catch (error: any) {
     message.error(
       error?.response?.data?.message ||
-        "An unexpected error occurred while creating post."
+      "An unexpected error occurred while creating post."
     );
     console.error(error);
     return null;
@@ -121,9 +122,10 @@ export const deleteUserPost = async (
   } catch (error: any) {
     message.error(
       error?.response?.data?.message ||
-        "An unexpected error occurred while deleting post."
+      "An unexpected error occurred while deleting post."
     );
     console.error(error);
     return null;
   }
 };
+

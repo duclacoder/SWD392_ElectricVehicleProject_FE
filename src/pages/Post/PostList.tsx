@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { Card, Pagination, Spin, Typography, message, Row, Col, Badge } from "antd";
 import { useNavigate } from "react-router-dom";
-import { Footer } from "../../Widgets/Footers/Footer";
 import { Header } from "../../Widgets/Headers/Header";
-import type { UserPostCustom } from "../../entities/UserPost";
+import { Footer } from "../../Widgets/Footers/Footer";
 import { getAllUserPosts } from "../../features/Post";
+import type { UserPostCustom } from "../../entities/UserPost";
 
 const { Title, Text } = Typography;
 
@@ -59,13 +60,12 @@ const PostList: React.FC = () => {
               level={1}
               className="!mb-4"
               style={{
-                background:
-                  "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                fontSize: "3.5rem",
+                background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                fontSize: '3.5rem',
                 fontWeight: 800,
-                letterSpacing: "-0.02em",
+                letterSpacing: '-0.02em'
               }}
             >
               Khám Phá Xe Của Bạn
@@ -81,18 +81,14 @@ const PostList: React.FC = () => {
                 <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
                   {total}+
                 </div>
-                <div className="text-sm text-gray-600 font-medium">
-                  Xe Đang Bán
-                </div>
+                <div className="text-sm text-gray-600 font-medium">Xe Đang Bán</div>
               </div>
 
               <div className="text-center px-6 py-3 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg">
                 <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent">
                   100%
                 </div>
-                <div className="text-sm text-gray-600 font-medium">
-                  Xác Thực
-                </div>
+                <div className="text-sm text-gray-600 font-medium">Xác Thực</div>
               </div>
 
               <div className="text-center px-6 py-3 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg">
@@ -133,11 +129,9 @@ const PostList: React.FC = () => {
                       hoverable
                       className="group overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 rounded-3xl bg-white/95 backdrop-blur-sm hover:-translate-y-2"
                       style={{
-                        height: "100%",
+                        height: '100%',
                         opacity: 0,
-                        animation: `fadeInUp 0.6s ease-out ${
-                          index * 0.1
-                        }s forwards`,
+                        animation: `fadeInUp 0.6s ease-out ${index * 0.1}s forwards`
                       }}
                       cover={
                         <div className="relative overflow-hidden h-64">
@@ -159,11 +153,11 @@ const PostList: React.FC = () => {
                             <Badge
                               count="MỚI"
                               style={{
-                                backgroundColor: "#fff",
-                                color: "#3b82f6",
-                                fontWeight: "bold",
-                                fontSize: "11px",
-                                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                                backgroundColor: '#fff',
+                                color: '#3b82f6',
+                                fontWeight: 'bold',
+                                fontSize: '11px',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
                               }}
                             />
                           </div>
@@ -181,10 +175,7 @@ const PostList: React.FC = () => {
                       onClick={() => navigate(`/userpost/${post.userPostId}`)}
                     >
                       <div className="p-5">
-                        <Title
-                          level={4}
-                          className="!mb-5 line-clamp-2 group-hover:text-blue-600 transition-colors duration-300 !text-lg !font-bold leading-snug"
-                        >
+                        <Title level={4} className="!mb-5 line-clamp-2 group-hover:text-blue-600 transition-colors duration-300 !text-lg !font-bold leading-snug">
                           {post.title}
                         </Title>
 
@@ -198,10 +189,9 @@ const PostList: React.FC = () => {
                               strong
                               className="text-3xl font-black"
                               style={{
-                                background:
-                                  "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
-                                WebkitBackgroundClip: "text",
-                                WebkitTextFillColor: "transparent",
+                                background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent'
                               }}
                             >
                               {post.vehicle?.price
@@ -209,9 +199,7 @@ const PostList: React.FC = () => {
                                 : "Liên hệ"}
                             </Text>
                             {post.vehicle?.price && (
-                              <Text className="text-sm font-semibold text-gray-500">
-                                VND
-                              </Text>
+                              <Text className="text-sm font-semibold text-gray-500">VND</Text>
                             )}
                           </div>
                         </div>
@@ -220,62 +208,30 @@ const PostList: React.FC = () => {
                         <div className="space-y-3">
                           <div className="flex items-center gap-3 p-3 bg-blue-50/50 rounded-xl hover:bg-blue-50 transition-colors group/item">
                             <div className="flex-shrink-0 w-9 h-9 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md group-hover/item:scale-110 transition-transform">
-                              <svg
-                                className="w-5 h-5 text-white"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                                />
+                              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                               </svg>
                             </div>
                             <Text className="text-sm font-semibold text-gray-700 flex-1">
-                              {post.vehicle?.brand || "N/A"}{" "}
-                              {post.vehicle?.model || ""}
+                              {post.vehicle?.brand || "N/A"} {post.vehicle?.model || ""}
                             </Text>
                           </div>
 
                           <div className="flex items-center gap-3 p-3 bg-purple-50/50 rounded-xl hover:bg-purple-50 transition-colors group/item">
                             <div className="flex-shrink-0 w-9 h-9 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md group-hover/item:scale-110 transition-transform">
-                              <svg
-                                className="w-5 h-5 text-white"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                />
+                              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                               </svg>
                             </div>
                             <Text className="text-sm font-semibold text-gray-700 flex-1">
-                              Năm {post.vehicle?.year || "N/A"} •{" "}
-                              {post.vehicle?.color || "N/A"}
+                              Năm {post.vehicle?.year || "N/A"} • {post.vehicle?.color || "N/A"}
                             </Text>
                           </div>
 
                           <div className="flex items-center gap-3 p-3 bg-indigo-50/50 rounded-xl hover:bg-indigo-50 transition-colors group/item">
                             <div className="flex-shrink-0 w-9 h-9 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-md group-hover/item:scale-110 transition-transform">
-                              <svg
-                                className="w-5 h-5 text-white"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                                />
+                              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                               </svg>
                             </div>
                             <Text className="text-sm font-semibold text-gray-700 flex-1">
@@ -310,11 +266,10 @@ const PostList: React.FC = () => {
                         Tổng{" "}
                         <span
                           style={{
-                            background:
-                              "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
-                            WebkitBackgroundClip: "text",
-                            WebkitTextFillColor: "transparent",
-                            fontWeight: 800,
+                            background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            fontWeight: 800
                           }}
                         >
                           {total}
