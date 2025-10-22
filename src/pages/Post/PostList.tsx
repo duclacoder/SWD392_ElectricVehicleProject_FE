@@ -1,204 +1,10 @@
-// import React, { useEffect, useState } from "react";
-// import { Card, Pagination, Spin, Typography, message, Row, Col } from "antd";
-// import { useNavigate } from "react-router-dom";
-// import { Header } from "../../Widgets/Headers/Header";
-// import { Footer } from "../../Widgets/Footers/Footer";
-// import { getAllUserPosts } from "../../features/Post";
-// import type { UserPostCustom } from "../../entities/UserPost";
-
-// const { Title, Text } = Typography;
-
-// const PostList: React.FC = () => {
-//     const [posts, setPosts] = useState<UserPostCustom[]>([]);
-//     const [loading, setLoading] = useState(false);
-//     const [page, setPage] = useState(1);
-//     const [pageSize, setPageSize] = useState(9);
-//     const [total, setTotal] = useState(0);
-//     const navigate = useNavigate();
-
-//     const fetchPosts = async (page: number, pageSize: number) => {
-//         try {
-//             setLoading(true);
-
-//             // gọi API dùng tham số page-based pagination
-//             const data = await getAllUserPosts({ page, pageSize });
-
-//             if (data) {
-//                 setPosts(data.items || []);
-//                 setTotal(data.totalItems || 0);
-//             } else {
-//                 message.error("Không thể tải danh sách bài đăng.");
-//             }
-//         } catch (error) {
-//             console.error(error);
-//             message.error("Đã xảy ra lỗi khi tải danh sách bài đăng.");
-//         } finally {
-//             setLoading(false);
-//         }
-//     };
-
-//     useEffect(() => {
-//         fetchPosts(page, pageSize);
-//     }, [page, pageSize]);
-
-//     return (
-//         <>
-//             <Header />
-//             <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-//                 <div className="container mx-auto px-4 py-12">
-//                     {/* Hero Section */}
-//                     <div className="text-center mb-12">
-//                         <Title
-//                             level={1}
-//                             className="!mb-3"
-//                             style={{
-//                                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-//                                 WebkitBackgroundClip: 'text',
-//                                 WebkitTextFillColor: 'transparent',
-//                                 fontSize: '2.5rem',
-//                                 fontWeight: 700
-//                             }}
-//                         >
-//                             Khám Phá Xe Của Bạn
-//                         </Title>
-//                         <Text className="text-lg text-gray-600">
-//                             Tìm kiếm chiếc xe hoàn hảo từ hàng nghìn lựa chọn
-//                         </Text>
-//                     </div>
-
-//                     {loading ? (
-//                         <div className="flex flex-col justify-center items-center min-h-[400px]">
-//                             <Spin size="large" />
-//                             <Text className="mt-4 text-gray-500">Đang tải xe...</Text>
-//                         </div>
-//                     ) : posts.length === 0 ? (
-//                         <div className="flex flex-col items-center justify-center min-h-[400px] bg-white rounded-3xl shadow-lg p-12">
-//                             <div className="text-6xl mb-4">🚗</div>
-//                             <Text className="text-xl text-gray-600">
-//                                 Không có bài đăng nào.
-//                             </Text>
-//                         </div>
-//                     ) : (
-//                         <>
-//                             <Row gutter={[24, 24]}>
-//                                 {posts.map((post) => (
-//                                     <Col xs={24} sm={12} lg={8} key={post.userPostId}>
-//                                         <Card
-//                                             hoverable
-//                                             className="group overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-300 rounded-2xl"
-//                                             style={{ height: '100%' }}
-//                                             cover={
-//                                                 <div className="relative overflow-hidden h-56">
-//                                                     <img
-//                                                         alt="vehicle"
-//                                                         src={
-//                                                             post.images && post.images.length > 0
-//                                                                 ? post.images[0]
-//                                                                 : "https://via.placeholder.com/400x250?text=No+Image"
-//                                                         }
-//                                                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-//                                                     />
-//                                                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-//                                                 </div>
-//                                             }
-//                                             onClick={() => navigate(`/userpost/${post.userPostId}`)}
-//                                         >
-//                                             <div className="p-2">
-//                                                 <Title level={4} className="!mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors">
-//                                                     {post.title}
-//                                                 </Title>
-
-//                                                 <div className="mb-3 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl">
-//                                                     <Text className="text-sm text-gray-600">Giá bán</Text>
-//                                                     <div className="flex items-baseline gap-1">
-//                                                         <Text strong className="text-2xl text-blue-600">
-//                                                             {post.vehicle?.price
-//                                                                 ? post.vehicle.price.toLocaleString()
-//                                                                 : "Liên hệ"}
-//                                                         </Text>
-//                                                         <Text className="text-sm text-gray-500">VND</Text>
-//                                                     </div>
-//                                                 </div>
-
-//                                                 <div className="space-y-2">
-//                                                     <div className="flex items-center gap-2 text-sm">
-//                                                         <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-//                                                         <Text className="text-gray-700">
-//                                                             {post.vehicle?.brand || "N/A"} {post.vehicle?.model || ""}
-//                                                         </Text>
-//                                                     </div>
-
-//                                                     <div className="flex items-center gap-2 text-sm">
-//                                                         <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
-//                                                         <Text className="text-gray-700">
-//                                                             Năm {post.vehicle?.year || "N/A"} • {post.vehicle?.color || "N/A"}
-//                                                         </Text>
-//                                                     </div>
-
-//                                                     <div className="flex items-center gap-2 text-sm">
-//                                                         <span className="w-2 h-2 bg-indigo-500 rounded-full"></span>
-//                                                         <Text className="text-gray-700">
-//                                                             {post.vehicle?.bodyType || "N/A"}
-//                                                         </Text>
-//                                                     </div>
-//                                                 </div>
-//                                             </div>
-//                                         </Card>
-//                                     </Col>
-//                                 ))}
-//                             </Row>
-
-//                             {/* Pagination */}
-//                             <div className="flex justify-center mt-12">
-//                                 <div className="bg-white px-6 py-4 rounded-2xl shadow-lg">
-//                                     <Pagination
-//                                         current={page}
-//                                         total={total}
-//                                         pageSize={pageSize}
-//                                         onChange={(p, ps) => {
-//                                             if (ps !== pageSize) {
-//                                                 setPageSize(ps);
-//                                                 setPage(1);
-//                                             } else {
-//                                                 setPage(p);
-//                                             }
-//                                         }}
-//                                         showSizeChanger
-//                                         showTotal={(total) => (
-//                                             <span className="text-gray-600 font-medium">
-//                                                 Tổng <span className="text-blue-600">{total}</span> bài đăng
-//                                             </span>
-//                                         )}
-//                                     />
-//                                 </div>
-//                             </div>
-//                         </>
-//                     )}
-//                 </div>
-//             </div>
-//             <Footer />
-//         </>
-//     );
-// };
-
-// export default PostList;
-
-import {
-  Badge,
-  Card,
-  Col,
-  message,
-  Pagination,
-  Row,
-  Spin,
-  Typography,
-} from "antd";
 import React, { useEffect, useState } from "react";
+import { Card, Pagination, Spin, Typography, message, Row, Col, Badge } from "antd";
 import { useNavigate } from "react-router-dom";
-import { Footer } from "../../Widgets/Footers/Footer";
 import { Header } from "../../Widgets/Headers/Header";
-import type { UserPostCustom } from "../../entities/UserPost";
+import { Footer } from "../../Widgets/Footers/Footer";
 import { getAllUserPosts } from "../../features/Post";
+import type { UserPostCustom } from "../../entities/UserPost";
 
 const { Title, Text } = Typography;
 
@@ -254,13 +60,12 @@ const PostList: React.FC = () => {
               level={1}
               className="!mb-4"
               style={{
-                background:
-                  "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                fontSize: "3.5rem",
+                background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                fontSize: '3.5rem',
                 fontWeight: 800,
-                letterSpacing: "-0.02em",
+                letterSpacing: '-0.02em'
               }}
             >
               Khám Phá Xe Của Bạn
@@ -276,18 +81,14 @@ const PostList: React.FC = () => {
                 <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
                   {total}+
                 </div>
-                <div className="text-sm text-gray-600 font-medium">
-                  Xe Đang Bán
-                </div>
+                <div className="text-sm text-gray-600 font-medium">Xe Đang Bán</div>
               </div>
 
               <div className="text-center px-6 py-3 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg">
                 <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent">
                   100%
                 </div>
-                <div className="text-sm text-gray-600 font-medium">
-                  Xác Thực
-                </div>
+                <div className="text-sm text-gray-600 font-medium">Xác Thực</div>
               </div>
 
               <div className="text-center px-6 py-3 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg">
@@ -328,11 +129,9 @@ const PostList: React.FC = () => {
                       hoverable
                       className="group overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 rounded-3xl bg-white/95 backdrop-blur-sm hover:-translate-y-2"
                       style={{
-                        height: "100%",
+                        height: '100%',
                         opacity: 0,
-                        animation: `fadeInUp 0.6s ease-out ${
-                          index * 0.1
-                        }s forwards`,
+                        animation: `fadeInUp 0.6s ease-out ${index * 0.1}s forwards`
                       }}
                       cover={
                         <div className="relative overflow-hidden h-64">
@@ -354,11 +153,11 @@ const PostList: React.FC = () => {
                             <Badge
                               count="MỚI"
                               style={{
-                                backgroundColor: "#fff",
-                                color: "#3b82f6",
-                                fontWeight: "bold",
-                                fontSize: "11px",
-                                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                                backgroundColor: '#fff',
+                                color: '#3b82f6',
+                                fontWeight: 'bold',
+                                fontSize: '11px',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
                               }}
                             />
                           </div>
@@ -376,10 +175,7 @@ const PostList: React.FC = () => {
                       onClick={() => navigate(`/userpost/${post.userPostId}`)}
                     >
                       <div className="p-5">
-                        <Title
-                          level={4}
-                          className="!mb-5 line-clamp-2 group-hover:text-blue-600 transition-colors duration-300 !text-lg !font-bold leading-snug"
-                        >
+                        <Title level={4} className="!mb-5 line-clamp-2 group-hover:text-blue-600 transition-colors duration-300 !text-lg !font-bold leading-snug">
                           {post.title}
                         </Title>
 
@@ -393,10 +189,9 @@ const PostList: React.FC = () => {
                               strong
                               className="text-3xl font-black"
                               style={{
-                                background:
-                                  "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
-                                WebkitBackgroundClip: "text",
-                                WebkitTextFillColor: "transparent",
+                                background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent'
                               }}
                             >
                               {post.vehicle?.price
@@ -404,9 +199,7 @@ const PostList: React.FC = () => {
                                 : "Liên hệ"}
                             </Text>
                             {post.vehicle?.price && (
-                              <Text className="text-sm font-semibold text-gray-500">
-                                VND
-                              </Text>
+                              <Text className="text-sm font-semibold text-gray-500">VND</Text>
                             )}
                           </div>
                         </div>
@@ -415,62 +208,30 @@ const PostList: React.FC = () => {
                         <div className="space-y-3">
                           <div className="flex items-center gap-3 p-3 bg-blue-50/50 rounded-xl hover:bg-blue-50 transition-colors group/item">
                             <div className="flex-shrink-0 w-9 h-9 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md group-hover/item:scale-110 transition-transform">
-                              <svg
-                                className="w-5 h-5 text-white"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                                />
+                              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                               </svg>
                             </div>
                             <Text className="text-sm font-semibold text-gray-700 flex-1">
-                              {post.vehicle?.brand || "N/A"}{" "}
-                              {post.vehicle?.model || ""}
+                              {post.vehicle?.brand || "N/A"} {post.vehicle?.model || ""}
                             </Text>
                           </div>
 
                           <div className="flex items-center gap-3 p-3 bg-purple-50/50 rounded-xl hover:bg-purple-50 transition-colors group/item">
                             <div className="flex-shrink-0 w-9 h-9 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md group-hover/item:scale-110 transition-transform">
-                              <svg
-                                className="w-5 h-5 text-white"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                />
+                              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                               </svg>
                             </div>
                             <Text className="text-sm font-semibold text-gray-700 flex-1">
-                              Năm {post.vehicle?.year || "N/A"} •{" "}
-                              {post.vehicle?.color || "N/A"}
+                              Năm {post.vehicle?.year || "N/A"} • {post.vehicle?.color || "N/A"}
                             </Text>
                           </div>
 
                           <div className="flex items-center gap-3 p-3 bg-indigo-50/50 rounded-xl hover:bg-indigo-50 transition-colors group/item">
                             <div className="flex-shrink-0 w-9 h-9 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-md group-hover/item:scale-110 transition-transform">
-                              <svg
-                                className="w-5 h-5 text-white"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                                />
+                              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                               </svg>
                             </div>
                             <Text className="text-sm font-semibold text-gray-700 flex-1">
@@ -505,11 +266,10 @@ const PostList: React.FC = () => {
                         Tổng{" "}
                         <span
                           style={{
-                            background:
-                              "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
-                            WebkitBackgroundClip: "text",
-                            WebkitTextFillColor: "transparent",
-                            fontWeight: 800,
+                            background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            fontWeight: 800
                           }}
                         >
                           {total}
