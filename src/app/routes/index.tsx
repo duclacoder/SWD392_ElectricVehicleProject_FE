@@ -27,6 +27,7 @@ import { AdminLayout } from "../layouts/AdminLayout";
 import PostPackagePage from "../../pages/Admin/PostPackage/index.tsx";
 import PackageStore from "../../pages/Packages/index.tsx";
 import PackagePricingPage from "../../pages/Packages/index.tsx";
+import PaymentSuccess from "../../pages/Payment/PaymentSuccess"
 
 export const AppRoutes = () => {
   return (
@@ -73,6 +74,7 @@ export const AppRoutes = () => {
       <Route path="/post" element={<PostVehicleSale />} />
       <Route path="/posts" element={<PostList />} />
       <Route path="/userpost/:id" element={<PostDetail />} />
+      <Route path="/paymentSuccess" element={<PaymentSuccess/>}/>
       <Route
         path="/admin/vehicles"
         element={
@@ -107,7 +109,6 @@ export const AppRoutes = () => {
         }
       />
       <Route path="/packages" element={<PackagePricingPage />} />
-
     </Routes>
   );
 };
