@@ -10,16 +10,19 @@ import {
 } from "lucide-react";
 import { adminPostPackageApi } from "../../features/Admin/api/adminPostPackageApi";
 import type { PostPackageCustom } from "../../entities/PostPackage";
-
-// 🔹 Import Header & Footer
 import { Header } from "../../Widgets/Headers/Header";
 import { Footer } from "../../Widgets/Footers/Footer";
+import type { CreatePaymentRequest } from "../../entities/Payment";
+import { CreatePayment, VnPayPayment } from "../../features/Payment";
+import { useNavigate } from "react-router-dom";
+
 
 const PackagePricingPage = () => {
     const [packages, setPackages] = useState<PostPackageCustom[]>([]);
-    const [selectedPlan, setSelectedPlan] = useState<number | null>(null);
     const [isAnnual, setIsAnnual] = useState(false);
     const [loading, setLoading] = useState(true);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchPackages = async () => {
@@ -46,23 +49,18 @@ const PackagePricingPage = () => {
 
     const handleBuyPackage = async (pkg: PostPackageCustom) => {
         try {
+            sessionStorage.setItem("selectedPackage", JSON.stringify(pkg));
             const userId = localStorage.getItem("userId");
-            if (!userId) {
-                message.warning("Bạn cần đăng nhập để mua gói!");
-                return;
+            const paymentRequestData : CreatePaymentRequest = {
+                UserId: userId || "",
+                TransferAmount: pkg.postPrice,
             }
-
-            // 🔹 Gọi API mua gói thực sự nếu backend có
-            // await createUserPackage({
-            //     userId: Number(userId),
-            //     packageId: pkg.postPackageId,
-            //     purchasedDuration: pkg.postDuration,
-            //     purchasedAtPrice: pkg.postPrice,
-            //     currency: pkg.currency || "VND",
-            // });
-
-            message.success(`Đăng ký thành công gói "${pkg.packageName}"!`);
-            setSelectedPlan(pkg.postPackageId);
+            const result : boolean = await CreatePayment(paymentRequestData);
+            if (result) {
+                const vnpayUrl = await VnPayPayment(sessionStorage.getItem("paymentId") || "")
+                if (vnpayUrl) 
+                    window.open(vnpayUrl);
+            }            
         } catch (error) {
             console.error(error);
             message.error("Có lỗi xảy ra khi mua gói!");
@@ -188,12 +186,10 @@ const PackagePricingPage = () => {
 
                                             <button
                                                 onClick={() => handleBuyPackage(pkg)}
-                                                className={`w-full py-3 rounded-lg font-semibold transition-all ${selectedPlan === pkg.postPackageId
-                                                    ? "bg-green-100 text-green-700"
-                                                    : "bg-gradient-to-r from-blue-600 to-sky-500 text-white hover:shadow-lg"
-                                                    }`}
+                                                className={`w-full py-3 rounded-lg font-semibold transition-all bg-green-100 text-green-700
+                                                    `}
                                             >
-                                                {selectedPlan === pkg.postPackageId ? "Đã mua ✓" : "Mua gói này"}
+                                                 Mua gói
                                             </button>
                                         </div>
                                     </div>
