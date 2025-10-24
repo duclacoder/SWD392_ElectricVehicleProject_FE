@@ -62,12 +62,12 @@ const UserSidebar: React.FC<UserSidebarProps> = () => {
           <ThunderboltOutlined />,
           "Add Battery"
         )}
-        {renderMenuItem(
+        {/* {renderMenuItem(
           "view-inspection-fee",
           "/InspectionFee",
           <ThunderboltOutlined />,
           "View Inspection Fee"
-        )}
+        )} */}
       </nav>
     </div>
   );
