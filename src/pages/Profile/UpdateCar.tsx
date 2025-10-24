@@ -1,22 +1,22 @@
+import { CarOutlined, EditOutlined } from "@ant-design/icons";
 import {
-  Typography,
+  Button,
+  Card,
   Form,
   Input,
   InputNumber,
-  //   Select,
-  Switch,
-  Button,
   message,
-  Card,
   Space,
   Spin,
+  //   Select,
+  Switch,
+  Typography,
 } from "antd";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Header } from "../../Widgets/Headers/Header";
 import { Footer } from "../../Widgets/Footers/Footer";
+import { Header } from "../../Widgets/Headers/Header";
 import UserSidebar from "../../Widgets/UserSidebar/UserSidebar";
-import { CarOutlined, EditOutlined } from "@ant-design/icons";
 
 const { Title, Paragraph } = Typography;
 // const { Option } = Select;

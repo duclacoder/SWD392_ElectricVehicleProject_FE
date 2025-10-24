@@ -6,9 +6,7 @@ interface AuthLayoutProps {
   children: React.ReactNode;
 }
 
-const AuthLayout: React.FC<AuthLayoutProps> = ({ 
-  children, 
-}) => {
+const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen bg-gray-100 flex">
       {/* Left Side - Auth Form */}
@@ -23,7 +21,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
               EV Management
             </span>
           </Link>
-          
+
           {/* Content from children */}
           {children}
         </div>
@@ -42,7 +40,8 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
         <div className="relative z-10 text-white max-w-md text-center">
           <h2 className="text-3xl font-bold mb-4">Car Trading Platform</h2>
           <p className="text-sky-100 mb-8 leading-relaxed">
-            Join our platform to buy and sell cars efficiently, connect with dealers, and find your perfect vehicle.
+            Join our platform to buy and sell cars efficiently, connect with
+            dealers, and find your perfect vehicle.
           </p>
 
           {/* Animated Car System Representation */}

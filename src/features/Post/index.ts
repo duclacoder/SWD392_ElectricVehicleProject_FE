@@ -1,77 +1,84 @@
 import { message } from "antd";
-import api from "../../shared/api/axios.ts";
-import type { ResponseDTO, PaginatedResult } from "../../entities/Response.ts";
+import type { PaginatedResult, ResponseDTO } from "../../entities/Response.ts";
 import type {
-    UserPostCustom,
-    CreateUserPostDTO,
-    GetAllUserPostRequestDTO
+  CreateUserPostDTO,
+  UserPostCustom,
 } from "../../entities/UserPost.ts";
+import api from "../../shared/api/axios.ts";
 
 export const getAllUserPosts = async (
-    params: GetAllUserPostRequestDTO
+  params: { page: number; pageSize: number; userName?: string }
 ): Promise<PaginatedResult<UserPostCustom> | null> => {
-    try {
-        const response = await api.get("/UserPost", { params });
-        const data: ResponseDTO<PaginatedResult<UserPostCustom>> = response.data;
+  try {
+    const response = await api.get("/UserPost", {
+      params: {
+        Page: params.page,
+        PageSize: params.pageSize,
+        UserName: params.userName || undefined
+      },
+    });
+    const data: ResponseDTO<PaginatedResult<UserPostCustom>> = response.data;
 
-        if (data.isSuccess) {
-            return data.result;
-        } else {
-            message.error(data.message || "Failed to fetch user posts");
-            return null;
-        }
-    } catch (error: any) {
-        message.error(
-            error?.response?.data?.message || "An unexpected error occurred while fetching user posts."
-        );
-        console.error(error);
-        return null;
+    if (data.isSuccess) return data.result;
+    else {
+      message.error(data.message || "Failed to fetch user posts");
+      return null;
     }
+  } catch (error: any) {
+    message.error(
+      error?.response?.data?.message ||
+      "An unexpected error occurred while fetching user posts."
+    );
+    console.error(error);
+    return null;
+  }
 };
 
 export const getUserPostById = async (
-    id: number
+  id: number
 ): Promise<UserPostCustom | null> => {
-    try {
-        const response = await api.get(`/UserPost/${id}`);
-        const data: ResponseDTO<UserPostCustom> = response.data;
+  try {
+    const response = await api.get(`/UserPost/${id}`);
+    const data: ResponseDTO<UserPostCustom> = response.data;
 
-        if (data.isSuccess) {
-            return data.result;
-        } else {
-            message.error(data.message || "Failed to fetch user post");
-            return null;
-        }
-    } catch (error: any) {
-        message.error(
-            error?.response?.data?.message || "An unexpected error occurred while fetching user post."
-        );
-        console.error(error);
-        return null;
+    if (data.isSuccess) {
+      return data.result;
+    } else {
+      message.error(data.message || "Failed to fetch user post");
+      return null;
     }
+  } catch (error: any) {
+    message.error(
+      error?.response?.data?.message ||
+      "An unexpected error occurred while fetching user post."
+    );
+    console.error(error);
+    return null;
+  }
 };
 
 export const createUserPost = async (
-    dto: CreateUserPostDTO
+  dto: CreateUserPostDTO
 ): Promise<UserPostCustom | null> => {
-    try {
-        const response = await api.post("/UserPost", dto);
-        const data: ResponseDTO<UserPostCustom> = response.data;
+  try {
+    const response = await api.post("/UserPost", dto);
+    const data: ResponseDTO<UserPostCustom> = response.data;
 
-        if (data.isSuccess) {
-            message.success("Post created successfully!");
-            return data.result;
-        } else {
-            message.error(data.message || "Failed to create post");
-            return null;
-        }
-    } catch (error: any) {
-        message.error(
-            error?.response?.data?.message || "An unexpected error occurred while creating post."
-        );
-        console.error(error);
-        return null;
+    if (data.isSuccess) {
+      message.success("Post created successfully!");
+      return data.result;
+    } else {
+      message.error(data.message || "Failed to create post");
+      return null;
     }
+  } catch (error: any) {
+    message.error(
+      error?.response?.data?.message ||
+      "An unexpected error occurred while creating post."
+    );
+    console.error(error);
+    return null;
+  }
 };
 
 // export const updateUserPost = async (
@@ -99,24 +106,26 @@ export const createUserPost = async (
 // };
 
 export const deleteUserPost = async (
-    id: number
+  id: number
 ): Promise<UserPostCustom | null> => {
-    try {
-        const response = await api.delete(`/UserPost/${id}`);
-        const data: ResponseDTO<UserPostCustom> = response.data;
+  try {
+    const response = await api.delete(`/UserPost/${id}`);
+    const data: ResponseDTO<UserPostCustom> = response.data;
 
-        if (data.isSuccess) {
-            message.success("Post deleted successfully!");
-            return data.result;
-        } else {
-            message.error(data.message || "Failed to delete post");
-            return null;
-        }
-    } catch (error: any) {
-        message.error(
-            error?.response?.data?.message || "An unexpected error occurred while deleting post."
-        );
-        console.error(error);
-        return null;
+    if (data.isSuccess) {
+      message.success("Post deleted successfully!");
+      return data.result;
+    } else {
+      message.error(data.message || "Failed to delete post");
+      return null;
     }
+  } catch (error: any) {
+    message.error(
+      error?.response?.data?.message ||
+      "An unexpected error occurred while deleting post."
+    );
+    console.error(error);
+    return null;
+  }
 };
+
