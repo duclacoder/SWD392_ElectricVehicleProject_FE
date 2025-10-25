@@ -45,6 +45,7 @@ interface CarDetail {
   updatedAt: string;
   verified: boolean;
   status: "Pending" | "Approved" | "Rejected";
+  imageUrl: string;
 }
 
 const ViewCarDetails = () => {
@@ -139,16 +140,12 @@ const ViewCarDetails = () => {
 
             {/* Car Images */}
             <div className="flex gap-2 mb-6">
-              <Image
-                src="https://via.placeholder.com/500x300.png?text=Main+Car+Image"
-                alt="Car main"
-                className="rounded-lg"
-              />
-              <div className="flex flex-col gap-2">
+              <Image src={car.imageUrl} alt="Car main" className="rounded-lg" />
+              {/* <div className="flex flex-col gap-2">
                 <Image src="https://via.placeholder.com/100.png?text=Side" />
                 <Image src="https://via.placeholder.com/100.png?text=Back" />
                 <Image src="https://via.placeholder.com/100.png?text=Interior" />
-              </div>
+              </div> */}
             </div>
 
             {/* Price and Status */}

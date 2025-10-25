@@ -18,6 +18,7 @@ import UserSidebar from "../../Widgets/UserSidebar/UserSidebar.tsx";
 const { Title, Paragraph } = Typography;
 const { Option } = Select;
 const { TextArea } = Input;
+import { useState } from "react";
 
 interface AddCarFormValues {
   userId: number;
@@ -42,38 +43,55 @@ interface AddCarFormValues {
   warrantyMonths: number;
   price: number; // decimal? maps to number
   currency: string;
+  image?: File;
 }
 
 const AddCar = () => {
   const [form] = Form.useForm();
   const currentUserId = localStorage.getItem("userId"); // Example: getting from localStorage
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      form.setFieldValue("image", file); // ✅ store file in form
+      setPreviewImage(URL.createObjectURL(file)); // ✅ generate preview
+    }
+  };
   if (!currentUserId) {
     message.error("User ID not found. Please log in.");
     return;
   }
 
-  const handleAddCar = async (values: AddCarFormValues) => {
-    const payload = {
-      ...values,
-      userId: currentUserId, // Assuming this user is adding the car
-    };
+  const handleAddCar = async (values: AddCarFormValues & { image?: File }) => {
+    const formData = new FormData();
+
+    // Append all fields from the form
+    Object.entries(values).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        formData.append(key, value);
+      }
+    });
+
+    // Append logged-in user ID (if not directly in form)
+    formData.append("UserId", currentUserId!);
+
+    // Ensure image is included
+    if (values.image) {
+      formData.append("Image", values.image);
+    }
 
     try {
       const response = await fetch("https://localhost:7000/AddCar", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          accept: "text/plain",
-        },
-        body: JSON.stringify(payload),
+        body: formData, // ✅ No JSON, no headers needed!
       });
 
       const result = await response.json();
 
       if (result.isSuccess) {
         message.success(result.message || "Car added successfully!");
-        form.resetFields(); // Clear form after successful submission
+        form.resetFields();
       } else {
         message.error(result.message || "Failed to add car.");
       }
@@ -293,6 +311,35 @@ const AddCar = () => {
                     <Option value="Truck">Truck</Option>
                     {/* Add more options as needed */}
                   </Select>
+                </Form.Item>
+
+                <Form.Item
+                  name="image"
+                  label="Upload Vehicle Image"
+                  valuePropName="file"
+                  rules={[
+                    { required: true, message: "Please upload an image!" },
+                  ]}
+                >
+                  <>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                    />
+
+                    {previewImage && (
+                      <img
+                        src={previewImage}
+                        alt="Vehicle Preview"
+                        style={{
+                          marginTop: "15px",
+                          width: "200px",
+                          borderRadius: "10px",
+                        }}
+                      />
+                    )}
+                  </>
                 </Form.Item>
               </Card>
 
