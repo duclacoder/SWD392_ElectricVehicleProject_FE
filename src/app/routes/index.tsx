@@ -27,7 +27,9 @@ import { AdminLayout } from "../layouts/AdminLayout";
 import PostPackagePage from "../../pages/Admin/PostPackage/index.tsx";
 import PackageStore from "../../pages/Packages/index.tsx";
 import PackagePricingPage from "../../pages/Packages/index.tsx";
-import PaymentSuccess from "../../pages/Payment/PaymentSuccess"
+import PaymentSuccess from "../../pages/Payment/PaymentSuccess";
+import ViewBatteryDetails from "../../pages/Profile/ViewBatteryDetails.tsx";
+import AddBattery from "../../pages/Profile/AddBattery.tsx";
 
 export const AppRoutes = () => {
   return (
@@ -54,7 +56,13 @@ export const AppRoutes = () => {
         path="/ViewCarDetails/:userId/:vehicleId"
         element={<ViewCarDetails />}
       />
+      <Route
+        path="/ViewBatteryDetails/:userId/:batteryId"
+        element={<ViewBatteryDetails />}
+      />
 
+      <Route path="/ViewBattery" element={<ViewBattery />} />
+      <Route path="/AddBattery" element={<AddBattery />} />
       <Route path="/InspectionFee" element={<InspectionFee />} />
       <Route
         path="/ViewInspectionFee/:inspectionFeeId"
@@ -74,7 +82,7 @@ export const AppRoutes = () => {
       <Route path="/post" element={<PostVehicleSale />} />
       <Route path="/posts" element={<PostList />} />
       <Route path="/userpost/:id" element={<PostDetail />} />
-      <Route path="/paymentSuccess" element={<PaymentSuccess/>}/>
+      <Route path="/paymentSuccess" element={<PaymentSuccess />} />
       <Route
         path="/admin/vehicles"
         element={

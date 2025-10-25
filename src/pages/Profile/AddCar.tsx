@@ -20,7 +20,7 @@ const { Option } = Select;
 const { TextArea } = Input;
 
 interface AddCarFormValues {
-  userId: number; // Stays number, hardcoded to 3
+  userId: number;
   vehicleName: string;
   description: string;
   brand: string;
@@ -54,7 +54,6 @@ const AddCar = () => {
   }
 
   const handleAddCar = async (values: AddCarFormValues) => {
-    // Hardcoding userId as 3, similar to the Profile.tsx fetch example
     const payload = {
       ...values,
       userId: currentUserId, // Assuming this user is adding the car
