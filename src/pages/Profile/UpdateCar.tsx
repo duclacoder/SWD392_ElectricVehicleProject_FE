@@ -8,7 +8,6 @@ import {
   message,
   Space,
   Spin,
-  //   Select,
   Switch,
   Typography,
 } from "antd";
@@ -19,7 +18,6 @@ import { Header } from "../../Widgets/Headers/Header";
 import UserSidebar from "../../Widgets/UserSidebar/UserSidebar";
 
 const { Title, Paragraph } = Typography;
-// const { Option } = Select;
 const { TextArea } = Input;
 
 interface CarDetail {
@@ -46,10 +44,11 @@ interface CarDetail {
   warrantyMonths: number;
   price: number;
   currency: string;
-  createdAt: string;
-  updatedAt: string;
-  verified: boolean;
-  status: string;
+  createdAt?: string;
+  updatedAt?: string;
+  verified?: boolean;
+  status?: string;
+  imageUrl?: string;
 }
 
 const UpdateCar = () => {
@@ -58,62 +57,106 @@ const UpdateCar = () => {
     vehicleId: string;
   }>();
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // loading while fetching
+  const [submitting, setSubmitting] = useState(false); // loading while submitting
   const [car, setCar] = useState<CarDetail | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   useEffect(() => {
     const fetchCar = async () => {
       try {
-        const response = await fetch(
+        const res = await fetch(
           `https://localhost:7000/UserGetCarDetailsForUpdate/${userId}/${vehicleId}`
         );
-        if (!response.ok)
-          throw new Error(`HTTP error! status: ${response.status}`);
-
-        const data = await response.json();
+        if (!res.ok) throw new Error(`Status ${res.status}`);
+        const data = await res.json();
         if (data.isSuccess) {
           setCar(data.result);
-          form.setFieldsValue(data.result); // pre-fill form
+          // Pre-fill form fields
+          form.setFieldsValue({
+            ...data.result,
+            // Ensure switches and other boolean values are properly set:
+            fastChargingSupport: Boolean(data.result.fastChargingSupport),
+          });
+          setPreviewImage(data.result.imageUrl ?? null); // show old image
         } else {
           message.error(data.message || "Failed to fetch car details.");
         }
-      } catch (error) {
-        console.error("Error fetching car:", error);
+      } catch (err) {
+        console.error("Fetch car error:", err);
         message.error("Error fetching car details.");
       } finally {
         setLoading(false);
       }
     };
-
     fetchCar();
   }, [userId, vehicleId, form]);
 
-  const handleUpdateCar = async (values: CarDetail) => {
-    const payload = {
-      ...values,
-      userId: Number(userId),
-      vehiclesId: Number(vehicleId),
-    };
+  // Image input change: set file and preview
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    if (file) {
+      setSelectedFile(file);
+      form.setFieldValue("image", file);
+      setPreviewImage(URL.createObjectURL(file));
+    }
+  };
+
+  // Build FormData and submit
+  const handleUpdateCar = async (values: any) => {
+    // Disable submit button
+    setSubmitting(true);
 
     try {
-      const response = await fetch("https://localhost:7000/UserCarUpdate", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          accept: "text/plain",
-        },
-        body: JSON.stringify(payload),
+      const formData = new FormData();
+
+      // Append every field from form values
+      // Convert undefined/null -> skip
+      Object.entries(values).forEach(([key, val]) => {
+        if (val === undefined || val === null) return;
+
+        // For boolean and number values, convert to string because FormData stores strings/blobs
+        if (typeof val === "boolean" || typeof val === "number") {
+          formData.append(key, String(val));
+        } else {
+          // Strings and others
+          formData.append(key, val as any);
+        }
       });
 
-      const result = await response.json();
+      // Ensure userId & vehiclesId are included (form values may or may not include them)
+      if (!formData.has("userId")) formData.append("userId", userId ?? "");
+      if (!formData.has("vehiclesId"))
+        formData.append("vehiclesId", vehicleId ?? "");
+
+      // If the user selected a new image file, append it as "Image"
+      // If not selectedFile, do NOT append "Image" -> backend should keep old image
+      if (selectedFile) {
+        formData.append("Image", selectedFile, selectedFile.name);
+      }
+
+      const res = await fetch("https://localhost:7000/UserCarUpdate", {
+        method: "PUT",
+        // DO NOT set Content-Type header — browser sets multipart boundary automatically
+        body: formData,
+      });
+
+      const result = await res.json();
+
       if (result.isSuccess) {
         message.success(result.message || "Car updated successfully!");
+        // Wait 1.5s (1500ms) as requested for a visible success pause
+        await new Promise((r) => setTimeout(r, 1500));
+        // No redirect (per your last instruction). If you want to navigate, add it later.
       } else {
         message.error(result.message || "Failed to update car.");
       }
-    } catch (error) {
-      console.error("Error updating car:", error);
+    } catch (err) {
+      console.error("Update error:", err);
       message.error("Error updating car: Could not connect to server.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -136,7 +179,8 @@ const UpdateCar = () => {
               <EditOutlined className="mr-2" /> Update Car
             </Title>
             <Paragraph type="secondary" className="mb-5">
-              Update the details of your car below.
+              Update the details of your car below. If you don't select a new
+              image, the existing image will remain.
             </Paragraph>
 
             <Form
@@ -147,16 +191,32 @@ const UpdateCar = () => {
             >
               {/* Vehicle Info */}
               <Card title="Vehicle Information" className="mb-5">
-                <Form.Item name="vehicleName" label="Vehicle Name">
+                <Form.Item
+                  name="vehicleName"
+                  label="Vehicle Name"
+                  rules={[{ required: true }]}
+                >
                   <Input />
                 </Form.Item>
-                <Form.Item name="description" label="Description">
+                <Form.Item
+                  name="description"
+                  label="Description"
+                  rules={[{ required: true }]}
+                >
                   <TextArea rows={4} />
                 </Form.Item>
-                <Form.Item name="brand" label="Brand">
+                <Form.Item
+                  name="brand"
+                  label="Brand"
+                  rules={[{ required: true }]}
+                >
                   <Input />
                 </Form.Item>
-                <Form.Item name="model" label="Model">
+                <Form.Item
+                  name="model"
+                  label="Model"
+                  rules={[{ required: true }]}
+                >
                   <Input />
                 </Form.Item>
                 <Form.Item name="color" label="Color">
@@ -173,6 +233,28 @@ const UpdateCar = () => {
                 </Form.Item>
                 <Form.Item name="bodyType" label="Body Type">
                   <Input />
+                </Form.Item>
+
+                {/* Image upload + preview */}
+                <Form.Item
+                  label="Vehicle Image (choose to replace)"
+                  name="image"
+                  valuePropName="file"
+                >
+                  <>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                    />
+                    {previewImage && (
+                      <img
+                        src={previewImage}
+                        alt="Vehicle Preview"
+                        style={{ marginTop: 15, width: 200, borderRadius: 10 }}
+                      />
+                    )}
+                  </>
                 </Form.Item>
               </Card>
 
@@ -213,7 +295,7 @@ const UpdateCar = () => {
 
               {/* Pricing */}
               <Card title="Pricing and Warranty" className="mb-5">
-                <Form.Item name="warrantyMonths" label="Warranty">
+                <Form.Item name="warrantyMonths" label="Warranty (months)">
                   <InputNumber style={{ width: "100%" }} addonAfter="months" />
                 </Form.Item>
                 <Form.Item name="price" label="Price">
@@ -230,18 +312,24 @@ const UpdateCar = () => {
                   <Input value={car?.verified ? "Yes" : "No"} disabled />
                 </Form.Item>
                 <Form.Item label="Status">
-                  <Input value={car?.status} disabled />
+                  <Input value={car?.status ?? ""} disabled />
                 </Form.Item>
                 <Form.Item label="Created At">
-                  <Input value={car?.createdAt} disabled />
+                  <Input value={car?.createdAt ?? ""} disabled />
                 </Form.Item>
                 <Form.Item label="Updated At">
-                  <Input value={car?.updatedAt} disabled />
+                  <Input value={car?.updatedAt ?? ""} disabled />
                 </Form.Item>
               </Card>
 
               <Form.Item className="text-center mt-6">
-                <Button type="primary" htmlType="submit" size="large">
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  size="large"
+                  loading={submitting}
+                  disabled={submitting}
+                >
                   <Space>
                     <CarOutlined />
                     Update Car
