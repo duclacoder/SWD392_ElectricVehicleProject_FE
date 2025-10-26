@@ -41,6 +41,7 @@ interface Battery {
   price: number;
   currency: string;
   status: "Active" | "Deleted";
+  imageUrl: string;
 }
 
 interface BatteryApiResponse {
@@ -179,7 +180,7 @@ const ViewBattery = () => {
                         <Col span={8}>
                           <Image
                             alt="Battery Image"
-                            src="https://via.placeholder.com/300x200.png?text=Battery+Image"
+                            src={bat.imageUrl}
                             className="w-full h-full object-cover"
                             style={{ maxHeight: 200 }}
                           />

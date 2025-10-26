@@ -28,6 +28,7 @@ interface BatteryDetail {
   createdAt: string | null;
   updatedAt: string | null;
   status: "Active" | "Deleted";
+  imageUrl: string;
 }
 
 const ViewBatteryDetails = () => {
@@ -111,15 +112,15 @@ const ViewBatteryDetails = () => {
             {/* Images */}
             <div className="flex gap-2 mb-6">
               <Image
-                src="https://via.placeholder.com/500x300.png?text=Battery+Image"
+                src={battery.imageUrl}
                 alt="Battery"
                 className="rounded-lg"
               />
-              <div className="flex flex-col gap-2">
+              {/* <div className="flex flex-col gap-2">
                 <Image src="https://via.placeholder.com/100.png?text=Side" />
                 <Image src="https://via.placeholder.com/100.png?text=Top" />
                 <Image src="https://via.placeholder.com/100.png?text=Specs" />
-              </div>
+              </div> */}
             </div>
 
             {/* Price & Status */}
