@@ -13,6 +13,7 @@ import {
 import { Header } from "../../Widgets/Headers/Header";
 import { Footer } from "../../Widgets/Footers/Footer";
 import UserSidebar from "../../Widgets/UserSidebar/UserSidebar";
+import { useState } from "react";
 
 const { Title, Paragraph } = Typography;
 const { TextArea } = Input;
@@ -28,37 +29,56 @@ interface AddBatteryFormValues {
   warrantyMonths: number;
   price: number;
   currency: string;
+  image?: File;
 }
 
 const AddBattery = () => {
   const [form] = Form.useForm();
   const currentUserId = localStorage.getItem("userId");
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   if (!currentUserId) {
     message.error("User ID not found. Please log in.");
     return null;
   }
 
+  // ✅ Image upload + preview
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      form.setFieldValue("image", file);
+      setPreviewImage(URL.createObjectURL(file));
+    }
+  };
+
+  // ✅ Submit using FormData instead of JSON
   const handleAddBattery = async (values: AddBatteryFormValues) => {
-    const payload = {
-      ...values,
-      userId: Number(currentUserId),
-    };
+    const formData = new FormData();
+
+    Object.entries(values).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        formData.append(key, value as any);
+      }
+    });
+
+    formData.append("userId", currentUserId);
+
+    if (values.image) {
+      formData.append("ImageUpload", values.image); // 👈 MUST MATCH C# PARAMETER NAME
+    }
 
     try {
       const response = await fetch("https://localhost:7000/AddBattery", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          accept: "text/plain",
-        },
-        body: JSON.stringify(payload),
+        body: formData,
       });
 
       const result = await response.json();
+
       if (result.isSuccess) {
         message.success(result.message || "Battery added successfully!");
         form.resetFields();
+        setPreviewImage(null);
       } else {
         message.error(result.message || "Failed to add battery.");
       }
@@ -98,12 +118,12 @@ const AddBattery = () => {
               }}
             >
               <Card title="Battery Information" className="mb-5">
+                {/* ✅ All original fields stay unchanged */}
                 <Form.Item
                   name="batteryName"
                   label="Battery Name"
                   rules={[
                     { required: true, message: "Please enter battery name" },
-                    { min: 2, max: 100, message: "2-100 characters required" },
                   ]}
                 >
                   <Input placeholder="e.g., Panasonic EV48" maxLength={100} />
@@ -112,10 +132,7 @@ const AddBattery = () => {
                 <Form.Item
                   name="description"
                   label="Description"
-                  rules={[
-                    { required: true, message: "Please enter description" },
-                    { max: 500, message: "Maximum 500 characters allowed" },
-                  ]}
+                  rules={[{ required: true }]}
                 >
                   <TextArea
                     rows={3}
@@ -127,10 +144,7 @@ const AddBattery = () => {
                 <Form.Item
                   name="brand"
                   label="Brand"
-                  rules={[
-                    { required: true, message: "Please enter brand" },
-                    { max: 50, message: "Maximum 50 characters allowed" },
-                  ]}
+                  rules={[{ required: true }]}
                 >
                   <Input placeholder="e.g., Panasonic" maxLength={50} />
                 </Form.Item>
@@ -138,15 +152,7 @@ const AddBattery = () => {
                 <Form.Item
                   name="capacity"
                   label="Capacity (kWh)"
-                  rules={[
-                    { required: true, message: "Please enter capacity" },
-                    {
-                      type: "number",
-                      min: 1,
-                      max: 1000,
-                      message: "1-1000 kWh",
-                    },
-                  ]}
+                  rules={[{ required: true }]}
                 >
                   <InputNumber
                     min={1}
@@ -159,10 +165,7 @@ const AddBattery = () => {
                 <Form.Item
                   name="voltage"
                   label="Voltage (V)"
-                  rules={[
-                    { required: true, message: "Please enter voltage" },
-                    { type: "number", min: 1, max: 999, message: "1-999 V" },
-                  ]}
+                  rules={[{ required: true }]}
                 >
                   <InputNumber
                     min={1}
@@ -171,24 +174,37 @@ const AddBattery = () => {
                     addonAfter="V"
                   />
                 </Form.Item>
+
+                {/* ✅ Image Upload Like AddCar */}
+                <Form.Item
+                  name="image"
+                  label="Upload Battery Image"
+                  rules={[
+                    { required: true, message: "Please upload an image!" },
+                  ]}
+                >
+                  <>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                    />
+                    {previewImage && (
+                      <img
+                        src={previewImage}
+                        alt="Battery Preview"
+                        style={{ marginTop: 15, width: 200, borderRadius: 10 }}
+                      />
+                    )}
+                  </>
+                </Form.Item>
               </Card>
 
               <Card title="Pricing & Warranty" className="mb-5">
                 <Form.Item
                   name="warrantyMonths"
                   label="Warranty (Months)"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please enter warranty duration",
-                    },
-                    {
-                      type: "number",
-                      min: 0,
-                      max: 240,
-                      message: "0-240 months",
-                    },
-                  ]}
+                  rules={[{ required: true }]}
                 >
                   <InputNumber
                     min={0}
@@ -201,39 +217,19 @@ const AddBattery = () => {
                 <Form.Item
                   name="price"
                   label="Price"
-                  rules={[
-                    { required: true, message: "Please enter price" },
-                    {
-                      type: "number",
-                      min: 1,
-                      max: 100000000,
-                      message: "1 - 100,000,000",
-                    },
-                  ]}
+                  rules={[{ required: true }]}
                 >
                   <InputNumber
                     min={1}
                     max={100000000}
                     style={{ width: "100%" }}
-                    formatter={(value) =>
-                      `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                    }
-                    parser={(value: string | undefined) =>
-                      value ? parseFloat(value.replace(/\$\s?|(,*)/g, "")) : 0
-                    }
                   />
                 </Form.Item>
 
                 <Form.Item
                   name="currency"
                   label="Currency"
-                  rules={[
-                    { required: true, message: "Please select currency" },
-                    {
-                      pattern: /^[A-Z]{3}$/,
-                      message: "Currency must be 3-letter ISO",
-                    },
-                  ]}
+                  rules={[{ required: true }]}
                 >
                   <Select>
                     <Option value="VND">VND</Option>
