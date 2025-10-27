@@ -6,12 +6,13 @@ import {
   DeleteOutlined,
   EyeOutlined,
   MoreOutlined,
-  PlusOutlined, // Thêm icon Delete
+  PlusOutlined,
   RollbackOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
 import type { TableProps } from "antd";
 import {
+  Avatar,
   Button,
   Dropdown,
   Input,
@@ -45,14 +46,12 @@ const AdminVehiclePage = () => {
   const [searchText, setSearchText] = useState("");
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
-  // State cho modal Cập nhật/Tạo mới
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<AdminVehicle | null>(
     null
   );
   const [submitLoading, setSubmitLoading] = useState(false);
 
-  // State cho modal Chi tiết
   const [isDetailVisible, setIsDetailVisible] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<AdminVehicle | null>(
     null
@@ -86,7 +85,6 @@ const AdminVehiclePage = () => {
     fetchVehicles();
   }, [fetchVehicles]);
 
-  // --- Handlers cho modal Cập nhật/Tạo mới ---
   const handleShowAddModal = () => {
     setEditingVehicle(null);
     setIsModalVisible(true);
@@ -119,7 +117,6 @@ const AdminVehiclePage = () => {
     setSubmitLoading(false);
   };
 
-  // --- Handlers cho modal Chi tiết ---
   const handleShowDetailModal = (vehicle: AdminVehicle) => {
     setSelectedVehicle(vehicle);
     setIsDetailVisible(true);
@@ -129,7 +126,6 @@ const AdminVehiclePage = () => {
     setIsDetailVisible(false);
   };
 
-  // --- Handler cho Delete/Undelete ---
   const handleDelete = (vehicle: AdminVehicle) => {
     confirm({
       title: `Are you sure you want to delete ${vehicle.vehicleName}?`,
@@ -146,7 +142,6 @@ const AdminVehiclePage = () => {
     });
   };
 
-  // *** THÊM HANDLER MỚI ***
   const handleUnDelete = (vehicle: AdminVehicle) => {
     confirm({
       title: `Are you sure you want to undelete ${vehicle.vehicleName}?`,
@@ -163,16 +158,15 @@ const AdminVehiclePage = () => {
     });
   };
 
-  // Cập nhật columns cho vehicle
   const columns: TableProps<AdminVehicle>["columns"] = [
     {
       title: "Name",
       dataIndex: "vehicleName",
       key: "vehicleName",
       sorter: (a, b) => a.vehicleName.localeCompare(b.vehicleName),
-      render: (text) => (
+      render: (text, record) => (
         <Space>
-          <CarOutlined />
+          <Avatar src={record.imageUrl} icon={<CarOutlined />} />
           <Text>{text}</Text>
         </Space>
       ),
@@ -234,7 +228,7 @@ const AdminVehiclePage = () => {
             color = "error";
             icon = <CloseCircleOutlined />;
             break;
-          case "deleted": // *** THÊM CASE CHO DELETED ***
+          case "deleted":
             color = "error";
             icon = <DeleteOutlined />;
             break;
@@ -254,7 +248,6 @@ const AdminVehiclePage = () => {
       key: "actions",
       align: "center",
       render: (_, record) => {
-        // *** CẬP NHẬT LOGIC MENU ***
         const isDeleted = record.status?.toLowerCase() === "deleted";
 
         const menuItems = [
@@ -267,9 +260,8 @@ const AdminVehiclePage = () => {
             key: "2",
             label: "Edit",
 
-            disabled: isDeleted, // Không thể sửa xe đã xóa
+            disabled: isDeleted,
           },
-          // Hiển thị Delete hoặc Undelete
           isDeleted
             ? {
                 key: "3",
@@ -391,7 +383,6 @@ const AdminVehiclePage = () => {
         rowClassName="cursor-pointer"
       />
 
-      {/* Modal cho Cập nhật/Tạo mới */}
       <VehicleFormModal
         visible={isModalVisible}
         onCancel={handleModalCancel}
@@ -400,7 +391,6 @@ const AdminVehiclePage = () => {
         loading={submitLoading}
       />
 
-      {/* RENDER MODAL CHI TIẾT */}
       <VehicleDetailModal
         visible={isDetailVisible}
         onCancel={handleDetailModalCancel}

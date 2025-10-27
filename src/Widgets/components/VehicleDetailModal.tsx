@@ -1,13 +1,58 @@
-import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
-import { Badge, Descriptions, Modal, Tag } from "antd";
+import {
+  BgColorsOutlined,
+  CalendarOutlined,
+  CarOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+  DashboardOutlined,
+  DollarOutlined,
+  EyeOutlined,
+  InfoCircleOutlined,
+  SafetyCertificateOutlined,
+  TagOutlined,
+  ThunderboltOutlined,
+  UsergroupAddOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
+import {
+  Button,
+  Col,
+  Divider,
+  Image,
+  Modal,
+  Row,
+  Space,
+  Tag,
+  Typography,
+} from "antd";
 import type { FC } from "react";
 import type { AdminVehicle } from "../../entities/AdminVehicle";
+
+const { Title, Text, Paragraph } = Typography;
 
 interface VehicleDetailModalProps {
   visible: boolean;
   onCancel: () => void;
   vehicle: AdminVehicle | null;
 }
+
+const DetailItem: FC<{
+  icon: React.ReactNode;
+  label: string;
+  value: React.ReactNode;
+}> = ({ icon, label, value }) => (
+  <div className="flex items-start mb-3">
+    <span className="text-gray-500 mr-3 text-lg">{icon}</span>
+    <div>
+      <Text type="secondary" className="block text-xs uppercase tracking-wider">
+        {label}
+      </Text>
+      <Text strong className="text-base text-gray-800">
+        {value ?? "N/A"}
+      </Text>
+    </div>
+  </div>
+);
 
 export const VehicleDetailModal: FC<VehicleDetailModalProps> = ({
   visible,
@@ -16,121 +61,221 @@ export const VehicleDetailModal: FC<VehicleDetailModalProps> = ({
 }) => {
   if (!vehicle) return null;
 
+  const renderStatusTag = (status: string | undefined) => {
+    let color = "default";
+    switch (status?.toLowerCase()) {
+      case "approved":
+      case "admin":
+        color = "success";
+        break;
+      case "pending":
+        color = "processing";
+        break;
+      case "rejected":
+      case "deleted":
+        color = "error";
+        break;
+    }
+    return status ? (
+      <Tag color={color} className="font-medium">
+        {status}
+      </Tag>
+    ) : (
+      <Tag>Unknown</Tag>
+    );
+  };
+
+  const renderVerifiedTag = (verified: boolean | undefined) => (
+    <Tag
+      icon={verified ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
+      color={verified ? "success" : "error"}
+      className="font-medium"
+    >
+      {verified ? "Verified" : "Not Verified"}
+    </Tag>
+  );
+
   return (
     <Modal
-      title="Vehicle Details"
+      title={
+        <Space>
+          <CarOutlined />
+          <span className="font-semibold">
+            {vehicle.vehicleName || "Vehicle Details"}
+          </span>
+        </Space>
+      }
       open={visible}
       onCancel={onCancel}
       footer={[
-        <button
+        <Button
           key="close"
+          type="primary"
           onClick={onCancel}
-          className="bg-sky-500 text-white font-semibold text-sm px-4 py-2 rounded-lg hover:bg-sky-600 transition"
+          className="rounded-lg"
         >
           Close
-        </button>,
+        </Button>,
       ]}
-      width={1000}
+      width={900}
+      styles={{
+        body: { backgroundColor: "#f9fafb", padding: "24px" },
+      }}
     >
-      <Descriptions
-        bordered
-        column={2}
-        layout="horizontal"
-        style={{ maxHeight: "70vh", overflowY: "auto", padding: "8px" }}
-      >
-        {/* Basic Info */}
-        <Descriptions.Item label="Vehicle ID" span={1}>
-          {vehicle.vehiclesId}
-        </Descriptions.Item>
-        <Descriptions.Item label="Owner (User ID)" span={1}>
-          {vehicle.userId}
-        </Descriptions.Item>
-        <Descriptions.Item label="Vehicle Name" span={2}>
-          {vehicle.vehicleName}
-        </Descriptions.Item>
-        <Descriptions.Item label="Description" span={2}>
-          {vehicle.description}
-        </Descriptions.Item>
-        <Descriptions.Item label="Brand">{vehicle.brand}</Descriptions.Item>
-        <Descriptions.Item label="Model">{vehicle.model}</Descriptions.Item>
-        <Descriptions.Item label="Year">{vehicle.year}</Descriptions.Item>
-        <Descriptions.Item label="Color">{vehicle.color}</Descriptions.Item>
-        <Descriptions.Item label="Seats">{vehicle.seats}</Descriptions.Item>
-        <Descriptions.Item label="Body Type">
-          {vehicle.bodyType}
-        </Descriptions.Item>
-        <Descriptions.Item label="Odometer (km)">
-          {vehicle.km.toLocaleString()} km
-        </Descriptions.Item>
-        <Descriptions.Item label="Warranty">
-          {vehicle.warrantyMonths} months
-        </Descriptions.Item>
-
-        {/* EV Specs */}
-        <Descriptions.Item label="Battery Capacity" span={1}>
-          <Badge status="processing" text={`${vehicle.batteryCapacity} kWh`} />
-        </Descriptions.Item>
-        <Descriptions.Item label="Range" span={1}>
-          {vehicle.rangeKm} km
-        </Descriptions.Item>
-        <Descriptions.Item label="Motor Power" span={1}>
-          {vehicle.motorPowerKw} kW
-        </Descriptions.Item>
-        <Descriptions.Item label="Top Speed" span={1}>
-          {vehicle.topSpeedKph} kph
-        </Descriptions.Item>
-        <Descriptions.Item label="Acceleration (0-100s)" span={1}>
-          {vehicle.acceleration} s
-        </Descriptions.Item>
-        <Descriptions.Item label="Charging Time" span={1}>
-          {vehicle.chargingTimeHours} hours
-        </Descriptions.Item>
-        <Descriptions.Item label="Fast Charging" span={1}>
-          {vehicle.fastChargingSupport ? (
-            <Tag color="green">Yes</Tag>
-          ) : (
-            <Tag color="red">No</Tag>
-          )}
-        </Descriptions.Item>
-        <Descriptions.Item label="Connector Type" span={1}>
-          {vehicle.connectorType}
-        </Descriptions.Item>
-        <Descriptions.Item label="Battery Status" span={2}>
-          {vehicle.batteryStatus}
-        </Descriptions.Item>
-
-        {/* Pricing & Status */}
-        <Descriptions.Item label="Price" span={1}>
-          <Tag color="blue">
-            {vehicle.price.toLocaleString()} {vehicle.currency}
-          </Tag>
-        </Descriptions.Item>
-        <Descriptions.Item label="Status" span={1}>
-          <Tag color="purple">{vehicle.status}</Tag>
-        </Descriptions.Item>
-        <Descriptions.Item label="Verified" span={2}>
-          <Tag
-            icon={
-              vehicle.verified ? (
-                <CheckCircleOutlined />
-              ) : (
-                <CloseCircleOutlined />
-              )
+      <Row gutter={[24, 24]}>
+        <Col xs={24} md={10} className="text-center">
+          <Image
+            width="100%"
+            src={
+              vehicle.imageUrl ||
+              "https://via.placeholder.com/400x300?text=No+Image"
             }
-            color={vehicle.verified ? "success" : "error"}
-          >
-            {vehicle.verified ? "Verified" : "Not Verified"}
-          </Tag>
-        </Descriptions.Item>
+            alt={vehicle.vehicleName}
+            style={{
+              borderRadius: "12px",
+              border: "1px solid #e5e7eb",
+              objectFit: "cover",
+              maxHeight: "300px",
+            }}
+            preview={{
+              mask: (
+                <Space>
+                  <EyeOutlined />
+                  Preview
+                </Space>
+              ),
+            }}
+          />
+          <div className="mt-4 bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+            <DetailItem
+              icon={<DollarOutlined />}
+              label="Price"
+              value={
+                <Text strong className="text-2xl text-blue-600">
+                  {vehicle.price?.toLocaleString() ?? "N/A"} {vehicle.currency}
+                </Text>
+              }
+            />
+            <Divider style={{ margin: "12px 0" }} />
+            <Row>
+              <Col span={12}>
+                <DetailItem
+                  icon={<TagOutlined />}
+                  label="Status"
+                  value={renderStatusTag(vehicle.status)}
+                />
+              </Col>
+              <Col span={12}>
+                <DetailItem
+                  icon={<SafetyCertificateOutlined />}
+                  label="Verified"
+                  value={renderVerifiedTag(vehicle.verified)}
+                />
+              </Col>
+            </Row>
+          </div>
+        </Col>
 
-        {/* Timestamps */}
-        <Descriptions.Item label="Created At" span={1}>
-          {new Date(vehicle.createdAt).toLocaleString()}
-        </Descriptions.Item>
-        <Descriptions.Item label="Updated At" span={1}>
-          {new Date(vehicle.updatedAt).toLocaleString()}
-        </Descriptions.Item>
-      </Descriptions>
+        <Col xs={24} md={14}>
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 h-full">
+            <Title level={4} className="mb-5 text-gray-700">
+              Vehicle Information
+            </Title>
+
+            <Row gutter={[16, 0]}>
+              {" "}
+              <Col span={12}>
+                <DetailItem
+                  icon={<InfoCircleOutlined />}
+                  label="Vehicle ID"
+                  value={vehicle.vehiclesId}
+                />
+              </Col>
+              <Col span={12}>
+                <DetailItem
+                  icon={<UserOutlined />}
+                  label="Owner (User ID)"
+                  value={vehicle.userId}
+                />
+              </Col>
+              <Col span={12}>
+                <DetailItem
+                  icon={<CarOutlined />}
+                  label="Brand"
+                  value={vehicle.brand}
+                />
+              </Col>
+              <Col span={12}>
+                <DetailItem
+                  icon={<CarOutlined />}
+                  label="Model"
+                  value={vehicle.model}
+                />
+              </Col>
+              <Col span={12}>
+                <DetailItem
+                  icon={<CalendarOutlined />}
+                  label="Year"
+                  value={vehicle.year}
+                />
+              </Col>
+              <Col span={12}>
+                <DetailItem
+                  icon={<BgColorsOutlined />}
+                  label="Color"
+                  value={vehicle.color}
+                />
+              </Col>{" "}
+              {/* Added Color Icon */}
+              <Col span={12}>
+                <DetailItem
+                  icon={<UsergroupAddOutlined />}
+                  label="Seats"
+                  value={vehicle.seats}
+                />
+              </Col>
+              <Col span={12}>
+                <DetailItem
+                  icon={<CarOutlined />}
+                  label="Body Type"
+                  value={vehicle.bodyType || "N/A"}
+                />
+              </Col>
+              <Col span={12}>
+                <DetailItem
+                  icon={<DashboardOutlined />}
+                  label="Odometer"
+                  value={`${vehicle.km?.toLocaleString()} km`}
+                />
+              </Col>
+              <Col span={12}>
+                <DetailItem
+                  icon={<SafetyCertificateOutlined />}
+                  label="Warranty"
+                  value={
+                    vehicle.warrantyMonths != null
+                      ? `${vehicle.warrantyMonths} months`
+                      : "N/A"
+                  }
+                />
+              </Col>
+              <Col span={12}>
+                <DetailItem
+                  icon={<ThunderboltOutlined />}
+                  label="Fast Charging"
+                  value={
+                    vehicle.fastChargingSupport ? (
+                      <Tag color="green">Yes</Tag>
+                    ) : (
+                      <Tag color="red">No</Tag>
+                    )
+                  }
+                />
+              </Col>
+            </Row>
+          </div>
+        </Col>
+      </Row>
     </Modal>
   );
 };
