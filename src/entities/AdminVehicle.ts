@@ -26,6 +26,7 @@ export interface AdminVehicle {
   updatedAt: string;
   verified: boolean;
   status: string;
+  imageUrl: string;
 }
 
 export interface AdminVehicleFormData {
@@ -50,4 +51,5 @@ export interface AdminVehicleFormData {
   warrantyMonths: number;
   price: number;
   currency: string;
+  image?: File | string;
 }
