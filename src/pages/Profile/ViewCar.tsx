@@ -48,6 +48,7 @@ interface Car {
   currency: string;
   verified: boolean;
   status: "Pending" | "Approved" | "Rejected" | "Deleted"; // Explicitly define possible statuses
+  imageUrl: string;
 }
 
 interface CarApiResponse {
@@ -216,7 +217,7 @@ const ViewCar = () => {
                             {/* Placeholder Image */}
                             <Image
                               alt={`${car.brand} ${car.model}`}
-                              src="https://via.placeholder.com/300x200.png?text=Car+Image" // Placeholder image
+                              src={`${car.imageUrl}`} // Placeholder image
                               className="w-full h-full object-cover"
                               style={{ maxHeight: 200 }}
                             />

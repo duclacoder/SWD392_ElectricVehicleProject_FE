@@ -1,22 +1,49 @@
-import { CheckCircle, Download, Mail, Phone, MapPin, Clock } from "lucide-react";
-import { useState } from "react";
+import { CheckCircle, Download, Mail, Clock } from "lucide-react";
+import { use, useEffect, useState } from "react";
+import type { PostPackage } from "../../../entities/PostPackage";
+import { HomeFilled } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 const PaymentSuccess = () => {
   const [showReceipt, setShowReceipt] = useState(false);
+  const [packageInfo, setPackageInfo] = useState<PostPackage>();
 
-  const transactionInfo = {
-    transactionId: "TXN-2025-789456",
-    amount: "850,000,000 VNĐ",
-    date: "23 Oct 2025, 14:35:22",
-    vehicle: "Mercedes-Benz E-Class 2024",
-    vin: "WDD2130451A123456",
-    dealer: {
-      name: "Luxury Motors Saigon",
-      address: "123 Nguyen Hue, District 1, HCMC",
-      phone: "+84 28 3823 4567",
-      email: "contact@luxurymotors.vn"
+  const navigate = useNavigate();
+
+  const handleBacktoHome = () => {
+    sessionStorage.clear();
+    navigate("/");
+  }
+
+  useEffect(() => {
+    try {
+      const storedPackage = JSON.parse(sessionStorage.getItem("selectedPackage") || "") as PostPackage;
+      if (storedPackage) {
+        setPackageInfo(storedPackage);
+        console.log("Selected Package Info:", storedPackage);
+      }
+    } catch (error) {
+      console.error("Error loading package info:", error);
     }
+  }, []);
+
+  // Format ngày giờ
+  const formatDate = () => {
+    const now = new Date();
+    const day = now.getDate();
+    const month = now.toLocaleString('en-US', { month: 'short' });
+    const year = now.getFullYear();
+    const time = now.toLocaleTimeString('en-US', { hour12: false });
+    return `${day} ${month} ${year}, ${time}`;
   };
+
+  if (!packageInfo) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-sky-700 to-sky-900 flex items-center justify-center">
+        <div className="text-white text-xl">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-700 to-sky-900 flex items-center justify-center p-4">
@@ -53,19 +80,11 @@ const PaymentSuccess = () => {
                 <h2 className="text-xl font-bold text-gray-800 mb-6 pb-2 border-b-2 border-sky-700">
                   Transaction Summary
                 </h2>
-                
-                <div className="space-y-4">
-                  <div className="flex justify-between items-start">
-                    <span className="text-gray-600 font-medium">Transaction ID</span>
-                    <span className="text-gray-900 font-mono text-sm bg-gray-100 px-3 py-1 rounded">
-                      {transactionInfo.transactionId}
-                    </span>
-                  </div>
-                  
+                <div className="space-y-4">                                                
                   <div className="flex justify-between items-start">
                     <span className="text-gray-600 font-medium">Amount Paid</span>
                     <span className="text-2xl font-bold text-green-600">
-                      {transactionInfo.amount}
+                      {packageInfo.postPrice + " VND"} 
                     </span>
                   </div>
                   
@@ -74,82 +93,88 @@ const PaymentSuccess = () => {
                       <Clock className="w-4 h-4 mr-1" />
                       Date & Time
                     </span>
-                    <span className="text-gray-900 text-right">{transactionInfo.date}</span>
+                    <span className="text-gray-900 text-right">{formatDate()}</span>
                   </div>
 
                   <div className="bg-sky-50 rounded-lg p-4 mt-6">
-                    <p className="text-sm font-semibold text-sky-900 mb-2">Vehicle Details</p>
-                    <p className="text-gray-800 font-medium">{transactionInfo.vehicle}</p>
-                    <p className="text-gray-500 text-sm mt-1">VIN: {transactionInfo.vin}</p>
+                    <p className="text-sm font-semibold text-sky-900 mb-2">Package Details</p>
+                    <p className="text-gray-800 font-medium text-lg">{packageInfo.packageName}</p>
+                    <p className="text-gray-600 text-sm mt-2">{packageInfo.description}</p>
+                    <p className="text-gray-500 text-sm mt-2">
+                      Thời hạn: {packageInfo.postDuration} ngày
+                    </p>
                   </div>
                 </div>
               </div>
 
-              {/* Dealer Information */}
+              {/* Package Information */}
               <div>
                 <h2 className="text-xl font-bold text-gray-800 mb-6 pb-2 border-b-2 border-sky-700">
-                  Dealer Information
+                  Package Information
                 </h2>
                 
                 <div className="bg-gray-50 rounded-xl p-6 space-y-4">
                   <div>
                     <p className="text-lg font-bold text-gray-900 mb-1">
-                      {transactionInfo.dealer.name}
+                      {packageInfo.packageName}
                     </p>
+                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                      packageInfo.status === 'Active' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {packageInfo.status}
+                    </span>
                   </div>
 
-                  <div className="flex items-start text-sm">
-                    <MapPin className="w-5 h-5 text-sky-700 mr-3 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700">{transactionInfo.dealer.address}</span>
-                  </div>
+                  <div className="border-t border-gray-200 pt-4 space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Package ID:</span>
+                      <span className="text-sm font-mono bg-gray-200 px-2 py-1 rounded">
+                        #{packageInfo.postPackageId}
+                      </span>
+                    </div>
 
-                  <div className="flex items-center text-sm">
-                    <Phone className="w-5 h-5 text-sky-700 mr-3 flex-shrink-0" />
-                    <a href={`tel:${transactionInfo.dealer.phone}`} className="text-sky-700 hover:text-sky-800 font-medium">
-                      {transactionInfo.dealer.phone}
-                    </a>
-                  </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Duration:</span>
+                      <span className="text-sm font-semibold text-gray-900">
+                        {packageInfo.postDuration} days
+                      </span>
+                    </div>
 
-                  <div className="flex items-center text-sm">
-                    <Mail className="w-5 h-5 text-sky-700 mr-3 flex-shrink-0" />
-                    <a href={`mailto:${transactionInfo.dealer.email}`} className="text-sky-700 hover:text-sky-800 font-medium">
-                      {transactionInfo.dealer.email}
-                    </a>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Currency:</span>
+                      <span className="text-sm font-semibold text-gray-900">
+                        {packageInfo.currency}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Price:</span>
+                      <span className="text-lg font-bold text-sky-700">
+                        {packageInfo.postPrice + " VND"} 
+                      </span>
+                    </div>
                   </div>
                 </div>
 
                 <div className="mt-6 bg-amber-50 border border-amber-200 rounded-lg p-4">
                   <p className="text-sm text-amber-900">
-                    <span className="font-semibold">Next Steps:</span> The dealer will contact you within 24-48 hours to arrange vehicle inspection and delivery.
+                    <span className="font-semibold">Next Steps:</span> Your post will be activated within 24 hours. You can manage your posts from the dashboard.
                   </p>
                 </div>
               </div>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
+            <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t text-white border-gray-200">
               <button
-                onClick={() => setShowReceipt(!showReceipt)}
-                className="flex-1 bg-sky-700 hover:bg-sky-800 text-white font-semibold py-4 rounded-xl transition-all transform hover:scale-105 flex items-center justify-center gap-2"
+                onClick={handleBacktoHome}
+                className="flex-1 bg-sky-600 hover:bg-sky-800 font-semibold py-4 rounded-xl transition-all transform flex items-center justify-center gap-2"
               >
-                <Download className="w-5 h-5" />
-                Download Receipt
-              </button>
-              
-              <button
-                onClick={() => window.print()}
-                className="flex-1 bg-white border-2 border-sky-700 text-sky-700 hover:bg-sky-50 font-semibold py-4 rounded-xl transition-all flex items-center justify-center gap-2"
-              >
-                <Mail className="w-5 h-5" />
-                Email Receipt
-              </button>
-              
-              <button
-                onClick={() => console.log("Navigate to dashboard")}
-                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-4 rounded-xl transition-all flex items-center justify-center"
-              >
-                Go to Dashboard
-              </button>
+                <HomeFilled className="w-5 h-5" />
+                Back to home
+              </button>            
             </div>
 
             {/* Additional Info */}

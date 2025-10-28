@@ -6,6 +6,9 @@ import type {
 import type { PaginatedResult, ResponseDTO } from "../../../entities/Response";
 import { apiRoot } from "../../../shared/api/axios";
 
+const camelToPascal = (str: string) =>
+  str.charAt(0).toUpperCase() + str.slice(1);
+
 export const getAllAdminVehicles = async (
   page: number,
   pageSize: number
@@ -50,27 +53,59 @@ export const createAdminVehicle = async (
       return false;
     }
 
-    const payload = {
-      ...vehicleData,
-      userId: Number(currentUserId),
-      status: "Admin",
-      verified: true,
-    };
+    const formData = new FormData();
 
-    const response = await apiRoot.post(`/AddCar`, payload);
+    formData.append("UserId", currentUserId);
+    formData.append("Status", "Admin");
+    formData.append("Verified", "true");
+
+    Object.entries(vehicleData).forEach(([key, value]) => {
+      if (key === "image") return;
+
+      const pascalCaseKey = camelToPascal(key);
+
+      if (value !== undefined && value !== null) {
+        if (typeof value === "boolean") {
+          formData.append(pascalCaseKey, value ? "true" : "false");
+        } else {
+          formData.append(pascalCaseKey, String(value));
+        }
+      }
+    });
+
+    if (vehicleData.image && typeof vehicleData.image !== "string") {
+      formData.append("Image", vehicleData.image);
+    } else if (!vehicleData.image) {
+    }
+
+    const response = await apiRoot.post(`/AddCar`, formData, {
+      headers: {
+        "Content-Type": undefined,
+      },
+    });
+
     const data: ResponseDTO<any> = response.data;
     if (data.isSuccess) {
       message.success("Vehicle created successfully!");
       return true;
     } else {
-      message.error(data.message || "Failed to create vehicle");
+      console.error("Backend validation errors:", data.message);
+      message.error(
+        data.message || "Failed to create vehicle. Check console for details."
+      );
       return false;
     }
   } catch (error: any) {
-    message.error(
-      error?.response?.data?.message || "An unexpected error occurred."
-    );
-    console.error(error);
+    if (error.response) {
+      console.error("API Error Response:", error.response.data);
+      message.error(
+        error.response.data?.message ||
+          "An unexpected error occurred during creation."
+      );
+    } else {
+      console.error("Network or other error:", error);
+      message.error("An unexpected network error occurred.");
+    }
     return false;
   }
 };
@@ -86,28 +121,58 @@ export const updateAdminVehicle = async (
       return false;
     }
 
-    const payload = {
-      ...vehicleData,
-      vehiclesId: vehicleId,
-      userId: Number(currentUserId),
-      status: "Admin",
-    };
+    const formData = new FormData();
 
-    const response = await apiRoot.put(`/UserCarUpdate`, payload);
+    formData.append("VehiclesId", String(vehicleId));
+    formData.append("UserId", currentUserId);
+    formData.append("Status", "Admin");
+
+    Object.entries(vehicleData).forEach(([key, value]) => {
+      if (key === "image") return;
+
+      const pascalCaseKey = camelToPascal(key);
+
+      if (value !== undefined && value !== null) {
+        if (typeof value === "boolean") {
+          formData.append(pascalCaseKey, value ? "true" : "false");
+        } else {
+          formData.append(pascalCaseKey, String(value));
+        }
+      }
+    });
+
+    if (vehicleData.image && typeof vehicleData.image !== "string") {
+      formData.append("Image", vehicleData.image);
+    }
+
+    const response = await apiRoot.put(`/UserCarUpdate`, formData, {
+      headers: {
+        "Content-Type": undefined,
+      },
+    });
 
     const data: ResponseDTO<any> = response.data;
     if (data.isSuccess) {
       message.success("Vehicle updated successfully!");
       return true;
     } else {
-      message.error(data.message || "Failed to update vehicle");
+      console.error("Backend validation errors:", data.message);
+      message.error(
+        data.message || "Failed to update vehicle. Check console for details."
+      );
       return false;
     }
   } catch (error: any) {
-    message.error(
-      error?.response?.data?.message || "An unexpected error occurred."
-    );
-    console.error(error);
+    if (error.response) {
+      console.error("API Error Response:", error.response.data);
+      message.error(
+        error.response.data?.message ||
+          "An unexpected error occurred during update."
+      );
+    } else {
+      console.error("Network or other error:", error);
+      message.error("An unexpected network error occurred.");
+    }
     return false;
   }
 };
