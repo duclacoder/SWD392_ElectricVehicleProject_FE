@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, Typography, Spin, message, Button, Image, Row, Col, Tag, Divider, Carousel } from "antd";
-import { ArrowLeftOutlined, UserOutlined, CalendarOutlined, CarOutlined, DashboardOutlined, EnvironmentOutlined, HomeOutlined, PhoneOutlined, EyeOutlined, HeartOutlined, ShareAltOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined, UserOutlined, CalendarOutlined, CarOutlined, DashboardOutlined, EnvironmentOutlined, HomeOutlined, PhoneOutlined, EyeOutlined, HeartOutlined, ShareAltOutlined, MailOutlined } from "@ant-design/icons";
 import { getUserPostById } from "../../features/Post";
 import { Header } from "../../Widgets/Headers/Header";
 import { Footer } from "../../Widgets/Footers/Footer";
 import type { UserPostCustom } from "../../entities/UserPost";
+import { getUserById } from "../../features/Post/UserPost";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -14,6 +15,7 @@ const PostDetail: React.FC = () => {
     const navigate = useNavigate();
 
     const [post, setPost] = useState<UserPostCustom | null>(null);
+    const [userInfo, setUserInfo] = useState<User | null>(null);
     const [loading, setLoading] = useState(false);
 
     const fetchPost = async () => {
@@ -24,6 +26,12 @@ const PostDetail: React.FC = () => {
             const data = await getUserPostById(Number(id));
             if (data) {
                 setPost(data);
+                if (data.userId) {
+                    const user = await getUserById(String(data.userId));
+                    if (user) {
+                        setUserInfo(user);
+                    }
+                }
             } else {
                 message.error("Không tìm thấy bài đăng.");
             }
@@ -257,8 +265,18 @@ const PostDetail: React.FC = () => {
                                             </div>
                                         )}
                                     </div>
-
-                                    <Button
+                                    {userInfo?.phone ? (
+                                        <Button
+                                            type="primary"
+                                            size="large"
+                                            block
+                                            icon={<PhoneOutlined />}
+                                            className="!h-12 !rounded-xl !text-base font-semibold mb-3"
+                                            href={`tel:${userInfo.phone}`}
+                                        >
+                                            {userInfo.phone}
+                                        </Button>
+                                    ) : (<Button
                                         type="primary"
                                         size="large"
                                         block
@@ -266,6 +284,7 @@ const PostDetail: React.FC = () => {
                                     >
                                         📞 Liên hệ ngay
                                     </Button>
+                                    )}
 
                                     <Row gutter={8}>
                                         <Col span={12}>
@@ -290,14 +309,21 @@ const PostDetail: React.FC = () => {
 
                                     <Divider />
 
-                                    {/* Thông tin người đăng */}
                                     <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                                        <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                                            <UserOutlined className="text-blue-600 text-xl" />
-                                        </div>
+                                        <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden">
+                                            {userInfo?.imageUrl ? (
+                                                <img
+                                                    src={userInfo.imageUrl}
+                                                    alt={userInfo.fullName || post.userName}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <UserOutlined className="text-blue-600 text-xl" />
+                                            )}                                        </div>
                                         <div className="flex-1">
-                                            <div className="font-semibold">{post.userName}</div>
-                                            <div className="text-sm text-gray-500">Người bán</div>
+                                            <div className="font-semibold">{userInfo?.fullName || "Người bán"}
+                                                <div className="text-sm text-gray-500">Người bán</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </Card>
@@ -316,6 +342,48 @@ const PostDetail: React.FC = () => {
                                             <span className="text-gray-600">Loại tin</span>
                                             <span className="font-medium">Cá nhân</span>
                                         </div>
+                                        {(userInfo?.fullName) && (
+                                            <div className="flex justify-between py-2 border-b border-gray-100">
+                                                <span className="text-gray-600">
+                                                    <UserOutlined className="mr-2" />
+                                                    Người bán
+                                                </span>
+                                                <span className="font-medium">
+                                                    {userInfo?.fullName || "Người bán"}
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        {userInfo?.phone && (
+                                            <div className="flex justify-between py-2 border-b border-gray-100">
+                                                <span className="text-gray-600">
+                                                    <PhoneOutlined className="mr-2" />
+                                                    Điện thoại
+                                                </span>
+                                                <a
+                                                    href={`tel:${userInfo.phone}`}
+                                                    className="font-medium text-blue-600 hover:text-blue-700 hover:underline"
+                                                >
+                                                    {userInfo.phone}
+                                                </a>
+                                            </div>
+                                        )}
+
+                                        {userInfo?.email && (
+                                            <div className="flex justify-between py-2 border-b border-gray-100">
+                                                <span className="text-gray-600">
+                                                    <MailOutlined className="mr-2" />
+                                                    Email
+                                                </span>
+                                                <a
+                                                    href={`mailto:${userInfo.email}`}
+                                                    className="font-medium text-blue-600 hover:text-blue-700 hover:underline truncate max-w-[150px]"
+                                                    title={userInfo.email}
+                                                >
+                                                    {userInfo.email}
+                                                </a>
+                                            </div>
+                                        )}
                                         <div className="flex justify-between py-2">
                                             <span className="text-gray-600">Ngày đăng</span>
                                             <span className="font-medium">Hôm nay</span>
@@ -350,7 +418,7 @@ const PostDetail: React.FC = () => {
                         </Button>
                     </div>
                 )}
-            </div>
+            </div >
 
             <Footer />
         </>

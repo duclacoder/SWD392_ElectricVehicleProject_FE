@@ -30,6 +30,7 @@ import PackagePricingPage from "../../pages/Packages/index.tsx";
 import PaymentSuccess from "../../pages/Payment/PaymentSuccess";
 import ViewBatteryDetails from "../../pages/Profile/ViewBatteryDetails.tsx";
 import AddBattery from "../../pages/Profile/AddBattery.tsx";
+import MyPostsManagement from "../../pages/Profile/PostManagement.tsx";
 
 export const AppRoutes = () => {
   return (
@@ -117,6 +118,7 @@ export const AppRoutes = () => {
         }
       />
       <Route path="/packages" element={<PackagePricingPage />} />
+      <Route path="/ViewPost" element={<MyPostsManagement />} />
     </Routes>
   );
 };

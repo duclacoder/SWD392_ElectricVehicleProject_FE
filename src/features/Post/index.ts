@@ -2,19 +2,20 @@ import { message } from "antd";
 import type { PaginatedResult, ResponseDTO } from "../../entities/Response.ts";
 import type {
   CreateUserPostDTO,
+  GetAllUserPostRequestDTO,
   UserPostCustom,
 } from "../../entities/UserPost.ts";
 import api from "../../shared/api/axios.ts";
 
 export const getAllUserPosts = async (
-  params: { page: number; pageSize: number; userName?: string }
+  params: GetAllUserPostRequestDTO
 ): Promise<PaginatedResult<UserPostCustom> | null> => {
   try {
     const response = await api.get("/UserPost", {
       params: {
         Page: params.page,
         PageSize: params.pageSize,
-        UserName: params.userName || undefined
+        UserId: params.userId
       },
     });
     const data: ResponseDTO<PaginatedResult<UserPostCustom>> = response.data;

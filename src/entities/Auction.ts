@@ -12,7 +12,7 @@ export interface Auction {
 }
 
 export interface AuctionBid {
-  id: number;
+  id?: number;
   auction_id: number;
   bidder_id: number;
   bid_amount: number;
@@ -64,4 +64,10 @@ export interface AuctionVehicleDetails {
 export interface CombinedData {
   auction: AuctionCustom;
   vehicle: AuctionVehicleDetails;
+}
+export interface BidWithName {
+  bidderId: number;
+  bidderName: string;
+  amount: number;
+  time: string;
 }

@@ -46,31 +46,6 @@ const PostVehicleSale: React.FC = () => {
   //   }
   // }, [navigate]);
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const userId = localStorage.getItem("userId");
-
-    if (!token || !userId) {
-      message.warning("Bạn cần đăng nhập để đăng bài!");
-      navigate("/login");
-      return;
-    }
-
-    getUserById(userId)
-      .then((user) => {
-        if (user) {
-          setUserInfo(user);
-        } else {
-          message.error("Không thể lấy thông tin người dùng");
-        }
-      })
-      .catch((err) => {
-        console.error("Lỗi khi lấy thông tin user:", err);
-        message.error("Lỗi khi tải thông tin người dùng");
-      });
-  }, [navigate]);
-
-
   const uploadProps = {
     name: "file",
     action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
@@ -90,10 +65,17 @@ const PostVehicleSale: React.FC = () => {
   const onFinish = async (values: any) => {
     setLoading(true);
     try {
+      const userId = localStorage.getItem("userId");
+
+      if (!userId) {
+        message.error("Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại!");
+        navigate("/login");
+        return;
+      }
       const postData: CreateUserPostDTO = {
-        userName: userInfo?.fullName || "Khách hàng",
+        userId: parseInt(userId),
         title: values.title || `${values.vehicleBrand} ${values.vehicleModel}`,
-        packageName: values.packageName || "a",
+        packageName: values.packageName || "Gói Cơ Bản",
         year: values.vehicleYear,
         imageUrls: uploadedFiles.map((f) => f.response?.url || f.name),
         vehicle: {

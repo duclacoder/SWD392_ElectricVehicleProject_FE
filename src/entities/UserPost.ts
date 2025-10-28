@@ -11,7 +11,7 @@ export interface VehiclePostDTO {
 }
 
 export interface CreateUserPostDTO {
-  userName: string;
+  userId: number;
   packageName: string;
   title: string;
   description: string;
@@ -36,7 +36,7 @@ export interface VehicleUserPost {
 
 export interface UserPostCustom {
   userPostsId?: number;
-  userName: string;
+  userId: number;
   title: string;
   description: string;
   vehicle?: VehicleUserPost;
@@ -48,5 +48,5 @@ export interface UserPostCustom {
 export interface GetAllUserPostRequestDTO {
   page: number;
   pageSize: number;
-  userName?: string;
+  userId?: number;
 }
