@@ -1,8 +1,8 @@
-import { CheckCircle, Download, Mail, Clock } from "lucide-react";
-import { use, useEffect, useState } from "react";
-import type { PostPackage } from "../../../entities/PostPackage";
 import { HomeFilled } from "@ant-design/icons";
+import { CheckCircle, Clock } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import type { PostPackage } from "../../../entities/PostPackage";
 
 const PaymentSuccess = () => {
   const [showReceipt, setShowReceipt] = useState(false);
@@ -13,11 +13,13 @@ const PaymentSuccess = () => {
   const handleBacktoHome = () => {
     sessionStorage.clear();
     navigate("/");
-  }
+  };
 
   useEffect(() => {
     try {
-      const storedPackage = JSON.parse(sessionStorage.getItem("selectedPackage") || "") as PostPackage;
+      const storedPackage = JSON.parse(
+        sessionStorage.getItem("selectedPackage") || ""
+      ) as PostPackage;
       if (storedPackage) {
         setPackageInfo(storedPackage);
         console.log("Selected Package Info:", storedPackage);
@@ -31,9 +33,9 @@ const PaymentSuccess = () => {
   const formatDate = () => {
     const now = new Date();
     const day = now.getDate();
-    const month = now.toLocaleString('en-US', { month: 'short' });
+    const month = now.toLocaleString("en-US", { month: "short" });
     const year = now.getFullYear();
-    const time = now.toLocaleTimeString('en-US', { hour12: false });
+    const time = now.toLocaleTimeString("en-US", { hour12: false });
     return `${day} ${month} ${year}, ${time}`;
   };
 
@@ -62,13 +64,17 @@ const PaymentSuccess = () => {
             <div className="absolute inset-0 bg-white/10"></div>
             <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -mr-20 -mt-20"></div>
             <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full -ml-16 -mb-16"></div>
-            
+
             <div className="relative z-10">
               <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-full mb-4 animate-bounce">
                 <CheckCircle className="w-12 h-12 text-green-500" />
               </div>
-              <h1 className="text-4xl font-bold text-white mb-2">Payment Completed!</h1>
-              <p className="text-green-50 text-lg">Your transaction has been processed successfully</p>
+              <h1 className="text-4xl font-bold text-white mb-2">
+                Payment Completed!
+              </h1>
+              <p className="text-green-50 text-lg">
+                Your transaction has been processed successfully
+              </p>
             </div>
           </div>
 
@@ -80,26 +86,36 @@ const PaymentSuccess = () => {
                 <h2 className="text-xl font-bold text-gray-800 mb-6 pb-2 border-b-2 border-sky-700">
                   Transaction Summary
                 </h2>
-                <div className="space-y-4">                                                
+                <div className="space-y-4">
                   <div className="flex justify-between items-start">
-                    <span className="text-gray-600 font-medium">Amount Paid</span>
+                    <span className="text-gray-600 font-medium">
+                      Amount Paid
+                    </span>
                     <span className="text-2xl font-bold text-green-600">
-                      {packageInfo.postPrice + " VND"} 
+                      {packageInfo.postPrice + " VND"}
                     </span>
                   </div>
-                  
+
                   <div className="flex justify-between items-start">
                     <span className="text-gray-600 font-medium flex items-center">
                       <Clock className="w-4 h-4 mr-1" />
                       Date & Time
                     </span>
-                    <span className="text-gray-900 text-right">{formatDate()}</span>
+                    <span className="text-gray-900 text-right">
+                      {formatDate()}
+                    </span>
                   </div>
 
                   <div className="bg-sky-50 rounded-lg p-4 mt-6">
-                    <p className="text-sm font-semibold text-sky-900 mb-2">Package Details</p>
-                    <p className="text-gray-800 font-medium text-lg">{packageInfo.packageName}</p>
-                    <p className="text-gray-600 text-sm mt-2">{packageInfo.description}</p>
+                    <p className="text-sm font-semibold text-sky-900 mb-2">
+                      Package Details
+                    </p>
+                    <p className="text-gray-800 font-medium text-lg">
+                      {packageInfo.packageName}
+                    </p>
+                    <p className="text-gray-600 text-sm mt-2">
+                      {packageInfo.description}
+                    </p>
                     <p className="text-gray-500 text-sm mt-2">
                       Thời hạn: {packageInfo.postDuration} ngày
                     </p>
@@ -112,17 +128,19 @@ const PaymentSuccess = () => {
                 <h2 className="text-xl font-bold text-gray-800 mb-6 pb-2 border-b-2 border-sky-700">
                   Package Information
                 </h2>
-                
+
                 <div className="bg-gray-50 rounded-xl p-6 space-y-4">
                   <div>
                     <p className="text-lg font-bold text-gray-900 mb-1">
                       {packageInfo.packageName}
                     </p>
-                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
-                      packageInfo.status === 'Active' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
+                    <span
+                      className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                        packageInfo.status === "Active"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
                       {packageInfo.status}
                     </span>
                   </div>
@@ -152,7 +170,7 @@ const PaymentSuccess = () => {
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600">Price:</span>
                       <span className="text-lg font-bold text-sky-700">
-                        {packageInfo.postPrice + " VND"} 
+                        {packageInfo.postPrice + " VND"}
                       </span>
                     </div>
                   </div>
@@ -160,7 +178,9 @@ const PaymentSuccess = () => {
 
                 <div className="mt-6 bg-amber-50 border border-amber-200 rounded-lg p-4">
                   <p className="text-sm text-amber-900">
-                    <span className="font-semibold">Next Steps:</span> Your post will be activated within 24 hours. You can manage your posts from the dashboard.
+                    <span className="font-semibold">Next Steps:</span> Your post
+                    will be activated within 24 hours. You can manage your posts
+                    from the dashboard.
                   </p>
                 </div>
               </div>
@@ -174,16 +194,18 @@ const PaymentSuccess = () => {
               >
                 <HomeFilled className="w-5 h-5" />
                 Back to home
-              </button>            
+              </button>
             </div>
 
             {/* Additional Info */}
             <div className="mt-8 text-center">
               <p className="text-sm text-gray-500">
-                A confirmation email with all details has been sent to your registered email address.
+                A confirmation email with all details has been sent to your
+                registered email address.
               </p>
               <p className="text-xs text-gray-400 mt-2">
-                Questions? Contact our support team 24/7 at support@evmanagement.com
+                Questions? Contact our support team 24/7 at
+                support@evmanagement.com
               </p>
             </div>
           </div>
@@ -192,7 +214,8 @@ const PaymentSuccess = () => {
         {/* Bottom Message */}
         <div className="mt-6 text-center">
           <p className="text-white/90 text-sm">
-            Thank you for choosing EV Management. We're excited to be part of your journey!
+            Thank you for choosing EV Management. We're excited to be part of
+            your journey!
           </p>
         </div>
       </div>

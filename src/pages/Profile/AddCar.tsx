@@ -11,6 +11,7 @@ import {
   Switch,
   Typography,
 } from "antd";
+import { useState } from "react";
 import { Footer } from "../../Widgets/Footers/Footer.tsx";
 import { Header } from "../../Widgets/Headers/Header.tsx";
 import UserSidebar from "../../Widgets/UserSidebar/UserSidebar.tsx";
@@ -18,7 +19,6 @@ import UserSidebar from "../../Widgets/UserSidebar/UserSidebar.tsx";
 const { Title, Paragraph } = Typography;
 const { Option } = Select;
 const { TextArea } = Input;
-import { useState } from "react";
 
 interface AddCarFormValues {
   userId: number;
