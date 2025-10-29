@@ -4,9 +4,29 @@ export interface LoginForm {
 }
 
 export interface RegisterForm {
-  userName: string;
+  email: string;
   password: string;
   confirmPassword: string;
-  email: string;
+}
+
+export interface RegisterGoogleForm {
+  tokenId: string;
+  password: string;
+  confirmPassword: string;
+}
+
+export interface UserFormData {
+  userName: string;
   fullName: string;
+  email: string;
+  phone: string;
+  password?: string;
+  roleId: number;
+  status?: boolean;
+}
+
+export interface GoogleLoginForm {
+  tokenId: string;
+  password: string;
+  confirmPassword: string;
 }
