@@ -1,33 +1,33 @@
 export interface CreatePostPackageDTO {
-    packageName: string;
-    description: string;
-    postPrice: number;
-    currency?: string;
-    postDuration: number;
-    status?: string;
+  packageName: string;
+  description: string;
+  postPrice: number;
+  currency?: string;
+  postDuration: number;
+  status?: string;
 }
 
 export interface PostPackage {
-    postPackagesId: number;
-    packageName: string;
-    description: string;
-    postPrice: number;
-    currency: string;
-    postDuration: number;
-    status: string;
+  postPackagesId: number;
+  packageName: string;
+  description: string;
+  postPrice: number;
+  currency: string;
+  postDuration: number;
+  status: string;
 }
 
 export interface GetAllPostPackageRequestDTO {
-    page: number;
-    pageSize: number;
+  page: number;
+  pageSize: number;
 }
 
 export interface PostPackageCustom {
-    postPackageId: number;
-    packageName: string;
-    description: string;
-    postPrice: number;
-    currency?: string;
-    postDuration: number;
-    status?: string;
+  postPackageId: number;
+  packageName: string;
+  description: string;
+  postPrice: number;
+  currency?: string;
+  postDuration: number;
+  status?: string;
 }
