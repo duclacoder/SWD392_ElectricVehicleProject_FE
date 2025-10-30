@@ -525,7 +525,7 @@ const AuctionDetail: React.FC<AuctionDetailProps> = ({ onTimeLeftChange }) => {
                         key={i}
                         className="flex justify-between py-2 border-b last:border-0"
                       >
-                        <span>Người {bid.bidderId}</span>
+                        <span>{bid.bidderName}</span>
                         <span className="font-semibold text-green-600">
                           {formatPrice(bid.amount)} VNĐ
                         </span>
