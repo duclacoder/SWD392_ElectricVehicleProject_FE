@@ -1,5 +1,6 @@
 export interface UserPackagesDTO {
-  userName: string;
+  userId: number;
+  userName?: string;
   packagesName: string;
   purchasedDuration: number;
   purchasedAtPrice: number;

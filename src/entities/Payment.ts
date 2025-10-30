@@ -1,6 +1,7 @@
 export interface CreatePaymentRequest {
     UserId: string;
-    TransferAmount: number;
+    UserPackageId?: string;
+    AuctionsFeeId?: string;
 }
 
 export interface Payment {

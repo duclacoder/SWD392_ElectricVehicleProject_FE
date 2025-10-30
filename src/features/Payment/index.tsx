@@ -19,7 +19,13 @@ export const VnPayPayment = async (paymentId : string) : Promise<string | null> 
 
 export const CreatePayment = async (createRequest : CreatePaymentRequest) : Promise<boolean> => {
     try {
-        const response = await api.post(`/Payment/CreatePayment?UserId=${createRequest.UserId}&TransferAmount=${createRequest.TransferAmount}`);
+        let response = null;
+        if (createRequest.UserPackageId && createRequest.AuctionsFeeId){
+            response = await api.post(`Payment/CreatePayment?UserId=${createRequest.UserId}&AuctionsFeeId=${createRequest.AuctionsFeeId}`);
+        }        
+        if (createRequest.UserPackageId && createRequest.UserPackageId){
+            response = await api.post(`Payment/CreatePayment?UserId=${createRequest.UserId}&UserPackageId=${createRequest.UserPackageId}`);
+        }
         const data: ResponseDTO<Payment> = response.data;
         if (data.isSuccess) {
             sessionStorage.setItem("paymentId", data.result?.paymentsId || "");

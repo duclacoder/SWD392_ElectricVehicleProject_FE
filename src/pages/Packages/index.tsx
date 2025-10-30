@@ -15,6 +15,9 @@ import { Footer } from "../../Widgets/Footers/Footer";
 import type { CreatePaymentRequest } from "../../entities/Payment";
 import { CreatePayment, VnPayPayment } from "../../features/Payment";
 import { useNavigate } from "react-router-dom";
+import api from "../../shared/api/axios";
+import { createUserPackage } from "../../features/Package";
+import type { UserPackagesDTO } from "../../entities/UserPackage";
 
 
 const PackagePricingPage = () => {
@@ -51,9 +54,20 @@ const PackagePricingPage = () => {
         try {
             sessionStorage.setItem("selectedPackage", JSON.stringify(pkg));
             const userId = localStorage.getItem("userId");
+
+            const newUserPackage : UserPackagesDTO = {
+                userId: userId ? parseInt(userId) : 0,
+                packagesName: pkg.packageName,
+                purchasedDuration: pkg.postDuration,
+                purchasedAtPrice: isAnnual ? pkg.postPrice * 12 * 0.7 : pkg.postPrice,
+                currency: "VND" 
+            }
+
+            const userPackage = await createUserPackage(newUserPackage);
+            
             const paymentRequestData : CreatePaymentRequest = {
                 UserId: userId || "",
-                TransferAmount: pkg.postPrice,
+                UserPackageId: userPackage?.userPackagesId?.toString() || "",
             }
             const result : boolean = await CreatePayment(paymentRequestData);
             if (result) {

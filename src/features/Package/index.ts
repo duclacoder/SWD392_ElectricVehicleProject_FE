@@ -58,11 +58,10 @@ export const createUserPackage = async (
   dto: UserPackagesDTO
 ): Promise<UserPackagesCustom | null> => {
   try {
-    const response = await api.post("/UserPackages/Create", dto);
+    const response = await api.post("UserPackages/Create", dto);
     const data: ResponseDTO<UserPackagesCustom> = response.data;
 
     if (data.isSuccess) {
-      message.success("Package purchased successfully!");
       return data.result;
     } else {
       message.error(data.message || "Failed to purchase package");
@@ -149,4 +148,5 @@ export const filterUserPackages = async (
     console.error(error);
     return null;
   }
+
 };
