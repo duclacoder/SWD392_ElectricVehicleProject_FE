@@ -2,18 +2,24 @@ import {
   CheckCircleOutlined,
   ClockCircleOutlined,
   CloseCircleOutlined,
+  EditOutlined,
+  EyeOutlined,
+  MoreOutlined,
   PlusOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
 import type { TableProps } from "antd";
-import { Button, Input, Space, Table, Tag, Typography } from "antd";
+import { Button, Dropdown, Input, Space, Table, Tag, Typography } from "antd";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { CreateAuctionFormData } from "../../../entities/AdminAuction";
 import type { AuctionCustom } from "../../../entities/Auction";
+import type { CreateAuctionWithAutoFeeFormData } from "../../../features/Admin/api/adminAuctionApi";
 import {
-  createAuction,
+  createAuctionWithAutoFee,
   getAllAuctions,
+  getAuctionById,
+  updateAuction,
 } from "../../../features/Admin/api/adminAuctionApi";
+import { AuctionDetailModal } from "../../../Widgets/components/AuctionDetailModal";
 import { AuctionFormModal } from "../../../Widgets/components/AuctionFormModal";
 
 const { Title, Text } = Typography;
@@ -25,7 +31,16 @@ const AdminAuctionPage = () => {
 
   // State cho modal Cập nhật/Tạo mới
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editingAuction, setEditingAuction] = useState<AuctionCustom | null>(
+    null
+  );
   const [submitLoading, setSubmitLoading] = useState(false);
+
+  // State cho modal Chi tiết
+  const [isDetailVisible, setIsDetailVisible] = useState(false);
+  const [selectedAuction, setSelectedAuction] = useState<AuctionCustom | null>(
+    null
+  );
 
   const [pagination, setPagination] = useState({
     current: 1,
@@ -57,22 +72,57 @@ const AdminAuctionPage = () => {
 
   // --- Handlers cho modal Cập nhật/Tạo mới ---
   const handleShowAddModal = () => {
+    setEditingAuction(null);
     setIsModalVisible(true);
+  };
+
+  const handleShowEditModal = async (auction: AuctionCustom) => {
+    const fullAuction = await getAuctionById(auction.auctionId);
+    if (fullAuction) {
+      setEditingAuction(fullAuction);
+      setIsModalVisible(true);
+    }
   };
 
   const handleModalCancel = () => {
     setIsModalVisible(false);
+    setEditingAuction(null);
   };
 
-  const handleModalSubmit = async (values: CreateAuctionFormData) => {
+  const handleModalSubmit = async (
+    values: CreateAuctionWithAutoFeeFormData
+  ) => {
     setSubmitLoading(true);
-    const success = await createAuction(values);
+    let success = false;
+
+    if (editingAuction) {
+      // Update existing auction - only endTime and status
+      success = await updateAuction(editingAuction.auctionId, {
+        endTime: values.endTime,
+        status: "Active", // Fixed status for update
+      });
+    } else {
+      // Create new auction
+      success = await createAuctionWithAutoFee(values);
+    }
 
     if (success) {
       setIsModalVisible(false);
+      setEditingAuction(null);
       fetchAuctions(); // Tải lại danh sách
     }
     setSubmitLoading(false);
+  };
+
+  // --- Handlers cho modal Chi tiết ---
+  const handleShowDetailModal = (auction: AuctionCustom) => {
+    setSelectedAuction(auction);
+    setIsDetailVisible(true);
+  };
+
+  const handleDetailModalCancel = () => {
+    setIsDetailVisible(false);
+    setSelectedAuction(null);
   };
 
   // Cập nhật columns cho Auctions
@@ -140,7 +190,49 @@ const AdminAuctionPage = () => {
         );
       },
     },
-    // Không thêm cột Actions vì user chỉ yêu cầu Get/Create
+    {
+      title: "Actions",
+      key: "actions",
+      align: "center",
+      render: (_, record) => {
+        const menuItems = [
+          {
+            key: "1",
+            label: "View Details",
+            icon: <EyeOutlined />,
+          },
+          {
+            key: "2",
+            label: "Edit",
+            icon: <EditOutlined />,
+          },
+        ];
+
+        return (
+          <Dropdown
+            menu={{
+              items: menuItems,
+              onClick: (info: any) => {
+                info.domEvent.stopPropagation();
+                switch (info.key) {
+                  case "1":
+                    handleShowDetailModal(record);
+                    break;
+                  case "2":
+                    handleShowEditModal(record);
+                    break;
+                }
+              },
+            }}
+          >
+            <Button
+              icon={<MoreOutlined />}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </Dropdown>
+        );
+      },
+    },
   ];
 
   const filteredAuctions = useMemo(() => {
@@ -203,8 +295,15 @@ const AdminAuctionPage = () => {
         visible={isModalVisible}
         onCancel={handleModalCancel}
         onSubmit={handleModalSubmit}
-        initialValues={null} // Chỉ tạo mới
+        initialValues={editingAuction}
         loading={submitLoading}
+      />
+
+      {/* Modal cho Chi tiết */}
+      <AuctionDetailModal
+        visible={isDetailVisible}
+        onCancel={handleDetailModalCancel}
+        auction={selectedAuction}
       />
     </div>
   );

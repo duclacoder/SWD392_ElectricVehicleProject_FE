@@ -1,31 +1,30 @@
-import React, { useState, useEffect } from "react";
 import {
+  CarOutlined,
+  CheckCircleOutlined,
+  PictureOutlined,
+  ThunderboltOutlined,
+  UploadOutlined,
+} from "@ant-design/icons";
+import {
+  Button,
+  Card,
+  Col,
   Form,
   Input,
-  Button,
   InputNumber,
   Row,
-  Col,
+  Space,
+  Typography,
   Upload,
   message,
-  Card,
-  Typography,
-  Space,
 } from "antd";
-import {
-  UploadOutlined,
-  CarOutlined,
-  ThunderboltOutlined,
-  PictureOutlined,
-  CheckCircleOutlined,
-} from "@ant-design/icons";
-import { Header } from "../../Widgets/Headers/Header";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Footer } from "../../Widgets/Footers/Footer";
+import { Header } from "../../Widgets/Headers/Header";
+import { useAuth } from "../../Widgets/hooks/useAuth";
 import type { CreateUserPostDTO } from "../../entities/UserPost";
 import { createUserPost } from "../../features/Post";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../Widgets/hooks/useAuth";
-import { getUserById } from "../../features/Post/UserPost";
 
 const { Title, Text } = Typography;
 
@@ -36,30 +35,47 @@ const PostVehicleSale: React.FC = () => {
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
   const [userInfo, setUserInfo] = useState<{ fullName: string } | null>(null);
-
-
-  // useEffect(() => {
-  //   const token = localStorage.getItem("token");
-  //   if (!token) {
-  //     message.warning("Bạn cần đăng nhập để đăng bài!");
-  //     navigate("/login");
-  //   }
-  // }, [navigate]);
+  const [fileList, setFileList] = useState<any[]>([]);
 
   const uploadProps = {
     name: "file",
-    action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
     headers: { authorization: "authorization-text" },
     multiple: true,
-    onChange(info: any) {
-      setUploadedFiles(info.fileList);
-      if (info.file.status === "done") {
-        message.success(`${info.file.name} tải lên thành công`);
-      } else if (info.file.status === "error") {
-        message.error(`${info.file.name} tải lên thất bại`);
+    fileList: fileList,
+    beforeUpload: (file: any) => {
+      const isImage = file.type.startsWith('image/');
+      if (!isImage) {
+        message.error('Chỉ được upload file ảnh!');
+        return Upload.LIST_IGNORE;
       }
+      
+      const isLt5M = file.size / 1024 / 1024 < 5;
+      if (!isLt5M) {
+        message.error('Ảnh phải nhỏ hơn 5MB!');
+        return Upload.LIST_IGNORE;
+      }
+
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+      setFileList((prev) => [
+        ...prev,
+        {
+          uid: file.uid,
+          status: "done",
+          url: reader.result, 
+          originFileObj: file,
+        },
+      ]);
+    };
+
+      setFileList((prev) => [...prev, file]);
+      return false;
     },
-    listType: "picture-card",
+    onRemove: (file: any) => {
+      setFileList((prev) => prev.filter((f) => f.uid !== file.uid));
+    },
+    listType: "picture-card" as const,
   };
 
   const onFinish = async (values: any) => {
@@ -68,16 +84,26 @@ const PostVehicleSale: React.FC = () => {
       const userId = localStorage.getItem("userId");
 
       if (!userId) {
-        message.error("Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại!");
+        message.error(
+          "Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại!"
+        );
         navigate("/login");
         return;
       }
+
+      if (fileList.length === 0) {
+        message.warning("Vui lòng tải lên ít nhất 1 ảnh xe!");
+        setLoading(false);
+        return;
+      }
+      
+      const imageFiles = fileList.map((file) => file.url || file);
+
       const postData: CreateUserPostDTO = {
         userId: parseInt(userId),
         title: values.title || `${values.vehicleBrand} ${values.vehicleModel}`,
-        packageName: values.packageName || "Gói Cơ Bản",
+        userPackageId: 1,
         year: values.vehicleYear,
-        imageUrls: uploadedFiles.map((f) => f.response?.url || f.name),
         vehicle: {
           brand: values.vehicleBrand,
           model: values.vehicleModel,
@@ -91,13 +117,16 @@ const PostVehicleSale: React.FC = () => {
         },
       };
 
-      const result = await createUserPost(postData);
+      const result = await createUserPost(postData, imageFiles);
       if (result) {
-        // message.success("🎉 Bài đăng bán xe đã được tạo thành công!");
         form.resetFields();
         setUploadedFiles([]);
         navigate("/");
       }
+      else {
+      // message.warning("Bạn không có gói đăng bài nào hợp lệ hoặc đã sử dụng hết. Vui lòng mua gói mới để đăng bài.");
+      navigate("/packages");
+    }
     } catch (error) {
       console.error("Failed to create user post:", error);
       message.error("❌ Đã xảy ra lỗi khi đăng bài bán xe.");
@@ -182,7 +211,8 @@ const PostVehicleSale: React.FC = () => {
               <div
                 className="rounded-3xl p-8 sm:p-10 mb-10 relative overflow-hidden"
                 style={{
-                  background: "linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%)",
+                  background:
+                    "linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%)",
                   border: "3px solid #0ea5e9",
                 }}
               >
@@ -208,7 +238,9 @@ const PostVehicleSale: React.FC = () => {
                           Hãng xe
                         </span>
                       }
-                      rules={[{ required: true, message: "Vui lòng nhập hãng xe!" }]}
+                      rules={[
+                        { required: true, message: "Vui lòng nhập hãng xe!" },
+                      ]}
                     >
                       <Input
                         size="large"
@@ -230,7 +262,9 @@ const PostVehicleSale: React.FC = () => {
                           Mẫu xe
                         </span>
                       }
-                      rules={[{ required: true, message: "Vui lòng nhập mẫu xe!" }]}
+                      rules={[
+                        { required: true, message: "Vui lòng nhập mẫu xe!" },
+                      ]}
                     >
                       <Input
                         size="large"
@@ -255,7 +289,9 @@ const PostVehicleSale: React.FC = () => {
                           Năm sản xuất
                         </span>
                       }
-                      rules={[{ required: true, message: "Nhập năm sản xuất!" }]}
+                      rules={[
+                        { required: true, message: "Nhập năm sản xuất!" },
+                      ]}
                     >
                       <InputNumber
                         size="large"
@@ -323,7 +359,8 @@ const PostVehicleSale: React.FC = () => {
               <div
                 className="rounded-3xl p-8 sm:p-10 mb-10 relative overflow-hidden"
                 style={{
-                  background: "linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%)",
+                  background:
+                    "linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%)",
                   border: "3px solid #3b82f6",
                 }}
               >
@@ -409,7 +446,9 @@ const PostVehicleSale: React.FC = () => {
                           boxShadow: "0 4px 12px rgba(59,130,246,0.1)",
                         }}
                         className="rounded-2xl h-14 font-medium"
-                        formatter={(v) => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                        formatter={(v) =>
+                          `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        }
                         placeholder="1,000,000,000"
                       />
                     </Form.Item>
@@ -421,7 +460,8 @@ const PostVehicleSale: React.FC = () => {
               <div
                 className="rounded-3xl p-8 sm:p-10 mb-10 relative overflow-hidden"
                 style={{
-                  background: "linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)",
+                  background:
+                    "linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)",
                   border: "3px solid #0284c7",
                 }}
               >
@@ -445,7 +485,12 @@ const PostVehicleSale: React.FC = () => {
                       Mô tả chi tiết
                     </span>
                   }
-                  rules={[{ required: true, message: "Vui lòng nhập mô tả chi tiết!" }]}
+                  rules={[
+                    {
+                      required: true,
+                      message: "Vui lòng nhập mô tả chi tiết!",
+                    },
+                  ]}
                 >
                   <Input.TextArea
                     rows={6}
@@ -461,7 +506,11 @@ const PostVehicleSale: React.FC = () => {
                 </Form.Item>
 
                 <Form.Item
-                  label={<span className="font-bold text-blue-900 text-base">Hình ảnh xe</span>}
+                  label={
+                    <span className="font-bold text-blue-900 text-base">
+                      Hình ảnh xe
+                    </span>
+                  }
                   className="mb-0"
                 >
                   <Upload {...uploadProps} className="upload-list-inline">
@@ -472,7 +521,8 @@ const PostVehicleSale: React.FC = () => {
                   </Upload>
                   <div className="mt-4 bg-blue-50 border-2 border-blue-200 rounded-xl p-4">
                     <Text className="text-blue-800 font-semibold">
-                      💡 Mẹo: Tải lên từ 5-10 ảnh chất lượng cao để tăng khả năng bán xe
+                      💡 Mẹo: Tải lên từ 5-10 ảnh chất lượng cao để tăng khả
+                      năng bán xe
                     </Text>
                   </div>
                 </Form.Item>

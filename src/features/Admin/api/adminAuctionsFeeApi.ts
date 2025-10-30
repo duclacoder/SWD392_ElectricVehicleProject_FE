@@ -136,3 +136,24 @@ export const getAuctionsFeeById = async (
     return null;
   }
 };
+
+export const getAuctionsFeeByAuctionId = async (
+  auctionId: number
+): Promise<AuctionsFee | null> => {
+  try {
+    const response = await api.get(`/AuctionsFee/GetAuctionFee/${auctionId}`);
+    const data: ResponseDTO<AuctionsFee> = response.data;
+    if (data.isSuccess) {
+      return data.result;
+    } else {
+      message.error(data.message || "Failed to fetch auction fee");
+      return null;
+    }
+  } catch (error: any) {
+    message.error(
+      error?.response?.data?.message || "An unexpected error occurred."
+    );
+    console.error(error);
+    return null;
+  }
+};

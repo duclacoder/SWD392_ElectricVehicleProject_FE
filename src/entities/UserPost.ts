@@ -12,11 +12,10 @@ export interface VehiclePostDTO {
 
 export interface CreateUserPostDTO {
   userId: number;
-  packageName: string;
+  userPackageId: number;
   title: string;
   description: string;
   vehicle?: VehiclePostDTO;
-  imageUrls?: string[];
 }
 
 export interface VehicleUserPost {
@@ -35,10 +34,10 @@ export interface VehicleUserPost {
 }
 
 export interface UserPostCustom {
-  userPostsId?: number;
-  userId: number;
+  userPostId?: number;
+  userName: string;
   title: string;
-  description: string;
+  description: string | null;
   vehicle?: VehicleUserPost;
   images?: string[];
   createdAt: string;

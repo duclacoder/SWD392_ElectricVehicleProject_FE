@@ -44,7 +44,7 @@ export const LoginGoogle = async (
     if (data.isSuccess) {
       if (data.result) {
         console.log(data.result);
-        const token = data.result.token;
+        const token = data.result;
         const userData = jwtDecode<JwtTokenDecode>(token);
         localStorage.setItem("token", token);
         localStorage.setItem("userId", userData.sub);

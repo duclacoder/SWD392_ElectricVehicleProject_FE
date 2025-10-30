@@ -1,8 +1,8 @@
+import { Calendar, Clock, Gauge } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import type { Auction } from "../../../entities/Auction.ts";
 import type { Vehicle } from "../../../entities/Vehicle.ts";
-import { Clock, Gauge, Calendar } from "lucide-react";
-import { Link } from "react-router-dom";
 import { getConnection, startConnection } from "../../../shared/api/signalR.js";
 
 type AuctionCardProps = {
@@ -10,9 +10,10 @@ type AuctionCardProps = {
     auction: Auction;
     vehicle: Vehicle;
   }[];
+  auctionTimeLeft?: Record<number, string>;
 };
 
-export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions }) => {
+export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions, auctionTimeLeft }) => {
   const [localAuctions, setLocalAuctions] = useState(auctions);
 
   useEffect(() => {
@@ -27,32 +28,37 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions }) => {
         const conn = getConnection();
 
         // Lắng nghe sự kiện ReceiveBid
-        conn.on("ReceiveBid", (auctionId: number, bidderId: string, bidderAmount: number) => {
-          console.log("AuctionCard nhận bid mới:", auctionId, bidderAmount);
+        conn.on(
+          "ReceiveBid",
+          (auctionId: number, bidderId: string, bidderAmount: number) => {
+            console.log("AuctionCard nhận bid mới:", auctionId, bidderAmount);
 
-          // Cập nhật giá trong local state
-          setLocalAuctions(prev =>
-            prev.map(item =>
-              item.auction.auctionId === auctionId
-                ? {
-                  ...item,
-                  auction: {
-                    ...item.auction,
-                    currentPrice: bidderAmount
+            // Cập nhật giá trong local state
+            setLocalAuctions((prev) =>
+              prev.map((item) =>
+                item.auction.auctionId === auctionId
+                  ? {
+                    ...item,
+                    auction: {
+                      ...item.auction,
+                      currentPrice: bidderAmount,
+                    },
                   }
-                }
-                : item
-            )
-          );
-        });
+                  : item
+              )
+            );
+          }
+        );
 
         // Join tất cả auction rooms
-        localAuctions.forEach(item => {
-          conn.invoke("JoinAuction", item.auction.auctionId)
-            .then(() => console.log(`AuctionCard joined room: ${item.auction.auctionId}`))
-            .catch(err => console.error("Join error:", err));
+        localAuctions.forEach((item) => {
+          conn
+            .invoke("JoinAuction", item.auction.auctionId)
+            .then(() =>
+              console.log(`AuctionCard joined room: ${item.auction.auctionId}`)
+            )
+            .catch((err) => console.error("Join error:", err));
         });
-
       } catch (error) {
         console.error("AuctionCard SignalR error:", error);
       }
@@ -97,14 +103,18 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions }) => {
     }
   };
 
-  const calculateTimeLeft = (endTime: string) => {
-    const end = new Date(endTime).getTime();
-    const now = Date.now();
-    const timeLeft = Math.max(0, end - now);
-    const hours = Math.floor(timeLeft / (1000 * 60 * 60));
-    const minutes = Math.floor((timeLeft / (1000 * 60)) % 60);
-    return { hours, minutes };
-  };
+ const calculateTimeLeft = (endTime?: string) => {
+  if (!endTime) return { hours: 0, minutes: 0 }; // thêm dòng này
+
+  const end = new Date(endTime).getTime();
+  if (isNaN(end)) return { hours: 0, minutes: 0 }; // kiểm tra định dạng sai
+
+  const now = Date.now();
+  const timeLeft = Math.max(0, end - now);
+  const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+  const minutes = Math.floor((timeLeft / (1000 * 60)) % 60);
+  return { hours, minutes };
+};
 
   if (!localAuctions || localAuctions.length === 0) {
     return (
@@ -117,7 +127,7 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {localAuctions.map(({ auction, vehicle }) => {
-        const { hours, minutes } = calculateTimeLeft(auction.end_time);
+const { hours, minutes } = calculateTimeLeft(auction.end_time || auction.endTime || "");
         // Sử dụng currentPrice nếu có, không thì dùng start_price
         const currentPrice = auction.currentPrice || auction.start_price || 0;
 
@@ -129,13 +139,16 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions }) => {
             {/* Vehicle image */}
             <div className="relative">
               <img
-                src={vehicle.images?.[0] || "/images/default-car.jpg"}
+                src={auction.images?.[0] ||           // ✅ Ảnh đầu tiên từ AuctionCustom (BE)
+                  vehicle.images?.[0] || "/images/default-car.jpg"}
                 alt={vehicle.vehicleName}
                 className="h-56 w-full object-cover transform group-hover:scale-105 transition duration-500"
                 loading="lazy"
               />
               <span
-                className={`absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full shadow-md ${getStatusBadge(auction.status)}`}
+                className={`absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full shadow-md ${getStatusBadge(
+                  auction.status
+                )}`}
               >
                 {getStatusText(auction.status)}
               </span>
@@ -156,7 +169,8 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions }) => {
                 </span>
                 {vehicle.km !== undefined && (
                   <span className="flex items-center gap-1">
-                    <Gauge className="w-4 h-4" /> {vehicle.km.toLocaleString()} km
+                    <Gauge className="w-4 h-4" /> {vehicle.km.toLocaleString()}{" "}
+                    km
                   </span>
                 )}
               </div>
@@ -169,8 +183,10 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions }) => {
                 {auction.status.toLowerCase() === "active" && (
                   <span className="flex items-center gap-1 text-red-500 text-sm font-medium">
                     <Clock className="w-4 h-4" />
-                    Còn lại: {hours}h {minutes}m
-                  </span>
+                    Còn lại:{" "}
+                    {auctionTimeLeft?.[auction.auctionId]
+                      ? auctionTimeLeft[auction.auctionId]
+                      : `${hours}h ${minutes}m`}                  </span>
                 )}
               </div>
 

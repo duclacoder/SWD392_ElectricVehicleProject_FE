@@ -1,5 +1,4 @@
 import {
-  ThunderboltOutlined,
   CalendarOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
@@ -7,6 +6,7 @@ import {
   DeleteOutlined,
   DollarOutlined,
   RollbackOutlined,
+  ThunderboltOutlined,
 } from "@ant-design/icons";
 import {
   Button,
@@ -23,8 +23,8 @@ import {
 } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Header } from "../../Widgets/Headers/Header.tsx";
 import { Footer } from "../../Widgets/Footers/Footer.tsx";
+import { Header } from "../../Widgets/Headers/Header.tsx";
 import UserSidebar from "../../Widgets/UserSidebar/UserSidebar.tsx";
 
 const { Title, Paragraph } = Typography;
