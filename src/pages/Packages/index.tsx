@@ -27,7 +27,7 @@ const PackagePricingPage = () => {
     const fetchPackages = async () => {
       try {
         setLoading(true);
-        const result = await adminPostPackageApi.getAll({
+        const result = await adminPostPackageApi.getActivePostPackages({
           page: 1,
           pageSize: 10,
         });

@@ -22,7 +22,12 @@ import AuctionFeeModal from "../../../Widgets/components/AuctionFeeModal";
 import { Footer } from "../../../Widgets/Footers/Footer";
 import { Header } from "../../../Widgets/Headers/Header";
 
-const AuctionDetail: React.FC = () => {
+
+type AuctionDetailProps = {
+  onTimeLeftChange?: (auctionId: number, timeLeft: string) => void;
+};
+
+const AuctionDetail: React.FC<AuctionDetailProps> = ({ onTimeLeftChange }) => {
   const { id } = useParams();
   const [auction, setAuction] = useState<AuctionCustom | null>(null);
   const [vehicle, setVehicle] = useState<AuctionVehicleDetails | null>(null);
@@ -40,6 +45,8 @@ const AuctionDetail: React.FC = () => {
   const [auctionStatus, setAuctionStatus] = useState<string>("ĐANG DIỄN RA");
   const [userInfor, setUserInfor] = useState<Map<number, string>>(new Map());
   const [loadingBids, setLoadingBids] = useState<Set<number>>(new Set());
+
+  
 
   const fetchUserName = async (bidderId: number): Promise<string> => {
     if (userInfor.has(bidderId)) {
@@ -236,7 +243,12 @@ const AuctionDetail: React.FC = () => {
     if (!auction?.endTime) return;
 
     const timer = setInterval(() => {
-      setTimeLeft(calculateTimeLeft());
+      const newTime = calculateTimeLeft(); 
+      setTimeLeft(newTime);
+
+        if (auction?.auctionId && onTimeLeftChange) {
+      onTimeLeftChange(auction.auctionId, newTime);
+    }
     }, 1000);
 
     return () => clearInterval(timer);

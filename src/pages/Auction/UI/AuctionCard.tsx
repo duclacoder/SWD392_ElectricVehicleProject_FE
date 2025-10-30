@@ -10,9 +10,10 @@ type AuctionCardProps = {
     auction: Auction;
     vehicle: Vehicle;
   }[];
+  auctionTimeLeft?: Record<number, string>;
 };
 
-export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions }) => {
+export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions, auctionTimeLeft }) => {
   const [localAuctions, setLocalAuctions] = useState(auctions);
 
   useEffect(() => {
@@ -37,12 +38,12 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions }) => {
               prev.map((item) =>
                 item.auction.auctionId === auctionId
                   ? {
-                      ...item,
-                      auction: {
-                        ...item.auction,
-                        currentPrice: bidderAmount,
-                      },
-                    }
+                    ...item,
+                    auction: {
+                      ...item.auction,
+                      currentPrice: bidderAmount,
+                    },
+                  }
                   : item
               )
             );
@@ -102,14 +103,18 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions }) => {
     }
   };
 
-  const calculateTimeLeft = (endTime: string) => {
-    const end = new Date(endTime).getTime();
-    const now = Date.now();
-    const timeLeft = Math.max(0, end - now);
-    const hours = Math.floor(timeLeft / (1000 * 60 * 60));
-    const minutes = Math.floor((timeLeft / (1000 * 60)) % 60);
-    return { hours, minutes };
-  };
+ const calculateTimeLeft = (endTime?: string) => {
+  if (!endTime) return { hours: 0, minutes: 0 }; // thêm dòng này
+
+  const end = new Date(endTime).getTime();
+  if (isNaN(end)) return { hours: 0, minutes: 0 }; // kiểm tra định dạng sai
+
+  const now = Date.now();
+  const timeLeft = Math.max(0, end - now);
+  const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+  const minutes = Math.floor((timeLeft / (1000 * 60)) % 60);
+  return { hours, minutes };
+};
 
   if (!localAuctions || localAuctions.length === 0) {
     return (
@@ -122,7 +127,7 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {localAuctions.map(({ auction, vehicle }) => {
-        const { hours, minutes } = calculateTimeLeft(auction.end_time);
+const { hours, minutes } = calculateTimeLeft(auction.end_time || auction.endTime || "");
         // Sử dụng currentPrice nếu có, không thì dùng start_price
         const currentPrice = auction.currentPrice || auction.start_price || 0;
 
@@ -134,7 +139,8 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions }) => {
             {/* Vehicle image */}
             <div className="relative">
               <img
-                src={vehicle.images?.[0] || "/images/default-car.jpg"}
+                src={auction.images?.[0] ||           // ✅ Ảnh đầu tiên từ AuctionCustom (BE)
+                  vehicle.images?.[0] || "/images/default-car.jpg"}
                 alt={vehicle.vehicleName}
                 className="h-56 w-full object-cover transform group-hover:scale-105 transition duration-500"
                 loading="lazy"
@@ -177,8 +183,10 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions }) => {
                 {auction.status.toLowerCase() === "active" && (
                   <span className="flex items-center gap-1 text-red-500 text-sm font-medium">
                     <Clock className="w-4 h-4" />
-                    Còn lại: {hours}h {minutes}m
-                  </span>
+                    Còn lại:{" "}
+                    {auctionTimeLeft?.[auction.auctionId]
+                      ? auctionTimeLeft[auction.auctionId]
+                      : `${hours}h ${minutes}m`}                  </span>
                 )}
               </div>
 

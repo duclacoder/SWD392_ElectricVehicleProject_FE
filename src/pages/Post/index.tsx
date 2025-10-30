@@ -55,6 +55,20 @@ const PostVehicleSale: React.FC = () => {
         return Upload.LIST_IGNORE;
       }
 
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+      setFileList((prev) => [
+        ...prev,
+        {
+          uid: file.uid,
+          status: "done",
+          url: reader.result, 
+          originFileObj: file,
+        },
+      ]);
+    };
+
       setFileList((prev) => [...prev, file]);
       return false;
     },
@@ -83,7 +97,7 @@ const PostVehicleSale: React.FC = () => {
         return;
       }
       
-      const imageFiles = fileList.map((file) => file.originFileObj || file);
+      const imageFiles = fileList.map((file) => file.url || file);
 
       const postData: CreateUserPostDTO = {
         userId: parseInt(userId),
@@ -109,6 +123,10 @@ const PostVehicleSale: React.FC = () => {
         setUploadedFiles([]);
         navigate("/");
       }
+      else {
+      // message.warning("Bạn không có gói đăng bài nào hợp lệ hoặc đã sử dụng hết. Vui lòng mua gói mới để đăng bài.");
+      navigate("/packages");
+    }
     } catch (error) {
       console.error("Failed to create user post:", error);
       message.error("❌ Đã xảy ra lỗi khi đăng bài bán xe.");
