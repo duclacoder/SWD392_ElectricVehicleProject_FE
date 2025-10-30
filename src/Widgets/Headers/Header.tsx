@@ -77,11 +77,11 @@ export const Header: FC = () => {
                   ref={dropdownRef}
                   className="absolute left-0 bg-white shadow-lg mt-2 rounded-md py-2 w-48 z-10"
                 >
-                  <a href="/#" className="block px-4 py-2 hover:bg-gray-100">
+                  <a href="/posts" className="block px-4 py-2 hover:bg-gray-100">
                     Sản phẩm
                   </a>
-                  <a href="/#" className="block px-4 py-2 hover:bg-gray-100">
-                    Dịch vụ
+                  <a href="/post" className="block px-4 py-2 hover:bg-gray-100">
+                    Đăng bài bán xe
                   </a>
                 </div>
               )}

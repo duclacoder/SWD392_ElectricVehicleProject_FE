@@ -12,11 +12,10 @@ export interface VehiclePostDTO {
 
 export interface CreateUserPostDTO {
   userId: number;
-  packageName: string;
+  userPackageId: number;
   title: string;
   description: string;
   vehicle?: VehiclePostDTO;
-  imageUrls?: string[];
 }
 
 export interface VehicleUserPost {

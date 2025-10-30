@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Modal } from "antd";
 import { useNavigate } from "react-router-dom";
 import {
     Search,
@@ -21,6 +22,7 @@ import { Footer } from "../../Widgets/Footers/Footer.tsx";
 import { Header } from "../../Widgets/Headers/Header.tsx";
 import UserSidebar from "../../Widgets/UserSidebar/UserSidebar.tsx";
 import SoldConfirmModal from "../../Widgets/components/SoldConfirmModal.tsx";
+import VehiclePostForm from "../../Widgets/components/VehiclePostForm.tsx";
 
 const MyPostsManagement: React.FC = () => {
     const navigate = useNavigate();
@@ -34,6 +36,8 @@ const MyPostsManagement: React.FC = () => {
     const [totalPages, setTotalPages] = useState(1);
     const [showSoldModal, setShowSoldModal] = useState(false);
     const [selectedPost, setSelectedPost] = useState<UserPostCustom | null>(null);
+    const [showAddPostModal, setShowAddPostModal] = useState(false);
+
 
     useEffect(() => {
         fetchUserPosts();
@@ -140,7 +144,7 @@ const MyPostsManagement: React.FC = () => {
                                     </div>
                                     <button
                                         className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-cyan-700 transition-all shadow-lg shadow-blue-200"
-                                        onClick={() => navigate("/AddPost")}
+                                        onClick={() => setShowAddPostModal(true)}
                                     >
                                         <Plus className="w-5 h-5" />
                                         Đăng bài mới
@@ -368,6 +372,23 @@ const MyPostsManagement: React.FC = () => {
                             onConfirm={confirmMarkAsSold}
                         />
 
+                        <Modal
+                            title="Đăng bài bán xe"
+                            open={showAddPostModal}
+                            onCancel={() => setShowAddPostModal(false)}
+                            footer={null}
+                            width={800}
+                            centered
+                            destroyOnClose
+                        >
+                            <VehiclePostForm
+                                onSuccess={() => {
+                                    setShowAddPostModal(false);
+                                    fetchUserPosts();
+                                }}
+                                onCancel={() => setShowAddPostModal(false)}
+                            />
+                        </Modal>
                     </div>
                 </div>
             </div>
