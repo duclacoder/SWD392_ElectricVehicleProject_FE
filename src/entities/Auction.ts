@@ -33,6 +33,7 @@ export interface AuctionCustom {
   openFee?: number;
   entryFee?: number;
   bids?: AuctionBidCustom[];
+  images?: string[];
 }
 
 export interface AuctionBidCustom {

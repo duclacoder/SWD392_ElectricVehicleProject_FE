@@ -59,4 +59,35 @@ export const adminPostPackageApi = {
     const res = await api.delete<ResponseDTO<null>>(`/PostPackage/${id}`);
     return res.data;
   },
+
+   getActivePostPackages: async (
+    params: GetAllPostPackageRequestDTO
+  ): Promise<PaginatedResult<PostPackageCustom> | null> => {
+    try {
+      const response = await api.get("/PostPackage/active", {
+        params: {
+          Page: params.page,
+          PageSize: params.pageSize,
+        },
+      });
+
+      const data: ResponseDTO<PaginatedResult<PostPackageCustom>> = response.data;
+
+      if (data.isSuccess) {
+        return data.result;
+      } else {
+        message.error(data.message || "Failed to fetch active post packages");
+        return null;
+      }
+    } catch (error: any) {
+      message.error(
+        error?.response?.data?.message ||
+          "An unexpected error occurred while fetching active post packages."
+      );
+      console.error(error);
+      return null;
+    }
+  },
 };
+
+ 

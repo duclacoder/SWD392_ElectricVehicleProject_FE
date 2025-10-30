@@ -59,11 +59,40 @@ export const getUserPostById = async (
 };
 
 export const createUserPost = async (
-  dto: CreateUserPostDTO
+  dto: CreateUserPostDTO,
+  imagesFiles: File[]
 ): Promise<UserPostCustom | null> => {
   try {
-    const response = await api.post("/UserPost", dto);
+    const formData = new FormData();
+
+    formData.append("UserId", dto.userId.toString());
+    formData.append('Title', dto.title);
+    formData.append('UserPackageId', dto.userPackageId.toString());
+
+     if (dto.vehicle) {
+      formData.append('Vehicle.Brand', dto.vehicle.brand || '');
+      formData.append('Vehicle.Model', dto.vehicle.model || '');
+      formData.append('Vehicle.Color', dto.vehicle.color || '');
+      formData.append('Vehicle.Year', dto.vehicle.year?.toString() || '');
+      formData.append('Vehicle.Price', dto.vehicle.price?.toString() || '');
+      formData.append('Vehicle.Description', dto.vehicle.description || '');
+      formData.append('Vehicle.BodyType', dto.vehicle.bodyType || '');
+      formData.append('Vehicle.RangeKm', dto.vehicle.rangeKm?.toString() || '');
+      formData.append('Vehicle.MotorPowerKw', dto.vehicle.motorPowerKw?.toString() || '');
+    }
+
+    imagesFiles.forEach((file) => {
+      formData.append('ImageUrls', file);
+    });
+
+     const response = await api.post("/UserPost", formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
     const data: ResponseDTO<UserPostCustom> = response.data;
+
 
     if (data.isSuccess) {
       message.success("Post created successfully!");
