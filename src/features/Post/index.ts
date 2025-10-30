@@ -15,7 +15,7 @@ export const getAllUserPosts = async (
       params: {
         Page: params.page,
         PageSize: params.pageSize,
-        UserId: params.userId
+        UserId: params.userId,
       },
     });
     const data: ResponseDTO<PaginatedResult<UserPostCustom>> = response.data;
@@ -28,7 +28,7 @@ export const getAllUserPosts = async (
   } catch (error: any) {
     message.error(
       error?.response?.data?.message ||
-      "An unexpected error occurred while fetching user posts."
+        "An unexpected error occurred while fetching user posts."
     );
     console.error(error);
     return null;
@@ -51,7 +51,7 @@ export const getUserPostById = async (
   } catch (error: any) {
     message.error(
       error?.response?.data?.message ||
-      "An unexpected error occurred while fetching user post."
+        "An unexpected error occurred while fetching user post."
     );
     console.error(error);
     return null;
@@ -104,7 +104,7 @@ export const createUserPost = async (
   } catch (error: any) {
     message.error(
       error?.response?.data?.message ||
-      "An unexpected error occurred while creating post."
+        "An unexpected error occurred while creating post."
     );
     console.error(error);
     return null;
@@ -152,10 +152,9 @@ export const deleteUserPost = async (
   } catch (error: any) {
     message.error(
       error?.response?.data?.message ||
-      "An unexpected error occurred while deleting post."
+        "An unexpected error occurred while deleting post."
     );
     console.error(error);
     return null;
   }
 };
-

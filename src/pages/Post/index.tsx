@@ -1,31 +1,30 @@
-import React, { useState, useEffect } from "react";
 import {
+  CarOutlined,
+  CheckCircleOutlined,
+  PictureOutlined,
+  ThunderboltOutlined,
+  UploadOutlined,
+} from "@ant-design/icons";
+import {
+  Button,
+  Card,
+  Col,
   Form,
   Input,
-  Button,
   InputNumber,
   Row,
-  Col,
+  Space,
+  Typography,
   Upload,
   message,
-  Card,
-  Typography,
-  Space,
 } from "antd";
-import {
-  UploadOutlined,
-  CarOutlined,
-  ThunderboltOutlined,
-  PictureOutlined,
-  CheckCircleOutlined,
-} from "@ant-design/icons";
-import { Header } from "../../Widgets/Headers/Header";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Footer } from "../../Widgets/Footers/Footer";
+import { Header } from "../../Widgets/Headers/Header";
+import { useAuth } from "../../Widgets/hooks/useAuth";
 import type { CreateUserPostDTO } from "../../entities/UserPost";
 import { createUserPost } from "../../features/Post";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../Widgets/hooks/useAuth";
-import { getUserById } from "../../features/Post/UserPost";
 
 const { Title, Text } = Typography;
 
@@ -71,7 +70,9 @@ const PostVehicleSale: React.FC = () => {
       const userId = localStorage.getItem("userId");
 
       if (!userId) {
-        message.error("Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại!");
+        message.error(
+          "Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại!"
+        );
         navigate("/login");
         return;
       }
@@ -192,7 +193,8 @@ const PostVehicleSale: React.FC = () => {
               <div
                 className="rounded-3xl p-8 sm:p-10 mb-10 relative overflow-hidden"
                 style={{
-                  background: "linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%)",
+                  background:
+                    "linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%)",
                   border: "3px solid #0ea5e9",
                 }}
               >
@@ -218,7 +220,9 @@ const PostVehicleSale: React.FC = () => {
                           Hãng xe
                         </span>
                       }
-                      rules={[{ required: true, message: "Vui lòng nhập hãng xe!" }]}
+                      rules={[
+                        { required: true, message: "Vui lòng nhập hãng xe!" },
+                      ]}
                     >
                       <Input
                         size="large"
@@ -240,7 +244,9 @@ const PostVehicleSale: React.FC = () => {
                           Mẫu xe
                         </span>
                       }
-                      rules={[{ required: true, message: "Vui lòng nhập mẫu xe!" }]}
+                      rules={[
+                        { required: true, message: "Vui lòng nhập mẫu xe!" },
+                      ]}
                     >
                       <Input
                         size="large"
@@ -265,7 +271,9 @@ const PostVehicleSale: React.FC = () => {
                           Năm sản xuất
                         </span>
                       }
-                      rules={[{ required: true, message: "Nhập năm sản xuất!" }]}
+                      rules={[
+                        { required: true, message: "Nhập năm sản xuất!" },
+                      ]}
                     >
                       <InputNumber
                         size="large"
@@ -333,7 +341,8 @@ const PostVehicleSale: React.FC = () => {
               <div
                 className="rounded-3xl p-8 sm:p-10 mb-10 relative overflow-hidden"
                 style={{
-                  background: "linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%)",
+                  background:
+                    "linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%)",
                   border: "3px solid #3b82f6",
                 }}
               >
@@ -419,7 +428,9 @@ const PostVehicleSale: React.FC = () => {
                           boxShadow: "0 4px 12px rgba(59,130,246,0.1)",
                         }}
                         className="rounded-2xl h-14 font-medium"
-                        formatter={(v) => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                        formatter={(v) =>
+                          `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        }
                         placeholder="1,000,000,000"
                       />
                     </Form.Item>
@@ -431,7 +442,8 @@ const PostVehicleSale: React.FC = () => {
               <div
                 className="rounded-3xl p-8 sm:p-10 mb-10 relative overflow-hidden"
                 style={{
-                  background: "linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)",
+                  background:
+                    "linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)",
                   border: "3px solid #0284c7",
                 }}
               >
@@ -455,7 +467,12 @@ const PostVehicleSale: React.FC = () => {
                       Mô tả chi tiết
                     </span>
                   }
-                  rules={[{ required: true, message: "Vui lòng nhập mô tả chi tiết!" }]}
+                  rules={[
+                    {
+                      required: true,
+                      message: "Vui lòng nhập mô tả chi tiết!",
+                    },
+                  ]}
                 >
                   <Input.TextArea
                     rows={6}
@@ -471,7 +488,11 @@ const PostVehicleSale: React.FC = () => {
                 </Form.Item>
 
                 <Form.Item
-                  label={<span className="font-bold text-blue-900 text-base">Hình ảnh xe</span>}
+                  label={
+                    <span className="font-bold text-blue-900 text-base">
+                      Hình ảnh xe
+                    </span>
+                  }
                   className="mb-0"
                 >
                   <Upload {...uploadProps} className="upload-list-inline">
@@ -482,7 +503,8 @@ const PostVehicleSale: React.FC = () => {
                   </Upload>
                   <div className="mt-4 bg-blue-50 border-2 border-blue-200 rounded-xl p-4">
                     <Text className="text-blue-800 font-semibold">
-                      💡 Mẹo: Tải lên từ 5-10 ảnh chất lượng cao để tăng khả năng bán xe
+                      💡 Mẹo: Tải lên từ 5-10 ảnh chất lượng cao để tăng khả
+                      năng bán xe
                     </Text>
                   </div>
                 </Form.Item>

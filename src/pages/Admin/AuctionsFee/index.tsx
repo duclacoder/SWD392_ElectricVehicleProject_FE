@@ -5,7 +5,6 @@ import {
   DollarOutlined,
   EyeOutlined,
   MoreOutlined,
-  PlusOutlined,
   RollbackOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
@@ -317,13 +316,13 @@ const AdminAuctionsFeePage = () => {
             onChange={(e) => setSearchText(e.target.value)}
             style={{ width: 300 }}
           />
-          <Button
+          {/* <Button
             type="primary"
             icon={<PlusOutlined />}
             onClick={handleShowAddModal}
           >
             Add Fee
-          </Button>
+          </Button> */}
         </Space>
       </div>
 

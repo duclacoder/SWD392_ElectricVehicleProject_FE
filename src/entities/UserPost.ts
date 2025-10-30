@@ -34,10 +34,10 @@ export interface VehicleUserPost {
 }
 
 export interface UserPostCustom {
-  userPostsId?: number;
-  userId: number;
+  userPostId?: number;
+  userName: string;
   title: string;
-  description: string;
+  description: string | null;
   vehicle?: VehicleUserPost;
   images?: string[];
   createdAt: string;

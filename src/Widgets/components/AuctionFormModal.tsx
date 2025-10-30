@@ -10,13 +10,12 @@ import {
   Select,
   Spin,
 } from "antd";
+import dayjs from "dayjs";
 import type { FC } from "react";
 import { useEffect, useState } from "react";
-import type { CreateAuctionFormData } from "../../entities/AdminAuction";
 import type { AdminVehicle } from "../../entities/AdminVehicle";
 import type { AuctionCustom } from "../../entities/Auction";
-import type { AuctionsFee } from "../../entities/AuctionsFee";
-import { getAllAuctionsFees } from "../../features/Admin/api/adminAuctionsFeeApi";
+import type { CreateAuctionWithAutoFeeFormData } from "../../features/Admin/api/adminAuctionApi";
 import { getAllAdminVehicles } from "../../features/Admin/api/adminVehicleApi";
 
 const { Option } = Select;
@@ -24,7 +23,7 @@ const { Option } = Select;
 interface AuctionFormModalProps {
   visible: boolean;
   onCancel: () => void;
-  onSubmit: (values: CreateAuctionFormData) => void;
+  onSubmit: (values: CreateAuctionWithAutoFeeFormData) => void;
   initialValues: Partial<AuctionCustom> | null;
   loading: boolean;
 }
@@ -38,25 +37,30 @@ export const AuctionFormModal: FC<AuctionFormModalProps> = ({
 }) => {
   const [form] = Form.useForm();
   const [vehicles, setVehicles] = useState<AdminVehicle[]>([]);
-  const [fees, setFees] = useState<AuctionsFee[]>([]);
   const [dropdownLoading, setDropdownLoading] = useState(false);
+  const isEditing = !!initialValues;
+
   useEffect(() => {
     if (visible) {
-      form.resetFields();
+      if (isEditing && initialValues) {
+        // Set form values for editing
+        form.setFieldsValue({
+          vehicleId: initialValues.vehicleId,
+          entryFee: initialValues.entryFee,
+          endTime: initialValues.endTime ? dayjs(initialValues.endTime) : null,
+        });
+      } else {
+        // Reset form for creating new auction
+        form.resetFields();
+      }
 
       const fetchDropdownData = async () => {
         setDropdownLoading(true);
         try {
-          const [vehiclesResult, feesResult] = await Promise.all([
-            getAllAdminVehicles(1, 100),
-            getAllAuctionsFees(1, 1000),
-          ]);
+          const vehiclesResult = await getAllAdminVehicles(1, 100);
 
           if (vehiclesResult) {
             setVehicles(vehiclesResult.items);
-          }
-          if (feesResult) {
-            setFees(feesResult.items);
           }
         } catch (error) {
           message.error("Failed to load data for selection");
@@ -67,17 +71,18 @@ export const AuctionFormModal: FC<AuctionFormModalProps> = ({
 
       fetchDropdownData();
     }
-  }, [visible, form]);
+  }, [visible, form, isEditing, initialValues]);
 
   const handleOk = () => {
     form
       .validateFields()
       .then((values) => {
         const currentUserId = localStorage.getItem("userId");
-        const finalValues: CreateAuctionFormData = {
-          ...values,
-          userName: currentUserId,
+        const finalValues: CreateAuctionWithAutoFeeFormData = {
+          userName: currentUserId || "",
+          vehicleId: values.vehicleId,
           endTime: values.endTime.toISOString(),
+          entryFee: values.entryFee,
         };
         onSubmit(finalValues);
       })
@@ -88,7 +93,7 @@ export const AuctionFormModal: FC<AuctionFormModalProps> = ({
 
   return (
     <Modal
-      title={"Add New Auction"}
+      title={isEditing ? "Edit Auction" : "Add New Auction"}
       open={visible}
       onCancel={onCancel}
       confirmLoading={loading}
@@ -103,7 +108,7 @@ export const AuctionFormModal: FC<AuctionFormModalProps> = ({
           loading={loading}
           onClick={handleOk}
         >
-          Submit
+          {isEditing ? "Update" : "Submit"}
         </Button>,
       ]}
     >
@@ -123,6 +128,7 @@ export const AuctionFormModal: FC<AuctionFormModalProps> = ({
               showSearch
               placeholder="Select a vehicle"
               optionFilterProp="children"
+              disabled={isEditing} // Disable vehicle selection when editing
               filterOption={(input, option) =>
                 String(option?.label ?? "")
                   .toLowerCase()
@@ -142,44 +148,17 @@ export const AuctionFormModal: FC<AuctionFormModalProps> = ({
             </Select>
           </Form.Item>
 
-          <Form.Item
-            name="auctionsFeeId"
-            label="Auction Fee Package"
-            rules={[{ required: true, message: "Please select a fee package" }]}
-          >
-            <Select
-              showSearch
-              placeholder="Select a fee package"
-              optionFilterProp="children"
-              filterOption={(input, option) =>
-                String(option?.label ?? "")
-                  .toLowerCase()
-                  .includes(input.toLowerCase())
-              }
-            >
-              {fees.map((fee) => (
-                <Option
-                  key={fee.auctionsFeeId}
-                  value={fee.auctionsFeeId}
-                  label={`${fee.type} - ${fee.description}`}
-                >
-                  <strong>{fee.type}</strong> (Entry:{" "}
-                  {fee.entryFee.toLocaleString()} {fee.currency})
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                name="startPrice"
-                label="Start Price"
-                rules={[{ required: true }]}
+                name="entryFee"
+                label="Entry Fee (Phí khởi điểm)"
+                rules={[{ required: true, message: "Please enter entry fee" }]}
               >
                 <InputNumber
                   style={{ width: "100%" }}
                   min={0}
+                  disabled={isEditing} // Disable entry fee when editing
                   formatter={(value) =>
                     `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                   }
@@ -200,38 +179,56 @@ export const AuctionFormModal: FC<AuctionFormModalProps> = ({
             </Col>
           </Row>
 
-          <Row gutter={16}>
-            <Col span={8}>
-              <Form.Item
-                name="entryFee"
-                label="Entry Fee (Override)"
-                rules={[{ required: true }]}
-                initialValue={0}
-              >
-                <InputNumber style={{ width: "100%" }} min={0} />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item
-                name="openFee"
-                label="Open Fee (Override)"
-                rules={[{ required: true }]}
-                initialValue={0}
-              >
-                <InputNumber style={{ width: "100%" }} min={0} />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item
-                name="feePerMinute"
-                label="Fee Per Minute (Override)"
-                rules={[{ required: true }]}
-                initialValue={0}
-              >
-                <InputNumber style={{ width: "100%" }} min={0} />
-              </Form.Item>
-            </Col>
-          </Row>
+          {/* Hidden fields with fixed values */}
+          <Form.Item
+            name="startPrice"
+            initialValue={0}
+            style={{ display: "none" }}
+          >
+            <InputNumber />
+          </Form.Item>
+
+          <div
+            style={{
+              padding: "16px",
+              backgroundColor: isEditing ? "#fff7e6" : "#f0f8ff",
+              borderRadius: "6px",
+              marginTop: "16px",
+            }}
+          >
+            <h4
+              style={{
+                margin: "0 0 8px 0",
+                color: isEditing ? "#fa8c16" : "#1890ff",
+              }}
+            >
+              {isEditing
+                ? "Edit Mode - Limited Fields"
+                : "Auto-Generated Fee Information"}
+            </h4>
+            <p style={{ margin: 0, color: "#666", fontSize: "14px" }}>
+              {isEditing ? (
+                <>
+                  • <strong>Editable:</strong> End Time only
+                  <br />• <strong>Status:</strong> Will be set to "Active"
+                  <br />• <strong>Other fields:</strong> Cannot be modified
+                  during edit
+                </>
+              ) : (
+                <>
+                  • <strong>Start Price:</strong> Fixed at 0<br />•{" "}
+                  <strong>Fee Per Minute:</strong> Fixed at 0<br />•{" "}
+                  <strong>Open Fee:</strong> Fixed at 0<br />•{" "}
+                  <strong>Auction Fee Entry Fee:</strong> Will be 1% of Entry
+                  Fee above
+                  <br />• <strong>Auction Fee Description:</strong> "Phí tham
+                  gia"
+                  <br />• <strong>Auction Fee Type:</strong> "Phí tham gia"
+                  <br />• <strong>Status:</strong> "Active"
+                </>
+              )}
+            </p>
+          </div>
         </Form>
       </Spin>
     </Modal>

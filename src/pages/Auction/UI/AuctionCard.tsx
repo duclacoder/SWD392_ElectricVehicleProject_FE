@@ -1,8 +1,8 @@
+import { Calendar, Clock, Gauge } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import type { Auction } from "../../../entities/Auction.ts";
 import type { Vehicle } from "../../../entities/Vehicle.ts";
-import { Clock, Gauge, Calendar } from "lucide-react";
-import { Link } from "react-router-dom";
 import { getConnection, startConnection } from "../../../shared/api/signalR.js";
 
 type AuctionCardProps = {
@@ -27,32 +27,37 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions }) => {
         const conn = getConnection();
 
         // Lắng nghe sự kiện ReceiveBid
-        conn.on("ReceiveBid", (auctionId: number, bidderId: string, bidderAmount: number) => {
-          console.log("AuctionCard nhận bid mới:", auctionId, bidderAmount);
+        conn.on(
+          "ReceiveBid",
+          (auctionId: number, bidderId: string, bidderAmount: number) => {
+            console.log("AuctionCard nhận bid mới:", auctionId, bidderAmount);
 
-          // Cập nhật giá trong local state
-          setLocalAuctions(prev =>
-            prev.map(item =>
-              item.auction.auctionId === auctionId
-                ? {
-                  ...item,
-                  auction: {
-                    ...item.auction,
-                    currentPrice: bidderAmount
-                  }
-                }
-                : item
-            )
-          );
-        });
+            // Cập nhật giá trong local state
+            setLocalAuctions((prev) =>
+              prev.map((item) =>
+                item.auction.auctionId === auctionId
+                  ? {
+                      ...item,
+                      auction: {
+                        ...item.auction,
+                        currentPrice: bidderAmount,
+                      },
+                    }
+                  : item
+              )
+            );
+          }
+        );
 
         // Join tất cả auction rooms
-        localAuctions.forEach(item => {
-          conn.invoke("JoinAuction", item.auction.auctionId)
-            .then(() => console.log(`AuctionCard joined room: ${item.auction.auctionId}`))
-            .catch(err => console.error("Join error:", err));
+        localAuctions.forEach((item) => {
+          conn
+            .invoke("JoinAuction", item.auction.auctionId)
+            .then(() =>
+              console.log(`AuctionCard joined room: ${item.auction.auctionId}`)
+            )
+            .catch((err) => console.error("Join error:", err));
         });
-
       } catch (error) {
         console.error("AuctionCard SignalR error:", error);
       }
@@ -135,7 +140,9 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions }) => {
                 loading="lazy"
               />
               <span
-                className={`absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full shadow-md ${getStatusBadge(auction.status)}`}
+                className={`absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full shadow-md ${getStatusBadge(
+                  auction.status
+                )}`}
               >
                 {getStatusText(auction.status)}
               </span>
@@ -156,7 +163,8 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions }) => {
                 </span>
                 {vehicle.km !== undefined && (
                   <span className="flex items-center gap-1">
-                    <Gauge className="w-4 h-4" /> {vehicle.km.toLocaleString()} km
+                    <Gauge className="w-4 h-4" /> {vehicle.km.toLocaleString()}{" "}
+                    km
                   </span>
                 )}
               </div>
