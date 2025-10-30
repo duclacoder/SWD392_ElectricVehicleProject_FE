@@ -19,20 +19,22 @@ export const VnPayPayment = async (
   }
 };
 
-export const CreatePayment = async (
-  createRequest: CreatePaymentRequest
-): Promise<boolean> => {
-  try {
-    const response = await api.post(
-      `/Payment/CreatePayment?UserId=${createRequest.UserId}&TransferAmount=${createRequest.TransferAmount}`
-    );
-    const data: ResponseDTO<Payment> = response.data;
-    if (data.isSuccess) {
-      sessionStorage.setItem("paymentId", data.result?.paymentsId || "");
-      return true;
-    } else return false;
-  } catch (error) {
-    message.error("Could not create payment. Please try again.");
-    return false;
-  }
-};
+export const CreatePayment = async (createRequest : CreatePaymentRequest) : Promise<boolean> => {
+    try {
+        let response = null;
+        if (createRequest.UserPackageId && createRequest.AuctionsFeeId){
+            response = await api.post(`Payment/CreatePayment?UserId=${createRequest.UserId}&AuctionsFeeId=${createRequest.AuctionsFeeId}`);
+        }        
+        if (createRequest.UserPackageId && createRequest.UserPackageId){
+            response = await api.post(`Payment/CreatePayment?UserId=${createRequest.UserId}&UserPackageId=${createRequest.UserPackageId}`);
+        }
+        const data: ResponseDTO<Payment> = response.data;
+        if (data.isSuccess) {
+            sessionStorage.setItem("paymentId", data.result?.paymentsId || "");
+            return true ;
+        } else return false;
+    } catch (error) {
+        message.error("Could not create payment. Please try again.");
+        return false;
+    }
+}
