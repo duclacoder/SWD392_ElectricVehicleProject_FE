@@ -12,9 +12,11 @@ export interface AuctionsFee {
 }
 
 export interface AuctionsFeeFormData {
+  auctionsId?: number;
   description: string;
   feePerMinute: number;
   entryFee: number;
   currency: string;
   type: string;
+  status?: string;
 }

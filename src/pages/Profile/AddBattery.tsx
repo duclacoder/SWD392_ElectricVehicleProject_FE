@@ -1,4 +1,4 @@
-import { ThunderboltOutlined, PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined, ThunderboltOutlined } from "@ant-design/icons";
 import {
   Button,
   Card,
@@ -10,10 +10,10 @@ import {
   Space,
   Typography,
 } from "antd";
-import { Header } from "../../Widgets/Headers/Header";
-import { Footer } from "../../Widgets/Footers/Footer";
-import UserSidebar from "../../Widgets/UserSidebar/UserSidebar";
 import { useState } from "react";
+import { Footer } from "../../Widgets/Footers/Footer";
+import { Header } from "../../Widgets/Headers/Header";
+import UserSidebar from "../../Widgets/UserSidebar/UserSidebar";
 
 const { Title, Paragraph } = Typography;
 const { TextArea } = Input;

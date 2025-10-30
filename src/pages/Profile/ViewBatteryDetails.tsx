@@ -1,15 +1,15 @@
 import {
-  ThunderboltOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
   DollarOutlined,
   FieldTimeOutlined,
+  ThunderboltOutlined,
 } from "@ant-design/icons";
 import { Card, Col, Image, Row, Spin, Tag, Typography, message } from "antd";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Header } from "../../Widgets/Headers/Header";
 import { Footer } from "../../Widgets/Footers/Footer";
+import { Header } from "../../Widgets/Headers/Header";
 import UserSidebar from "../../Widgets/UserSidebar/UserSidebar";
 
 const { Title, Paragraph } = Typography;
