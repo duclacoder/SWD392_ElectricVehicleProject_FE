@@ -35,29 +35,47 @@ const PostVehicleSale: React.FC = () => {
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
   const [userInfo, setUserInfo] = useState<{ fullName: string } | null>(null);
-
-  // useEffect(() => {
-  //   const token = localStorage.getItem("token");
-  //   if (!token) {
-  //     message.warning("Bạn cần đăng nhập để đăng bài!");
-  //     navigate("/login");
-  //   }
-  // }, [navigate]);
+  const [fileList, setFileList] = useState<any[]>([]);
 
   const uploadProps = {
     name: "file",
-    action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
     headers: { authorization: "authorization-text" },
     multiple: true,
-    onChange(info: any) {
-      setUploadedFiles(info.fileList);
-      if (info.file.status === "done") {
-        message.success(`${info.file.name} tải lên thành công`);
-      } else if (info.file.status === "error") {
-        message.error(`${info.file.name} tải lên thất bại`);
+    fileList: fileList,
+    beforeUpload: (file: any) => {
+      const isImage = file.type.startsWith('image/');
+      if (!isImage) {
+        message.error('Chỉ được upload file ảnh!');
+        return Upload.LIST_IGNORE;
       }
+      
+      const isLt5M = file.size / 1024 / 1024 < 5;
+      if (!isLt5M) {
+        message.error('Ảnh phải nhỏ hơn 5MB!');
+        return Upload.LIST_IGNORE;
+      }
+
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+      setFileList((prev) => [
+        ...prev,
+        {
+          uid: file.uid,
+          status: "done",
+          url: reader.result, 
+          originFileObj: file,
+        },
+      ]);
+    };
+
+      setFileList((prev) => [...prev, file]);
+      return false;
     },
-    listType: "picture-card",
+    onRemove: (file: any) => {
+      setFileList((prev) => prev.filter((f) => f.uid !== file.uid));
+    },
+    listType: "picture-card" as const,
   };
 
   const onFinish = async (values: any) => {
@@ -72,12 +90,20 @@ const PostVehicleSale: React.FC = () => {
         navigate("/login");
         return;
       }
+
+      if (fileList.length === 0) {
+        message.warning("Vui lòng tải lên ít nhất 1 ảnh xe!");
+        setLoading(false);
+        return;
+      }
+      
+      const imageFiles = fileList.map((file) => file.url || file);
+
       const postData: CreateUserPostDTO = {
         userId: parseInt(userId),
         title: values.title || `${values.vehicleBrand} ${values.vehicleModel}`,
-        packageName: values.packageName || "Gói Cơ Bản",
+        userPackageId: 1,
         year: values.vehicleYear,
-        imageUrls: uploadedFiles.map((f) => f.response?.url || f.name),
         vehicle: {
           brand: values.vehicleBrand,
           model: values.vehicleModel,
@@ -91,13 +117,16 @@ const PostVehicleSale: React.FC = () => {
         },
       };
 
-      const result = await createUserPost(postData);
+      const result = await createUserPost(postData, imageFiles);
       if (result) {
-        // message.success("🎉 Bài đăng bán xe đã được tạo thành công!");
         form.resetFields();
         setUploadedFiles([]);
         navigate("/");
       }
+      else {
+      // message.warning("Bạn không có gói đăng bài nào hợp lệ hoặc đã sử dụng hết. Vui lòng mua gói mới để đăng bài.");
+      navigate("/packages");
+    }
     } catch (error) {
       console.error("Failed to create user post:", error);
       message.error("❌ Đã xảy ra lỗi khi đăng bài bán xe.");

@@ -1,6 +1,6 @@
 import { Descriptions, Modal, Tag } from "antd";
 import React from "react";
-import type { PostPackage } from "../../../entities/PostPackage";
+import type { PostPackage } from "../../entities/PostPackage.ts";
 
 interface Props {
   open: boolean;
