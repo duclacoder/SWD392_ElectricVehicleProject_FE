@@ -9,63 +9,77 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import type { CreatePaymentRequest } from "../../entities/Payment";
+import { createUserPackage } from "../../features/Package";
+import type { UserPackagesDTO } from "../../entities/UserPackage";
 import type { PostPackageCustom } from "../../entities/PostPackage";
 import { adminPostPackageApi } from "../../features/Admin/api/adminPostPackageApi";
+import type { CreatePaymentRequest } from "../../entities/Payment";
 import { CreatePayment, VnPayPayment } from "../../features/Payment";
-import { Footer } from "../../Widgets/Footers/Footer";
 import { Header } from "../../Widgets/Headers/Header";
+import { Footer } from "../../Widgets/Footers/Footer";
+
 
 const PackagePricingPage = () => {
   const [packages, setPackages] = useState<PostPackageCustom[]>([]);
   const [isAnnual, setIsAnnual] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const navigate = useNavigate();
+    useEffect(() => {
+        const fetchPackages = async () => {
+            try {
+                setLoading(true);
+                const result = await adminPostPackageApi.getAll({
+                    page: 1,
+                    pageSize: 10,
+                });
+                if (result?.items?.length) {
+                    setPackages(result.items);
+                } else {
+                    message.warning("Không có gói bài đăng nào được tìm thấy!");
+                }
+            } catch (error) {
+                console.error(error);
+                message.error("Không thể tải danh sách gói bài đăng!");
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchPackages();
+    }, []);
 
-  useEffect(() => {
-    const fetchPackages = async () => {
-      try {
-        setLoading(true);
-        const result = await adminPostPackageApi.getActivePostPackages({
-          page: 1,
-          pageSize: 10,
-        });
-        if (result?.items?.length) {
-          setPackages(result.items);
-        } else {
-          message.warning("Không có gói bài đăng nào được tìm thấy!");
-        }
-      } catch (error) {
-        console.error(error);
-        message.error("Không thể tải danh sách gói bài đăng!");
+    const handleBuyPackage = async (pkg: PostPackageCustom) => {
+        try {
+            sessionStorage.setItem("selectedPackage", JSON.stringify(pkg));
+            const userId = localStorage.getItem("userId");
+
+            const newUserPackage : UserPackagesDTO = {
+                userId: userId ? parseInt(userId) : 0,
+                packagesName: pkg.packageName,
+                purchasedDuration: pkg.postDuration,
+                purchasedAtPrice: isAnnual ? pkg.postPrice * 12 * 0.7 : pkg.postPrice,
+                currency: "VND" 
+            }
+
+            const userPackage = await createUserPackage(newUserPackage);
+            
+            const paymentRequestData : CreatePaymentRequest = {
+                UserId: userId || "",
+                UserPackageId: userPackage?.userPackagesId?.toString() || "",
+            }
+            const result : boolean = await CreatePayment(paymentRequestData);
+            if (result) {
+                const vnpayUrl = await VnPayPayment(sessionStorage.getItem("paymentId") || "")
+                if (vnpayUrl) 
+                    window.open(vnpayUrl);
+            }            
+        } catch (error) {
+            console.error(error);
+            message.error("Có lỗi xảy ra khi mua gói!");
       } finally {
         setLoading(false);
       }
     };
-    fetchPackages();
-  }, []);
 
-  const handleBuyPackage = async (pkg: PostPackageCustom) => {
-    try {
-      sessionStorage.setItem("selectedPackage", JSON.stringify(pkg));
-      const userId = localStorage.getItem("userId");
-      const paymentRequestData: CreatePaymentRequest = {
-        UserId: userId || "",
-        TransferAmount: pkg.postPrice,
-      };
-      const result: boolean = await CreatePayment(paymentRequestData);
-      if (result) {
-        const vnpayUrl = await VnPayPayment(
-          sessionStorage.getItem("paymentId") || ""
-        );
-        if (vnpayUrl) window.open(vnpayUrl);
-      }
-    } catch (error) {
-      console.error(error);
-      message.error("Có lỗi xảy ra khi mua gói!");
-    }
-  };
 
   const benefits = [
     {
