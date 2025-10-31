@@ -1,5 +1,6 @@
 export interface AuctionsFee {
   auctionsFeeId: number;
+  auctionsId: number;
   description: string;
   feePerMinute: number;
   entryFee: number;

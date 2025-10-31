@@ -17,4 +17,5 @@ export interface Payment {
   updatedAt: Date;
   status: string;
   paymentMethod: string;
+  auctionsFeeId: string;
 }

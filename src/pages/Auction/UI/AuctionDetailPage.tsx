@@ -18,7 +18,6 @@ import type {
 import { auctionApi, vehicleApi } from "../../../features/Auction/index";
 import { getUserById } from "../../../features/Post/UserPost";
 import { getConnection, startConnection } from "../../../shared/api/signalR";
-import AuctionFeeModal from "../../../Widgets/components/AuctionFeeModal";
 import { Footer } from "../../../Widgets/Footers/Footer";
 import { Header } from "../../../Widgets/Headers/Header";
 
@@ -36,15 +35,11 @@ const AuctionDetail: React.FC<AuctionDetailProps> = ({ onTimeLeftChange }) => {
   const [joined, setJoined] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [connectionStatus, setConnectionStatus] =
-    useState<string>("Disconnected");
+  const [connectionStatus, setConnectionStatus] = useState<string>("Disconnected");
   const [currentPrice, setCurrentPrice] = useState<number>(0);
   const [timeLeft, setTimeLeft] = useState<string>("");
-  const [showFeeModal, setShowFeeModal] = useState(false);
-  const [selectedFee, setSelectedFee] = useState(null);
   const [auctionStatus, setAuctionStatus] = useState<string>("ĐANG DIỄN RA");
   const [userInfor, setUserInfor] = useState<Map<number, string>>(new Map());
-  const [loadingBids, setLoadingBids] = useState<Set<number>>(new Set());
 
   
 
@@ -83,10 +78,8 @@ const AuctionDetail: React.FC<AuctionDetailProps> = ({ onTimeLeftChange }) => {
       conn.onclose(() => setConnectionStatus("Disconnected"));
       conn.onreconnected(() => setConnectionStatus("Connected"));
 
-      conn.on("ReceiveBid", async (auctionId, bidderId, bidderAmount) => {
+      conn.on("ReceiveBid", async (bidderId, bidderAmount) => {
         try {
-          setLoadingBids((prev) => new Set(prev).add(bidderId));
-
           const bidderName = await fetchUserName(bidderId);
 
           const newBid: BidWithName = {
@@ -97,11 +90,6 @@ const AuctionDetail: React.FC<AuctionDetailProps> = ({ onTimeLeftChange }) => {
           };
           setBids((prev) => [newBid, ...prev]);
           setCurrentPrice(bidderAmount);
-          setLoadingBids((prev) => {
-            const newSet = new Set(prev);
-            newSet.delete(bidderId);
-            return newSet;
-          });
           // conn.on("BidRejected", (message) => alert(`Đặt giá thất bại: ${message}`));
         } catch (err) {
           console.error("SignalR error:", err);
@@ -131,7 +119,6 @@ const AuctionDetail: React.FC<AuctionDetailProps> = ({ onTimeLeftChange }) => {
       setCurrentPrice(initPrice);
 
       if (auctionData.bids && Array.isArray(auctionData.bids)) {
-        const tempUserCache = new Map<number, string>();
 
         const bidPromises = auctionData.bids
           .filter((b) => b && b.bidderId && b.bidAmount) // Filter out invalid entries
@@ -162,10 +149,6 @@ const AuctionDetail: React.FC<AuctionDetailProps> = ({ onTimeLeftChange }) => {
 
   const handleJoinAuction = async () => {
     if (!id) return;
-    if (!selectedFee) {
-      setShowFeeModal(true);
-      return;
-    }
     const conn = getConnection();
     if (conn.state !== "Connected") {
       alert("Chưa kết nối tới máy chủ. Vui lòng thử lại!");
@@ -180,11 +163,6 @@ const AuctionDetail: React.FC<AuctionDetailProps> = ({ onTimeLeftChange }) => {
       console.error("❌ Lỗi tham gia đấu giá:", err);
       alert("Không thể tham gia đấu giá. Vui lòng thử lại!");
     }
-  };
-
-  const handlePaymentSuccess = (fee) => {
-    setSelectedFee(fee);
-    alert(`Đã thanh toán gói "${fee.feeName}" thành công!`);
   };
 
   const handleBid = async () => {
@@ -538,13 +516,6 @@ const AuctionDetail: React.FC<AuctionDetailProps> = ({ onTimeLeftChange }) => {
           </div>
         </div>
       </div>
-      <AuctionFeeModal
-        isOpen={showFeeModal}
-        onClose={() => setShowFeeModal(false)}
-        onPaymentSuccess={handlePaymentSuccess}
-        auctionId={parseInt(id || "0")}
-      />
-
       <Footer />
     </>
   );

@@ -1,9 +1,11 @@
 import { Calendar, Clock, Gauge } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import type { Auction } from "../../../entities/Auction.ts";
 import type { Vehicle } from "../../../entities/Vehicle.ts";
 import { getConnection, startConnection } from "../../../shared/api/signalR.js";
+import { CheckEligibilityJoinAuction } from "../../../features/Auction/AuctionFee/index.tsx";
+import PayAuctionFeeModal from "./PayAuctionFeeModal.tsx";
 
 type AuctionCardProps = {
   auctions: {
@@ -15,6 +17,9 @@ type AuctionCardProps = {
 
 export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions, auctionTimeLeft }) => {
   const [localAuctions, setLocalAuctions] = useState(auctions);
+  const [openPayModal, setOpenPayModal] = useState(false);
+  const [selectedAuctionId, setSelectedAuctionId] = useState();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setLocalAuctions(auctions);
@@ -103,6 +108,7 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions, auctionTimeL
     }
   };
 
+
  const calculateTimeLeft = (endTime?: string) => {
   if (!endTime) return { hours: 0, minutes: 0 }; // thêm dòng này
 
@@ -115,6 +121,16 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions, auctionTimeL
   const minutes = Math.floor((timeLeft / (1000 * 60)) % 60);
   return { hours, minutes };
 };
+
+  const handlejoinAuction = async (auctionId: number) => {
+    const check : boolean = await CheckEligibilityJoinAuction(auctionId, localStorage.getItem("userId") || "");
+    if (check) {
+      navigate(`/auction/${auctionId}`);
+    } else {
+      setSelectedAuctionId(auctionId); 
+      setOpenPayModal(true);
+    }
+  };
 
   if (!localAuctions || localAuctions.length === 0) {
     return (
@@ -129,7 +145,7 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions, auctionTimeL
       {localAuctions.map(({ auction, vehicle }) => {
 const { hours, minutes } = calculateTimeLeft(auction.end_time || auction.endTime || "");
         // Sử dụng currentPrice nếu có, không thì dùng start_price
-        const currentPrice = auction.currentPrice || auction.start_price || 0;
+        const currentPrice = auction.currentPrice || auction.start_price ||  0;
 
         return (
           <article
@@ -191,12 +207,12 @@ const { hours, minutes } = calculateTimeLeft(auction.end_time || auction.endTime
               </div>
 
               <div className="flex gap-3 pt-2">
-                <Link
-                  to={`/auction/${auction.auctionId}`}
+                <button
+                  onClick={() => handlejoinAuction(auction.auctionId)}
                   className="flex-1 bg-blue-600 text-white font-semibold py-2 rounded-xl hover:bg-blue-700 transition text-center"
                 >
                   Tham gia đấu giá
-                </Link>
+                </button>
                 <Link
                   to={`/auction/${auction.auctionId}`}
                   className="flex-1 border border-blue-600 text-blue-600 font-semibold py-2 rounded-xl text-center hover:bg-blue-50 transition"
@@ -208,6 +224,13 @@ const { hours, minutes } = calculateTimeLeft(auction.end_time || auction.endTime
           </article>
         );
       })}
+      {selectedAuctionId && (
+        <PayAuctionFeeModal
+          isOpen={openPayModal}
+          onClose={() => setOpenPayModal(false)}
+          auctionId={selectedAuctionId}
+        />
+      )}
     </div>
   );
 };
