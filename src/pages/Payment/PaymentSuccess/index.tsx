@@ -3,31 +3,41 @@ import { CheckCircle, Clock } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { PostPackage } from "../../../entities/PostPackage";
+import type { AuctionsFee } from "../../../entities/AuctionsFee";
 
 const PaymentSuccess = () => {
-  const [showReceipt, setShowReceipt] = useState(false);
-  const [packageInfo, setPackageInfo] = useState<PostPackage>();
+  const [dataInfo, setDataInfo] = useState<PostPackage | AuctionsFee | undefined>(undefined);
 
   const navigate = useNavigate();
 
-  const handleBacktoHome = () => {
-    sessionStorage.clear();
-    navigate("/");
-  };
-
   useEffect(() => {
     try {
-      const storedPackage = JSON.parse(
-        sessionStorage.getItem("selectedPackage") || ""
-      ) as PostPackage;
-      if (storedPackage) {
-        setPackageInfo(storedPackage);
+      const storedPackageStr = sessionStorage.getItem("selectedPackage");
+      const storedAuctionFeeStr = sessionStorage.getItem("AuctionFee");
+
+      if (storedPackageStr) {
+        const storedPackage = JSON.parse(storedPackageStr) as PostPackage;
+        setDataInfo(storedPackage);
         console.log("Selected Package Info:", storedPackage);
+      } else if (storedAuctionFeeStr) {
+        const storedAuctionFee = JSON.parse(storedAuctionFeeStr) as AuctionsFee;
+        setDataInfo(storedAuctionFee);
+        console.log("Auction Fee Info:", storedAuctionFee);
       }
     } catch (error) {
       console.error("Error loading package info:", error);
     }
   }, []);
+
+const handleBacktoHome = () => { 
+  if(dataInfo?.postPackageId) 
+    navigate("/post"); 
+  else if(dataInfo?.auctionId) 
+    navigate(`/auction/${dataInfo?.auctionId}`);
+  else 
+    navigate("/");
+  sessionStorage.clear(); 
+};
 
   // Format ngày giờ
   const formatDate = () => {
@@ -38,14 +48,6 @@ const PaymentSuccess = () => {
     const time = now.toLocaleTimeString("en-US", { hour12: false });
     return `${day} ${month} ${year}, ${time}`;
   };
-
-  if (!packageInfo) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-sky-700 to-sky-900 flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-700 to-sky-900 flex items-center justify-center p-4">
@@ -69,12 +71,8 @@ const PaymentSuccess = () => {
               <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-full mb-4 animate-bounce">
                 <CheckCircle className="w-12 h-12 text-green-500" />
               </div>
-              <h1 className="text-4xl font-bold text-white mb-2">
-                Payment Completed!
-              </h1>
-              <p className="text-green-50 text-lg">
-                Your transaction has been processed successfully
-              </p>
+              <h1 className="text-4xl font-bold text-white mb-2">Payment Completed!</h1>
+              <p className="text-green-50 text-lg">Your transaction has been processed successfully</p>
             </div>
           </div>
 
@@ -83,16 +81,15 @@ const PaymentSuccess = () => {
             <div className="grid md:grid-cols-2 gap-8 mb-8">
               {/* Transaction Summary */}
               <div>
-                <h2 className="text-xl font-bold text-gray-800 mb-6 pb-2 border-b-2 border-sky-700">
-                  Transaction Summary
-                </h2>
+                <h2 className="text-xl font-bold text-gray-800 mb-6 pb-2 border-b-2 border-sky-700">Transaction Summary</h2>
                 <div className="space-y-4">
                   <div className="flex justify-between items-start">
-                    <span className="text-gray-600 font-medium">
-                      Amount Paid
-                    </span>
+                    <span className="text-gray-600 font-medium">Amount Paid</span>
                     <span className="text-2xl font-bold text-green-600">
-                      {packageInfo.postPrice + " VND"}
+                      {(typeof (dataInfo as any)?.postPrice === "number"
+                        ? (dataInfo as any)?.postPrice
+                        : (dataInfo as any)?.entryFee) || 0}{" "}
+                      VND
                     </span>
                   </div>
 
@@ -101,122 +98,77 @@ const PaymentSuccess = () => {
                       <Clock className="w-4 h-4 mr-1" />
                       Date & Time
                     </span>
-                    <span className="text-gray-900 text-right">
-                      {formatDate()}
-                    </span>
+                    <span className="text-gray-900 text-right">{formatDate()}</span>
                   </div>
 
                   <div className="bg-sky-50 rounded-lg p-4 mt-6">
-                    <p className="text-sm font-semibold text-sky-900 mb-2">
-                      Package Details
-                    </p>
-                    <p className="text-gray-800 font-medium text-lg">
-                      {packageInfo.packageName}
-                    </p>
-                    <p className="text-gray-600 text-sm mt-2">
-                      {packageInfo.description}
-                    </p>
-                    <p className="text-gray-500 text-sm mt-2">
-                      Thời hạn: {packageInfo.postDuration} ngày
-                    </p>
+                    <p className="text-sm font-semibold text-sky-900 mb-2">Infomation</p>
+                    <p className="text-gray-800 font-medium text-lg">Mã giao dịch: {sessionStorage.getItem("paymentId")}</p>
+                    <p className="text-gray-600 text-sm mt-2">Miêu tả: { (dataInfo as any)?.description || "-" }</p>
                   </div>
                 </div>
               </div>
 
               {/* Package Information */}
               <div>
-                <h2 className="text-xl font-bold text-gray-800 mb-6 pb-2 border-b-2 border-sky-700">
-                  Package Information
-                </h2>
+                <h2 className="text-xl font-bold text-gray-800 mb-6 pb-2 border-b-2 border-sky-700">Information</h2>
 
                 <div className="bg-gray-50 rounded-xl p-6 space-y-4">
                   <div>
                     <p className="text-lg font-bold text-gray-900 mb-1">
-                      {packageInfo.packageName}
+                      {(dataInfo as any)?.packageName || `Mã phiên đấu giá: ${(dataInfo as any)?.auctionId || "-"}`}
                     </p>
                     <span
                       className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
-                        packageInfo.status === "Active"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-gray-100 text-gray-800"
+                        (dataInfo as any)?.status === "Active" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
                       }`}
                     >
-                      {packageInfo.status}
+                      Trạng thái: {(dataInfo as any)?.status || "-"}
                     </span>
-                  </div>
 
-                  <div className="border-t border-gray-200 pt-4 space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Package ID:</span>
-                      <span className="text-sm font-mono bg-gray-200 px-2 py-1 rounded">
-                        #{packageInfo.postPackageId}
-                      </span>
-                    </div>
-
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Duration:</span>
-                      <span className="text-sm font-semibold text-gray-900">
-                        {packageInfo.postDuration} days
-                      </span>
-                    </div>
-
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Currency:</span>
-                      <span className="text-sm font-semibold text-gray-900">
-                        {packageInfo.currency}
-                      </span>
-                    </div>
-
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Price:</span>
+                    <div className="flex justify-between items-center mt-4">
+                      <span className="text-sm text-gray-600">Giá tiền thanh toán:</span>
                       <span className="text-lg font-bold text-sky-700">
-                        {packageInfo.postPrice + " VND"}
+                        {(typeof (dataInfo as any)?.postPrice === "number"
+                          ? (dataInfo as any)?.postPrice
+                          : (dataInfo as any)?.entryFee) || 0}{" "}
+                        VND
                       </span>
                     </div>
                   </div>
-                </div>
 
-                <div className="mt-6 bg-amber-50 border border-amber-200 rounded-lg p-4">
-                  <p className="text-sm text-amber-900">
-                    <span className="font-semibold">Next Steps:</span> Your post
-                    will be activated within 24 hours. You can manage your posts
-                    from the dashboard.
-                  </p>
+                  <div className="mt-6 bg-amber-50 border border-amber-200 rounded-lg p-4">
+                    <p className="text-sm text-amber-900">
+                      <span className="font-semibold">Next Steps:</span> Chuyển hướng để tiếp tục
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t text-white border-gray-200">
+            {/* Action + Additional Info */}
+            <div className="pt-6 border-t border-gray-200">
               <button
                 onClick={handleBacktoHome}
-                className="flex-1 bg-sky-600 hover:bg-sky-800 font-semibold py-4 rounded-xl transition-all transform flex items-center justify-center gap-2"
+                className="w-full bg-sky-600 hover:bg-sky-800 text-white font-semibold py-4 rounded-xl transition-all flex items-center justify-center gap-2"
               >
                 <HomeFilled className="w-5 h-5" />
-                Back to home
+                Chuyển hướng
               </button>
-            </div>
 
-            {/* Additional Info */}
-            <div className="mt-8 text-center">
-              <p className="text-sm text-gray-500">
-                A confirmation email with all details has been sent to your
-                registered email address.
-              </p>
-              <p className="text-xs text-gray-400 mt-2">
-                Questions? Contact our support team 24/7 at
-                support@evmanagement.com
-              </p>
+              <div className="mt-8 text-center">
+                <p className="text-sm text-gray-500">
+                  A confirmation email with all details has been sent to your registered email address.
+                </p>
+                <p className="text-xs text-gray-400 mt-2">Questions? Contact our support team 24/7 at support@evmanagement.com</p>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Bottom Message */}
         <div className="mt-6 text-center">
-          <p className="text-white/90 text-sm">
-            Thank you for choosing EV Management. We're excited to be part of
-            your journey!
-          </p>
+          <p className="text-white/90 text-sm">Thank you for choosing EV Management. We're excited to be part of your journey!</p>
         </div>
       </div>
     </div>
