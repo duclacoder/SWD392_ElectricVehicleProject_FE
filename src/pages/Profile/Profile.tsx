@@ -1,5 +1,6 @@
 import {
   CarOutlined,
+  CreditCardFilled,
   CrownOutlined,
   IdcardOutlined,
   LockOutlined,
@@ -23,6 +24,7 @@ import { useEffect, useState } from "react";
 import { Footer } from "../../Widgets/Footers/Footer.tsx";
 import { Header } from "../../Widgets/Headers/Header.tsx";
 import UserSidebar from "../../Widgets/UserSidebar/UserSidebar.tsx";
+import { CreditCard, Wallet, WalletCards } from "lucide-react";
 
 const { Title, Paragraph } = Typography;
 // Removed { Sider, Content } from Layout; as they are no longer used
@@ -37,6 +39,7 @@ interface UserProfile {
   phone: string;
   createdAt: string;
   updatedAt: string;
+  wallet: number;
   status: string;
 }
 
@@ -76,6 +79,7 @@ const ProfilePage = () => {
             createdAt: user.createdAt,
             updatedAt: user.updatedAt,
             status: user.status,
+            wallet: user.wallet
           });
         } else {
           message.error("Failed to load user profile");
@@ -120,6 +124,7 @@ const ProfilePage = () => {
           createdAt: result.result.createdAt,
           updatedAt: result.result.updatedAt,
           status: result.result.status,
+          wallet: result.result.wallet
         });
         message.success(result.message || "Profile updated successfully");
       } else {
@@ -342,11 +347,15 @@ const ProfilePage = () => {
                   <Descriptions.Item
                     label={
                       <Space>
-                        <IdcardOutlined /> Status
+                        <CreditCardFilled className="h-4 w-4"/> EV Wallet
                       </Space>
                     }
                   >
-                    {userProfile.status}
+                    <span className="text-blue-600">
+                    {typeof userProfile.wallet === "number"
+                      ? new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(userProfile.wallet)
+                      : new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(0)}
+                    </span>
                   </Descriptions.Item>
                 </Descriptions>
 
