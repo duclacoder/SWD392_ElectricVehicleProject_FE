@@ -16,11 +16,10 @@ import type {
   BidWithName,
 } from "../../../entities/Auction";
 import { auctionApi, vehicleApi } from "../../../features/Auction/index";
-import { getUserById } from "../../../features/Post/UserPost";
 import { getConnection, startConnection } from "../../../shared/api/signalR";
-import AuctionFeeModal from "../../../Widgets/components/AuctionFeeModal";
 import { Footer } from "../../../Widgets/Footers/Footer";
 import { Header } from "../../../Widgets/Headers/Header";
+import { getBidsByAuctionId } from "../../../features/Auction/AuctionBids";
 
 
 type AuctionDetailProps = {
@@ -36,37 +35,14 @@ const AuctionDetail: React.FC<AuctionDetailProps> = ({ onTimeLeftChange }) => {
   const [joined, setJoined] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [connectionStatus, setConnectionStatus] =
-    useState<string>("Disconnected");
+  const [connectionStatus, setConnectionStatus] = useState<string>("Disconnected");
   const [currentPrice, setCurrentPrice] = useState<number>(0);
   const [timeLeft, setTimeLeft] = useState<string>("");
-  const [showFeeModal, setShowFeeModal] = useState(false);
-  const [selectedFee, setSelectedFee] = useState(null);
   const [auctionStatus, setAuctionStatus] = useState<string>("ĐANG DIỄN RA");
   const [userInfor, setUserInfor] = useState<Map<number, string>>(new Map());
-  const [loadingBids, setLoadingBids] = useState<Set<number>>(new Set());
+  // const [winnerModalOpen, setWinnerModalOpen] = useState(false);
+  // const [auctionWinner, setAuctionWinner] = useState<AuctionWinnerDto | null>(null);
 
-  
-
-  const fetchUserName = async (bidderId: number): Promise<string> => {
-    if (userInfor.has(bidderId)) {
-      return userInfor.get(bidderId)!;
-    }
-    try {
-      const user = await getUserById(String(bidderId));
-      if (!user) {
-        throw new Error("User not found");
-      }
-      const userName = user.fullName || `Người dùng ${bidderId}`;
-
-      setUserInfor((prev) => new Map(prev).set(bidderId, userName));
-
-      return userName;
-    } catch (error) {
-      console.error("Lỗi khi lấy tên người dùng:", error);
-      return `Người ${bidderId}`;
-    }
-  };
   useEffect(() => {
     if (id) {
       fetchAuctionDetail();
@@ -80,28 +56,22 @@ const AuctionDetail: React.FC<AuctionDetailProps> = ({ onTimeLeftChange }) => {
       const conn = getConnection();
       setConnectionStatus(conn.state);
 
+      conn.off("ReceiveBid");
+      conn.off("BidRejected");
+
       conn.onclose(() => setConnectionStatus("Disconnected"));
       conn.onreconnected(() => setConnectionStatus("Connected"));
 
-      conn.on("ReceiveBid", async (auctionId, bidderId, bidderAmount) => {
+      conn.on("ReceiveBid", async (bidderFullName, bidderAmount) => {
         try {
-          setLoadingBids((prev) => new Set(prev).add(bidderId));
-
-          const bidderName = await fetchUserName(bidderId);
-
           const newBid: BidWithName = {
-            bidderId,
-            bidderName,
+            bidderId: 0,
+            bidderName: bidderFullName || `Unknow User`,
             amount: bidderAmount,
             time: new Date().toLocaleString("vi-VN"),
           };
           setBids((prev) => [newBid, ...prev]);
           setCurrentPrice(bidderAmount);
-          setLoadingBids((prev) => {
-            const newSet = new Set(prev);
-            newSet.delete(bidderId);
-            return newSet;
-          });
           // conn.on("BidRejected", (message) => alert(`Đặt giá thất bại: ${message}`));
         } catch (err) {
           console.error("SignalR error:", err);
@@ -116,37 +86,47 @@ const AuctionDetail: React.FC<AuctionDetailProps> = ({ onTimeLeftChange }) => {
       setConnectionStatus("Error");
     }
   };
+  const processBids = async (auctionId: number) => {
+    try {
+      const bidResult = await getBidsByAuctionId(auctionId);
+
+      if (bidResult?.items && bidResult.items.length > 0) {
+        const maxBid = Math.max(...bidResult.items.map(b => b.bidAmount));
+        setCurrentPrice(maxBid);
+
+        const processedBids: BidWithName[] = bidResult.items.map(b => ({
+          bidderId: 0,
+          bidderName: (b as any).bidderFullName || "Unknown",
+          amount: b.bidAmount,
+          time: new Date().toLocaleString("vi-VN"),
+        }));
+
+        setBids(processedBids.reverse());
+      } else {
+        setCurrentPrice(auction?.startPrice || 0);
+        setBids([]);
+      }
+    } catch (err) {
+      console.error("Lỗi xử lý bids:", err);
+    }
+  };
 
   const fetchAuctionDetail = async () => {
     try {
       setLoading(true);
+      const auctionId = Number(id);
+
       const auctionData = await auctionApi.getAuctionById(Number(id));
       if (!auctionData) throw new Error("Không thể tải thông tin đấu giá");
 
       setAuction(auctionData);
+      await processBids(auctionId);
 
       const initPrice = auctionData.bids?.length
-        ? Math.max(...auctionData.bids.map((b) => b.bidAmount))
-        : auctionData.startPrice;
+        ? Math.max(...auctionData.bids.map((b) => b.bidAmount || 0))
+        : (auctionData.startPrice || 0);
       setCurrentPrice(initPrice);
-
-      if (auctionData.bids && Array.isArray(auctionData.bids)) {
-        const tempUserCache = new Map<number, string>();
-
-        const bidPromises = auctionData.bids
-          .filter((b) => b && b.bidderId && b.bidAmount) // Filter out invalid entries
-          .map(async (b) => {
-            const bidderName = await fetchUserName(b.bidderId);
-            return {
-              bidderId: b.bidderId,
-              bidderName,
-              amount: b.bidAmount,
-              time: new Date(b.bidTime).toLocaleString("vi-VN"),
-            };
-          });
-        const initialBids = await Promise.all(bidPromises);
-        setBids(initialBids.reverse());
-      }
+      await processBids(auctionId);
 
       const vehicleData = await vehicleApi.getVehicleById(
         auctionData.vehicleId
@@ -162,10 +142,6 @@ const AuctionDetail: React.FC<AuctionDetailProps> = ({ onTimeLeftChange }) => {
 
   const handleJoinAuction = async () => {
     if (!id) return;
-    if (!selectedFee) {
-      setShowFeeModal(true);
-      return;
-    }
     const conn = getConnection();
     if (conn.state !== "Connected") {
       alert("Chưa kết nối tới máy chủ. Vui lòng thử lại!");
@@ -176,15 +152,11 @@ const AuctionDetail: React.FC<AuctionDetailProps> = ({ onTimeLeftChange }) => {
       await conn.invoke("JoinAuction", parseInt(id));
       setJoined(true);
       console.log("Joined auction:", id);
+      await refreshBidHistory();
     } catch (err) {
       console.error("❌ Lỗi tham gia đấu giá:", err);
       alert("Không thể tham gia đấu giá. Vui lòng thử lại!");
     }
-  };
-
-  const handlePaymentSuccess = (fee) => {
-    setSelectedFee(fee);
-    alert(`Đã thanh toán gói "${fee.feeName}" thành công!`);
   };
 
   const handleBid = async () => {
@@ -243,12 +215,12 @@ const AuctionDetail: React.FC<AuctionDetailProps> = ({ onTimeLeftChange }) => {
     if (!auction?.endTime) return;
 
     const timer = setInterval(() => {
-      const newTime = calculateTimeLeft(); 
+      const newTime = calculateTimeLeft();
       setTimeLeft(newTime);
 
-        if (auction?.auctionId && onTimeLeftChange) {
-      onTimeLeftChange(auction.auctionId, newTime);
-    }
+      if (auction?.auctionId && onTimeLeftChange) {
+        onTimeLeftChange(auction.auctionId, newTime);
+      }
     }, 1000);
 
     return () => clearInterval(timer);
@@ -256,8 +228,36 @@ const AuctionDetail: React.FC<AuctionDetailProps> = ({ onTimeLeftChange }) => {
 
   const formatPrice = (price: number) =>
     new Intl.NumberFormat("vi-VN").format(price);
-  const formatPriceShort = (price: number) => Math.floor(price / 1000000);
+  const formatPriceShort = (price?: number | null): string => {
+    if (price === undefined || price === null || isNaN(price)) {
+      return "0";
+    }
+    return new Intl.NumberFormat("vi-VN").format(price);
+  };
+
   const retryFetch = () => fetchAuctionDetail();
+
+   const formatPriceAuction = (price: number): string => {
+     if (price === undefined || price === null || isNaN(price) || price === 0) {
+    return "0";
+  }
+    if (price >= 1_000_000_000_000) {
+      return (price / 1_000_000_000_000).toFixed(1).replace(/\.0$/, '') + " nghìn tỷ";
+    } else if (price >= 1_000_000_000) {
+      return (price / 1_000_000_000).toFixed(1).replace(/\.0$/, '') + " tỷ";
+    } else if (price >= 1_000_000) {
+      return (price / 1_000_000).toFixed(1).replace(/\.0$/, '') + " triệu";
+    } else if (price >= 1_000) {
+      return (price / 1_000).toFixed(1).replace(/\.0$/, '') + " nghìn";
+    } else {
+      return price.toString();
+    }
+  };
+
+  const refreshBidHistory = async () => {
+    await processBids(Number(id));
+  };
+
 
   if (loading)
     return (
@@ -431,11 +431,10 @@ const AuctionDetail: React.FC<AuctionDetailProps> = ({ onTimeLeftChange }) => {
 
                 <div className="flex items-center justify-between mb-5">
                   <span
-                    className={`px-3 py-1 rounded-full text-sm font-medium shadow-sm ${
-                      auctionStatus === "ĐANG DIỄN RA"
-                        ? "bg-green-500 text-white"
-                        : "bg-gray-500 text-white"
-                    }`}
+                    className={`px-3 py-1 rounded-full text-sm font-medium shadow-sm ${auctionStatus === "ĐANG DIỄN RA"
+                      ? "bg-green-500 text-white"
+                      : "bg-gray-500 text-white"
+                      }`}
                   >
                     {auctionStatus}
                   </span>
@@ -476,15 +475,20 @@ const AuctionDetail: React.FC<AuctionDetailProps> = ({ onTimeLeftChange }) => {
                       {connectionStatus !== "Connected"
                         ? "Đang kết nối..."
                         : auctionStatus === "KẾT THÚC"
-                        ? "Phiên đã kết thúc"
-                        : "Đặt giá của bạn"}
+                          ? "Phiên đã kết thúc"
+                          : "Đặt giá của bạn"}
                     </button>
                   ) : (
                     <div className="space-y-3">
                       <input
-                        type="number"
-                        value={bidPrice}
-                        onChange={(e) => setBidPrice(e.target.value)}
+                        type="text"
+                        value={bidPrice ? formatPrice(parseFloat(bidPrice)) : ""}
+                        onChange={(e) => {
+                          const rawValue = e.target.value.replace(/\./g, "");
+                          if (rawValue === "" || /^\d+$/.test(rawValue)) {
+                            setBidPrice(rawValue);
+                          }
+                        }}
                         className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 transition bg-white"
                         placeholder="Nhập bình luận..."
                       />
@@ -538,13 +542,6 @@ const AuctionDetail: React.FC<AuctionDetailProps> = ({ onTimeLeftChange }) => {
           </div>
         </div>
       </div>
-      <AuctionFeeModal
-        isOpen={showFeeModal}
-        onClose={() => setShowFeeModal(false)}
-        onPaymentSuccess={handlePaymentSuccess}
-        auctionId={parseInt(id || "0")}
-      />
-
       <Footer />
     </>
   );

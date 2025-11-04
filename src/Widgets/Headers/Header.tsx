@@ -78,10 +78,16 @@ export const Header: FC = () => {
                   className="absolute left-0 bg-white shadow-lg mt-2 rounded-md py-2 w-48 z-10"
                 >
                   <a href="/posts" className="block px-4 py-2 hover:bg-gray-100">
-                    Sản phẩm
+                    Bài đăng xe
                   </a>
                   <a href="/post" className="block px-4 py-2 hover:bg-gray-100">
                     Đăng bài bán xe
+                  </a>
+                   <a href="/post/listBattery" className="block px-4 py-2 hover:bg-gray-100">
+                    Bài đăng pin
+                  </a>
+                   <a href="/post/battery" className="block px-4 py-2 hover:bg-gray-100">
+                    Đăng bài bán pin
                   </a>
                 </div>
               )}

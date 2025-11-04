@@ -16,6 +16,7 @@ export const getAllUserPosts = async (
         Page: params.page,
         PageSize: params.pageSize,
         UserId: params.userId,
+        IsVehiclePost: params.isVehiclePost,
       },
     });
     const data: ResponseDTO<PaginatedResult<UserPostCustom>> = response.data;
@@ -63,6 +64,15 @@ export const createUserPost = async (
   imagesFiles: File[]
 ): Promise<UserPostCustom | null> => {
   try {
+    if (imagesFiles.length === 0) {
+      message.warning("Please upload at least one image");
+      return null;
+    }
+     if (!dto.vehicle && !dto.battery) {
+      message.error("Please provide vehicle or battery information");
+      return null;
+    }
+
     const formData = new FormData();
 
     formData.append("UserId", dto.userId.toString());
@@ -79,6 +89,20 @@ export const createUserPost = async (
       formData.append('Vehicle.BodyType', dto.vehicle.bodyType || '');
       formData.append('Vehicle.RangeKm', dto.vehicle.rangeKm?.toString() || '');
       formData.append('Vehicle.MotorPowerKw', dto.vehicle.motorPowerKw?.toString() || '');
+    }
+
+     if (dto.battery) {
+      formData.append("Battery.BatteryName", dto.battery.batteryName || "");
+      formData.append("Battery.Brand", dto.battery.brand || "");
+      formData.append("Battery.Description", dto.battery.description || "");
+      formData.append("Battery.Capacity", dto.battery.capacity?.toString() || "");
+      formData.append("Battery.Voltage", dto.battery.voltage?.toString() || "");
+      formData.append(
+        "Battery.WarrantyMonths",
+        dto.battery.warrantyMonths?.toString() || ""
+      );
+      formData.append("Battery.Price", dto.battery.price?.toString() || "");
+      formData.append("Battery.Currency", dto.battery.currency || "VND");
     }
 
     imagesFiles.forEach((file) => {

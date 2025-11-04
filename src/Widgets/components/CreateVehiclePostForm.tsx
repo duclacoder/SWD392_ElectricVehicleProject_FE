@@ -13,16 +13,17 @@ import {
 import { UploadOutlined, CheckCircleOutlined } from "@ant-design/icons";
 import { createUserPost } from "../../features/Post/index";
 import type { CreateUserPostDTO } from "../../entities/UserPost";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   onSuccess?: () => void;
   onCancel?: () => void;
 }
- 
 const VehiclePostForm: React.FC<Props> = ({ onSuccess, onCancel }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [fileList, setFileList] = useState<any[]>([]);
+  const navigate = useNavigate();
 
   const uploadProps = {
     fileList,
@@ -88,12 +89,23 @@ const VehiclePostForm: React.FC<Props> = ({ onSuccess, onCancel }) => {
       };
 
       const imageFiles = fileList.map((f) => f.originFileObj || f);
-      await createUserPost(postData, imageFiles);
-      message.success("Đăng bài thành công!");
-      form.resetFields();
-      setFileList([]);
-      onSuccess?.();
-    } catch (e) {
+      const result = await createUserPost(postData, imageFiles);
+      if (result) {
+        message.success("✅ Đăng bài thành công!");
+        form.resetFields();
+        setFileList([]);
+        onSuccess?.();
+      } else {
+        message.warning({
+          content: "⚠️ Bạn không có gói đăng bài nào hợp lệ hoặc đã sử dụng hết. Đang chuyển đến trang mua gói...",
+          duration: 3,
+        });
+        setTimeout(() => {
+          navigate("/packages");
+        }, 1500);
+      }
+    }
+    catch (e) {
       console.error(e);
       message.error("Lỗi khi đăng bài! Vui lòng kiểm tra lại thông tin.");
     } finally {
