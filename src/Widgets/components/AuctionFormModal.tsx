@@ -83,6 +83,7 @@ export const AuctionFormModal: FC<AuctionFormModalProps> = ({
           vehicleId: values.vehicleId,
           endTime: values.endTime.toISOString(),
           entryFee: values.entryFee,
+          startPrice: values.startPrice,
         };
         onSubmit(finalValues);
       })
@@ -148,7 +149,28 @@ export const AuctionFormModal: FC<AuctionFormModalProps> = ({
             </Select>
           </Form.Item>
 
+          
+
           <Row gutter={16}>
+             <Col span={12}>
+              <Form.Item
+                name="startPrice"
+                label="Start Price (Giá khởi điểm)"
+                rules={[{ required: true, message: "Please enter entry fee" }]}
+              >
+                <InputNumber
+                  style={{ width: "100%" }}
+                  min={0}
+                  disabled={isEditing} // Disable entry fee when editing
+                  formatter={(value) =>
+                    `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  }
+                  parser={(value: string | undefined) =>
+                    value ? parseFloat(value.replace(/,/g, "")) : 0
+                  }
+                />
+              </Form.Item>
+            </Col>
             <Col span={12}>
               <Form.Item
                 name="entryFee"
@@ -179,14 +201,14 @@ export const AuctionFormModal: FC<AuctionFormModalProps> = ({
             </Col>
           </Row>
 
-          {/* Hidden fields with fixed values */}
+          {/* Hidden fields with fixed values
           <Form.Item
             name="startPrice"
             initialValue={0}
             style={{ display: "none" }}
           >
             <InputNumber />
-          </Form.Item>
+          </Form.Item> */}
 
           <div
             style={{

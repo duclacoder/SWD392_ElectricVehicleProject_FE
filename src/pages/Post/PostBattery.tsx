@@ -1,11 +1,4 @@
 import {
-  CarOutlined,
-  CheckCircleOutlined,
-  PictureOutlined,
-  ThunderboltOutlined,
-  UploadOutlined,
-} from "@ant-design/icons";
-import {
   Button,
   Card,
   Col,
@@ -18,6 +11,11 @@ import {
   Upload,
   message,
 } from "antd";
+import {
+  PictureOutlined,
+  UploadOutlined,
+  CheckCircleOutlined,
+} from "@ant-design/icons";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Footer } from "../../Widgets/Footers/Footer";
@@ -25,104 +23,63 @@ import { Header } from "../../Widgets/Headers/Header";
 import { useAuth } from "../../Widgets/hooks/useAuth";
 import type { CreateUserPostDTO } from "../../entities/UserPost";
 import { createUserPost } from "../../features/Post";
+import { Battery, Zap } from "lucide-react";
 
 const { Title, Text } = Typography;
 
-const PostVehicleSale: React.FC = () => {
+const PostBatterySale: React.FC = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
-  const [userInfo, setUserInfo] = useState<{ fullName: string } | null>(null);
   const [fileList, setFileList] = useState<any[]>([]);
 
-  // const uploadProps = {
-  //   name: "file",
-  //   headers: { authorization: "authorization-text" },
-  //   multiple: true,
-  //   fileList: fileList,
-  //   beforeUpload: (file: any) => {
-  //     const isImage = file.type.startsWith('image/');
-  //     if (!isImage) {
-  //       message.error('Chỉ được upload file ảnh!');
-  //       return Upload.LIST_IGNORE;
-  //     }
-      
-  //     const isLt5M = file.size / 1024 / 1024 < 5;
-  //     if (!isLt5M) {
-  //       message.error('Ảnh phải nhỏ hơn 5MB!');
-  //       return Upload.LIST_IGNORE;
-  //     }
-
-  //     const reader = new FileReader();
-  //     reader.readAsDataURL(file);
-  //     reader.onload = () => {
-  //     setFileList((prev) => [
-  //       ...prev,
-  //       {
-  //         uid: file.uid,
-  //         status: "done",
-  //         url: reader.result, 
-  //         originFileObj: file,
-  //       },
-  //     ]);
-  //   };
-
-  //     setFileList((prev) => [...prev, file]);
-  //     return false;
-  //   },
-  //   onRemove: (file: any) => {
-  //     setFileList((prev) => prev.filter((f) => f.uid !== file.uid));
-  //   },
-  //   listType: "picture-card" as const,
-  // };
+  const userId = localStorage.getItem("userId");
+  const userPackageId = 1; // Giá trị UserPackageId giả lập/mặc định
 
   const uploadProps = {
-      name: "file",
-      headers: { authorization: "authorization-text" },
-      multiple: true,
-      fileList: fileList,
-      beforeUpload: (file: any) => {
-        const isImage = file.type.startsWith("image/");
-        if (!isImage) {
-          message.error("Chỉ được upload file ảnh!");
-          return Upload.LIST_IGNORE;
-        }
-  
-        const isLt5M = file.size / 1024 / 1024 < 5;
-        if (!isLt5M) {
-          message.error("Ảnh phải nhỏ hơn 5MB!");
-          return Upload.LIST_IGNORE;
-        }
-  
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => {
-          setFileList((prev) => [
-            ...prev,
-            {
-              uid: file.uid,
-              status: "done",
-              url: reader.result,
-              originFileObj: file,
-            },
-          ]);
-        };
-        return false;
-      },
-      onRemove: (file: any) => {
-        setFileList((prev) => prev.filter((f) => f.uid !== file.uid));
-      },
-      listType: "picture-card" as const,
-    };
+    name: "file",
+    headers: { authorization: "authorization-text" },
+    multiple: true,
+    fileList: fileList,
+    beforeUpload: (file: any) => {
+      const isImage = file.type.startsWith("image/");
+      if (!isImage) {
+        message.error("Chỉ được upload file ảnh!");
+        return Upload.LIST_IGNORE;
+      }
+
+      const isLt5M = file.size / 1024 / 1024 < 5;
+      if (!isLt5M) {
+        message.error("Ảnh phải nhỏ hơn 5MB!");
+        return Upload.LIST_IGNORE;
+      }
+
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        setFileList((prev) => [
+          ...prev,
+          {
+            uid: file.uid,
+            status: "done",
+            url: reader.result,
+            originFileObj: file,
+          },
+        ]);
+      };
+      return false;
+    },
+    onRemove: (file: any) => {
+      setFileList((prev) => prev.filter((f) => f.uid !== file.uid));
+    },
+    listType: "picture-card" as const,
+  };
 
   const onFinish = async (values: any) => {
     setLoading(true);
     try {
-      const userId = localStorage.getItem("userId");
-
-      if (!userId) {
+      if (!userId || !isLoggedIn) {
         message.error(
           "Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại!"
         );
@@ -130,45 +87,46 @@ const PostVehicleSale: React.FC = () => {
         return;
       }
 
-      if (fileList.length === 0) {
-        message.warning("Vui lòng tải lên ít nhất 1 ảnh xe!");
+      const filesToUpload = fileList
+        .map((file) => file.originFileObj)
+        .filter((file) => file instanceof File);
+
+      if (filesToUpload.length === 0) {
+        message.warning("Vui lòng tải lên ít nhất 1 ảnh pin!");
         setLoading(false);
         return;
       }
-      
-      const imageFiles = fileList.map((file) => file.url || file);
 
       const postData: CreateUserPostDTO = {
         userId: parseInt(userId),
-        title: values.title || `${values.vehicleBrand} ${values.vehicleModel}`,
-        userPackageId: 1,
-        year: values.vehicleYear,
-        vehicle: {
-          brand: values.vehicleBrand,
-          model: values.vehicleModel,
-          year: values.vehicleYear,
-          color: values.vehicleColor,
-          price: values.vehiclePrice,
-          description: values.vehicleDescription,
-          bodyType: values.vehicleBodyType,
-          rangeKm: values.vehicleRangeKm,
-          motorPowerKw: values.vehicleMotorPowerKw,
+        title:
+        values.title || `${values.batteryBrand} ${values.batteryName}`,
+        userPackageId: userPackageId, // Sử dụng package ID giả lập
+        vehicle: null,  
+        battery: {
+          batteryName: values.batteryName,
+          brand: values.batteryBrand,
+          description: values.batteryDescription,
+          capacity: values.batteryCapacity,
+          voltage: values.batteryVoltage,
+          warrantyMonths: values.batteryWarrantyMonths,
+          price: values.batteryPrice,
+          currency: "VND",
         },
       };
 
-      const result = await createUserPost(postData, imageFiles);
+      const result = await createUserPost(postData, filesToUpload);
+
       if (result) {
         form.resetFields();
-        setUploadedFiles([]);
+        setFileList([]);
+        message.success("Đăng bài bán pin thành công! Bài đăng đang chờ duyệt.");
         navigate("/");
-      }
-      else {
-      // message.warning("Bạn không có gói đăng bài nào hợp lệ hoặc đã sử dụng hết. Vui lòng mua gói mới để đăng bài.");
-      navigate("/packages");
-    }
+      } 
+      
     } catch (error) {
-      console.error("Failed to create user post:", error);
-      message.error("❌ Đã xảy ra lỗi khi đăng bài bán xe.");
+      console.error("Failed to create battery post:", error);
+      message.error("Đã xảy ra lỗi khi đăng bài bán pin.");
     } finally {
       setLoading(false);
     }
@@ -200,7 +158,7 @@ const PostVehicleSale: React.FC = () => {
                 background: "white",
               }}
             >
-              <CarOutlined className="text-6xl text-blue-600" />
+              <Battery className="w-16 h-16 text-blue-600" />
             </div>
             <Title
               level={1}
@@ -212,10 +170,10 @@ const PostVehicleSale: React.FC = () => {
                 textShadow: "0 4px 20px rgba(0,0,0,0.2)",
               }}
             >
-              Đăng Bài Bán Xe
+              Đăng Bài Bán Pin
             </Title>
             <Text className="text-white text-xl opacity-95 font-medium block mb-8">
-              Tạo bài đăng chuyên nghiệp, thu hút người mua chỉ trong vài phút
+              Đăng tải pin của bạn để tiếp cận hàng ngàn người mua tiềm năng
             </Text>
 
             {/* Feature badges */}
@@ -224,10 +182,10 @@ const PostVehicleSale: React.FC = () => {
                 <Text className="text-white font-semibold">⚡ Nhanh chóng</Text>
               </div>
               <div className="bg-white bg-opacity-20 backdrop-blur-sm px-6 py-3 rounded-full border border-white border-opacity-30">
-                <Text className="text-white font-semibold">✨ Dễ dàng</Text>
+                <Text className="text-white font-semibold">💎 Chất lượng</Text>
               </div>
               <div className="bg-white bg-opacity-20 backdrop-blur-sm px-6 py-3 rounded-full border border-white border-opacity-30">
-                <Text className="text-white font-semibold">🎯 Hiệu quả</Text>
+                <Text className="text-white font-semibold">🛡️ Bảo mật</Text>
               </div>
             </div>
           </div>
@@ -246,44 +204,44 @@ const PostVehicleSale: React.FC = () => {
               autoComplete="off"
               className="p-4 sm:p-8"
             >
-              {/* Thông tin cơ bản */}
+              {/* Thông tin cơ bản về Pin */}
               <div
                 className="rounded-3xl p-8 sm:p-10 mb-10 relative overflow-hidden"
                 style={{
                   background:
-                    "linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%)",
+                    "linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%)", // Tông xanh nhạt
                   border: "3px solid #0ea5e9",
                 }}
               >
                 <Space align="center" className="mb-8">
                   <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center shadow-xl">
-                    <CarOutlined className="text-3xl text-white" />
+                    <Battery className="w-8 h-8 text-white" />
                   </div>
                   <Title
                     level={3}
                     className="!mb-0 text-blue-900"
                     style={{ fontSize: "1.75rem", fontWeight: 700 }}
                   >
-                    Thông tin cơ bản
+                    Thông tin cơ bản về Pin
                   </Title>
                 </Space>
 
                 <Row gutter={[24, 24]}>
                   <Col xs={24} md={12}>
                     <Form.Item
-                      name="vehicleBrand"
+                      name="batteryBrand"
                       label={
                         <span className="font-bold text-blue-900 text-base">
-                          Hãng xe
+                          Thương hiệu Pin
                         </span>
                       }
                       rules={[
-                        { required: true, message: "Vui lòng nhập hãng xe!" },
+                        { required: true, message: "Vui lòng nhập thương hiệu pin!" },
                       ]}
                     >
                       <Input
                         size="large"
-                        placeholder="Tesla, Toyota, VinFast..."
+                        placeholder="Panasonic, GS, Bosch..."
                         className="rounded-2xl h-14 text-base font-medium"
                         style={{
                           background: "white",
@@ -295,19 +253,19 @@ const PostVehicleSale: React.FC = () => {
                   </Col>
                   <Col xs={24} md={12}>
                     <Form.Item
-                      name="vehicleModel"
+                      name="batteryName"
                       label={
                         <span className="font-bold text-blue-900 text-base">
-                          Mẫu xe
+                          Tên Pin / Model
                         </span>
                       }
                       rules={[
-                        { required: true, message: "Vui lòng nhập mẫu xe!" },
+                        { required: true, message: "Vui lòng nhập tên pin / model!" },
                       ]}
                     >
                       <Input
                         size="large"
-                        placeholder="Model 3, Camry, VF8..."
+                        placeholder="Premium, MF 50D20L..."
                         className="rounded-2xl h-14 text-base font-medium"
                         style={{
                           background: "white",
@@ -319,117 +277,65 @@ const PostVehicleSale: React.FC = () => {
                   </Col>
                 </Row>
 
-                <Row gutter={[24, 24]}>
-                  <Col xs={24} sm={8}>
-                    <Form.Item
-                      name="vehicleYear"
-                      label={
-                        <span className="font-bold text-blue-900 text-base">
-                          Năm sản xuất
-                        </span>
-                      }
-                      rules={[
-                        { required: true, message: "Nhập năm sản xuất!" },
-                      ]}
-                    >
-                      <InputNumber
-                        size="large"
-                        min={1900}
-                        max={new Date().getFullYear() + 1}
-                        style={{
-                          width: "100%",
-                          background: "white",
-                          border: "2px solid #0ea5e9",
-                          boxShadow: "0 4px 12px rgba(14,165,233,0.1)",
-                        }}
-                        className="rounded-2xl h-14 font-medium"
-                        placeholder="2024"
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} sm={8}>
-                    <Form.Item
-                      name="vehicleColor"
-                      label={
-                        <span className="font-bold text-blue-900 text-base">
-                          Màu sắc
-                        </span>
-                      }
-                      rules={[{ required: true, message: "Nhập màu xe!" }]}
-                    >
-                      <Input
-                        size="large"
-                        placeholder="Trắng, Đen, Đỏ..."
-                        className="rounded-2xl h-14 text-base font-medium"
-                        style={{
-                          background: "white",
-                          border: "2px solid #0ea5e9",
-                          boxShadow: "0 4px 12px rgba(14,165,233,0.1)",
-                        }}
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} sm={8}>
-                    <Form.Item
-                      name="vehicleBodyType"
-                      label={
-                        <span className="font-bold text-blue-900 text-base">
-                          Dòng xe
-                        </span>
-                      }
-                      rules={[{ required: true, message: "Nhập dòng xe!" }]}
-                    >
-                      <Input
-                        size="large"
-                        placeholder="Sedan, SUV, Coupe..."
-                        className="rounded-2xl h-14 text-base font-medium"
-                        style={{
-                          background: "white",
-                          border: "2px solid #0ea5e9",
-                          boxShadow: "0 4px 12px rgba(14,165,233,0.1)",
-                        }}
-                      />
-                    </Form.Item>
-                  </Col>
-                </Row>
+                <Form.Item
+                  name="title"
+                  label={
+                    <span className="font-bold text-blue-900 text-base">
+                      Tiêu đề bài đăng (Tùy chọn)
+                    </span>
+                  }
+                  tooltip="Tiêu đề hấp dẫn giúp thu hút người mua (VD: Pin Panasonic 60Ah mới 95% giá tốt)"
+                >
+                  <Input
+                    size="large"
+                    placeholder="Pin Panasonic 60Ah mới 95% giá tốt"
+                    className="rounded-2xl h-14 text-base font-medium"
+                    style={{
+                      background: "white",
+                      border: "2px solid #0ea5e9",
+                      boxShadow: "0 4px 12px rgba(14,165,233,0.1)",
+                    }}
+                  />
+                </Form.Item>
+
               </div>
 
-              {/* Thông số kỹ thuật */}
+              {/* Thông số kỹ thuật & Giá Pin */}
               <div
                 className="rounded-3xl p-8 sm:p-10 mb-10 relative overflow-hidden"
                 style={{
                   background:
-                    "linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%)",
+                    "linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)", // Tông xanh nhạt hơn
                   border: "3px solid #3b82f6",
                 }}
               >
                 <Space align="center" className="mb-8">
                   <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center shadow-xl">
-                    <ThunderboltOutlined className="text-3xl text-white" />
+                    <Zap className="w-8 h-8 text-white" />
                   </div>
                   <Title
                     level={3}
                     className="!mb-0 text-blue-900"
                     style={{ fontSize: "1.75rem", fontWeight: 700 }}
                   >
-                    Thông số kỹ thuật & Giá
+                    Thông số & Giá
                   </Title>
                 </Space>
 
                 <Row gutter={[24, 24]}>
                   <Col xs={24} sm={8}>
                     <Form.Item
-                      name="vehicleRangeKm"
+                      name="batteryCapacity"
                       label={
                         <span className="font-bold text-blue-900 text-base">
-                          Quãng đường (km)
+                          Dung lượng (Ah)
                         </span>
                       }
-                      rules={[{ required: true, message: "Nhập quãng đường!" }]}
+                      rules={[{ required: true, message: "Nhập dung lượng (Ah)!" }]}
                     >
                       <InputNumber
                         size="large"
-                        min={0}
+                        min={1}
                         style={{
                           width: "100%",
                           background: "white",
@@ -437,23 +343,26 @@ const PostVehicleSale: React.FC = () => {
                           boxShadow: "0 4px 12px rgba(59,130,246,0.1)",
                         }}
                         className="rounded-2xl h-14 font-medium"
-                        placeholder="500"
+                        placeholder="60"
+                        formatter={(v) => `${v} Ah`}
+                        parser={(v) => v?.replace(' Ah', '') as number}
                       />
                     </Form.Item>
                   </Col>
                   <Col xs={24} sm={8}>
                     <Form.Item
-                      name="vehicleMotorPowerKw"
+                      name="batteryVoltage"
                       label={
                         <span className="font-bold text-blue-900 text-base">
-                          Công suất (kW)
+                          Điện áp (V)
                         </span>
                       }
-                      rules={[{ required: true, message: "Nhập công suất!" }]}
+                      rules={[{ required: true, message: "Nhập điện áp (V)!" }]}
                     >
                       <InputNumber
                         size="large"
-                        min={0}
+                        min={1}
+                        step={0.1}
                         style={{
                           width: "100%",
                           background: "white",
@@ -461,19 +370,21 @@ const PostVehicleSale: React.FC = () => {
                           boxShadow: "0 4px 12px rgba(59,130,246,0.1)",
                         }}
                         className="rounded-2xl h-14 font-medium"
-                        placeholder="150"
+                        placeholder="12"
+                        formatter={(v) => `${v} V`}
+                        parser={(v) => v?.replace(' V', '') as number}
                       />
                     </Form.Item>
                   </Col>
                   <Col xs={24} sm={8}>
                     <Form.Item
-                      name="vehiclePrice"
+                      name="batteryWarrantyMonths"
                       label={
                         <span className="font-bold text-blue-900 text-base">
-                          Giá bán (VNĐ)
+                          Bảo hành còn lại (Tháng)
                         </span>
                       }
-                      rules={[{ required: true, message: "Nhập giá bán!" }]}
+                      rules={[{ required: true, message: "Nhập số tháng bảo hành!" }]}
                     >
                       <InputNumber
                         size="large"
@@ -485,14 +396,40 @@ const PostVehicleSale: React.FC = () => {
                           boxShadow: "0 4px 12px rgba(59,130,246,0.1)",
                         }}
                         className="rounded-2xl h-14 font-medium"
-                        formatter={(v) =>
-                          `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                        }
-                        placeholder="1,000,000,000"
+                        placeholder="12"
+                        formatter={(v) => `${v} tháng`}
+                        parser={(v) => v?.replace(' tháng', '') as number}
                       />
                     </Form.Item>
                   </Col>
                 </Row>
+
+                <Form.Item
+                  name="batteryPrice"
+                  label={
+                    <span className="font-bold text-blue-900 text-base">
+                      Giá bán (VNĐ)
+                    </span>
+                  }
+                  rules={[{ required: true, message: "Nhập giá bán!" }]}
+                >
+                  <InputNumber
+                    size="large"
+                    min={0}
+                    style={{
+                      width: "100%",
+                      background: "white",
+                      border: "2px solid #3b82f6",
+                      boxShadow: "0 4px 12px rgba(59,130,246,0.1)",
+                    }}
+                    className="rounded-2xl h-14 font-medium"
+                    formatter={(v) =>
+                      `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    }
+                    parser={(v) => v?.replace(/,*/g, '') as number}
+                    placeholder="2,500,000"
+                  />
+                </Form.Item>
               </div>
 
               {/* Mô tả & Hình ảnh */}
@@ -500,7 +437,7 @@ const PostVehicleSale: React.FC = () => {
                 className="rounded-3xl p-8 sm:p-10 mb-10 relative overflow-hidden"
                 style={{
                   background:
-                    "linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)",
+                    "linear-gradient(135deg, #f0f8ff 0%, #e0f2fe 100%)", // Tông xanh nhạt nhất
                   border: "3px solid #0284c7",
                 }}
               >
@@ -518,7 +455,7 @@ const PostVehicleSale: React.FC = () => {
                 </Space>
 
                 <Form.Item
-                  name="vehicleDescription"
+                  name="batteryDescription"
                   label={
                     <span className="font-bold text-blue-900 text-base">
                       Mô tả chi tiết
@@ -533,7 +470,7 @@ const PostVehicleSale: React.FC = () => {
                 >
                   <Input.TextArea
                     rows={6}
-                    placeholder="Mô tả tình trạng xe, lý do bán, các nâng cấp, bảo hành còn lại..."
+                    placeholder="Mô tả tình trạng pin, lý do bán, bảo hành còn lại, xe nào tương thích..."
                     className="rounded-2xl text-base font-medium"
                     style={{
                       resize: "none",
@@ -547,7 +484,7 @@ const PostVehicleSale: React.FC = () => {
                 <Form.Item
                   label={
                     <span className="font-bold text-blue-900 text-base">
-                      Hình ảnh xe
+                      Hình ảnh Pin
                     </span>
                   }
                   className="mb-0"
@@ -560,8 +497,7 @@ const PostVehicleSale: React.FC = () => {
                   </Upload>
                   <div className="mt-4 bg-blue-50 border-2 border-blue-200 rounded-xl p-4">
                     <Text className="text-blue-800 font-semibold">
-                      💡 Mẹo: Tải lên từ 5-10 ảnh chất lượng cao để tăng khả
-                      năng bán xe
+                      💡 Mẹo: Tải lên hình ảnh rõ ràng của pin, các tem nhãn và cọc pin.
                     </Text>
                   </div>
                 </Form.Item>
@@ -576,7 +512,7 @@ const PostVehicleSale: React.FC = () => {
                   size="large"
                   icon={loading ? null : <CheckCircleOutlined />}
                   className="h-16 px-16 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-xl transition-all transform hover:-translate-y-1"
-                  style={{ background: "#0ea5e9", borderColor: "#0ea5e9" }}
+                  style={{ background: "#0ea5e9", borderColor: "#0ea5e9" }} 
                 >
                   Đăng bài
                 </Button>
@@ -590,4 +526,4 @@ const PostVehicleSale: React.FC = () => {
   );
 };
 
-export default PostVehicleSale;
+export default PostBatterySale;

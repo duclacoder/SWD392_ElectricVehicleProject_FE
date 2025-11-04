@@ -40,3 +40,8 @@ export const CreatePayment = async (createRequest : CreatePaymentRequest) : Prom
         return false;
     }
 }
+
+export const getPaymentsByUserId = async (userId: number): Promise<ResponseDTO<Payment[]>> => {
+  const response = await api.get<ResponseDTO<Payment[]>>(`/Payment/${userId}`);
+  return response.data;
+};

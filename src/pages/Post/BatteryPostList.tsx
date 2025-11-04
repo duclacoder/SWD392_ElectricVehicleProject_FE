@@ -14,34 +14,39 @@ import { Footer } from "../../Widgets/Footers/Footer";
 import { Header } from "../../Widgets/Headers/Header";
 import type { UserPostCustom } from "../../entities/UserPost";
 import { getAllUserPosts } from "../../features/Post";
+import { Battery } from 'lucide-react'; // Sử dụng icon Pin
 
 const { Title, Text } = Typography;
 
-const PostList: React.FC = () => {
+const BatteryPostList: React.FC = () => {
   const [posts, setPosts] = useState<UserPostCustom[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(9);
   const [total, setTotal] = useState(0);
-    const [filterType, setFilterType] = useState<"all" | "vehicle" | "battery">("all");
   const navigate = useNavigate();
+
+  const formatPrice = (price: number | undefined) => {
+    if (price === undefined || price === null) return "Liên hệ";
+    return price.toLocaleString('vi-VN');
+  };
 
   const fetchPosts = async (page: number, pageSize: number) => {
     try {
       setLoading(true);
 
-      // gọi API dùng tham số page-based pagination
-      const data = await getAllUserPosts({ page, pageSize, isVehiclePost: true });
+      // GỌI API CHỈ LẤY BÀI ĐĂNG PIN (isVehiclePost: false)
+      const data = await getAllUserPosts({ page, pageSize, isVehiclePost: false, userId: undefined });
 
       if (data) {
         setPosts(data.items || []);
         setTotal(data.totalItems || 0);
       } else {
-        message.error("Không thể tải danh sách bài đăng.");
+        message.error("Không thể tải danh sách bài đăng Pin.");
       }
     } catch (error) {
       console.error(error);
-      message.error("Đã xảy ra lỗi khi tải danh sách bài đăng.");
+      message.error("Đã xảy ra lỗi khi tải danh sách bài đăng Pin.");
     } finally {
       setLoading(false);
     }
@@ -54,16 +59,16 @@ const PostList: React.FC = () => {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 relative overflow-hidden">
-        {/* Decorative Elements */}
-        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-blue-400/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
-        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-purple-400/20 rounded-full blur-3xl translate-x-1/2 translate-y-1/2"></div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50 to-teal-50 relative overflow-hidden">
+        {/* Decorative Elements (Tông xanh lá/ngọc lục bảo) */}
+        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-emerald-400/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-green-400/20 rounded-full blur-3xl translate-x-1/2 translate-y-1/2"></div>
 
         <div className="container mx-auto px-4 py-16 relative z-10">
           {/* Hero Section */}
           <div className="text-center mb-16">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl mb-6 shadow-2xl">
-              <span className="text-4xl">🚗</span>
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl mb-6 shadow-2xl">
+              <Battery className="w-10 h-10 text-white" />
             </div>
 
             <Title
@@ -71,7 +76,7 @@ const PostList: React.FC = () => {
               className="!mb-4"
               style={{
                 background:
-                  "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%)",
+                  "linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 fontSize: "3.5rem",
@@ -79,38 +84,38 @@ const PostList: React.FC = () => {
                 letterSpacing: "-0.02em",
               }}
             >
-              Khám Phá Xe Của Bạn
+              Chợ Mua Bán Pin EV
             </Title>
 
             <Text className="text-xl text-gray-600 block mb-8">
-              Tìm kiếm chiếc xe hoàn hảo từ hàng nghìn lựa chọn
+              Tìm kiếm pin thay thế hoặc pin nâng cấp chất lượng cao
             </Text>
 
             {/* Stats Bar */}
             <div className="flex flex-wrap items-center justify-center gap-6 md:gap-12">
               <div className="text-center px-6 py-3 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg">
-                <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
+                <div className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-700 bg-clip-text text-transparent">
                   {total}+
                 </div>
                 <div className="text-sm text-gray-600 font-medium">
-                  Xe Đang Bán
+                  Pin Đang Bán
                 </div>
               </div>
 
               <div className="text-center px-6 py-3 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg">
-                <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent">
-                  100%
+                <div className="text-3xl font-bold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">
+                  Li-ion
                 </div>
                 <div className="text-sm text-gray-600 font-medium">
-                  Xác Thực
+                  Đa Dạng Loại Pin
                 </div>
               </div>
 
               <div className="text-center px-6 py-3 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg">
-                <div className="text-3xl font-bold bg-gradient-to-r from-pink-600 to-pink-700 bg-clip-text text-transparent">
-                  24/7
+                <div className="text-3xl font-bold bg-gradient-to-r from-teal-600 to-teal-700 bg-clip-text text-transparent">
+                  18+
                 </div>
-                <div className="text-sm text-gray-600 font-medium">Hỗ Trợ</div>
+                <div className="text-sm text-gray-600 font-medium">Thương Hiệu</div>
               </div>
             </div>
           </div>
@@ -119,20 +124,20 @@ const PostList: React.FC = () => {
             <div className="flex flex-col justify-center items-center min-h-[500px]">
               <div className="relative">
                 <Spin size="large" />
-                <div className="absolute inset-0 blur-2xl bg-blue-500/30 animate-pulse"></div>
+                <div className="absolute inset-0 blur-2xl bg-emerald-500/30 animate-pulse"></div>
               </div>
               <Text className="mt-6 text-lg text-gray-600 font-medium animate-pulse">
-                Đang tải xe của bạn...
+                Đang tải pin...
               </Text>
             </div>
           ) : posts.length === 0 ? (
             <div className="flex flex-col items-center justify-center min-h-[500px] bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-16">
-              <div className="text-8xl mb-6">🚗</div>
+              <div className="text-8xl mb-6">🔋</div>
               <Title level={3} className="!mb-2 text-gray-800">
-                Chưa Có Xe Nào
+                Chưa Có Bài Đăng Pin Nào
               </Title>
               <Text className="text-lg text-gray-500">
-                Hãy quay lại sau để khám phá thêm nhiều xe mới
+                Hãy quay lại sau hoặc thử mua gói đăng bài để chia sẻ pin của bạn
               </Text>
             </div>
           ) : (
@@ -153,11 +158,11 @@ const PostList: React.FC = () => {
                       cover={
                         <div className="relative overflow-hidden h-64">
                           <img
-                            alt="vehicle"
+                            alt="battery"
                             src={
                               post.images && post.images.length > 0
                                 ? post.images[0]
-                                : "https://via.placeholder.com/400x300?text=No+Image"
+                                : "https://via.placeholder.com/400x300?text=Battery+Image"
                             }
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                           />
@@ -165,13 +170,13 @@ const PostList: React.FC = () => {
                           {/* Dark Overlay on Hover */}
                           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                          {/* NEW Badge */}
+                          {/* Badge Trạng thái */}
                           <div className="absolute top-4 right-4">
                             <Badge
-                              count="MỚI"
+                              count={post.status === "Active" ? "CÒN HÀNG" : "HẾT HÀNG"}
                               style={{
-                                backgroundColor: "#fff",
-                                color: "#3b82f6",
+                                backgroundColor: post.status === "Active" ? "#10b981" : "#ef4444",
+                                color: "#fff",
                                 fontWeight: "bold",
                                 fontSize: "11px",
                                 boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
@@ -183,7 +188,7 @@ const PostList: React.FC = () => {
                           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0">
                             <div className="bg-white/95 backdrop-blur-md px-6 py-2.5 rounded-full shadow-2xl border border-white/20">
                               <Text className="text-sm font-bold text-gray-800">
-                                Xem Chi Tiết →
+                                Xem Chi Tiết Pin →
                               </Text>
                             </div>
                           </div>
@@ -194,13 +199,13 @@ const PostList: React.FC = () => {
                       <div className="p-5">
                         <Title
                           level={4}
-                          className="!mb-5 line-clamp-2 group-hover:text-blue-600 transition-colors duration-300 !text-lg !font-bold leading-snug"
+                          className="!mb-5 line-clamp-2 group-hover:text-emerald-600 transition-colors duration-300 !text-lg !font-bold leading-snug"
                         >
                           {post.title}
                         </Title>
 
                         {/* Price Section */}
-                        <div className="mb-5 p-5 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl border-2 border-blue-100/50 shadow-sm">
+                        <div className="mb-5 p-5 bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 rounded-2xl border-2 border-emerald-100/50 shadow-sm">
                           <Text className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">
                             Giá bán
                           </Text>
@@ -210,16 +215,14 @@ const PostList: React.FC = () => {
                               className="text-3xl font-black"
                               style={{
                                 background:
-                                  "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
+                                  "linear-gradient(135deg, #059669 0%, #10b981 100%)",
                                 WebkitBackgroundClip: "text",
                                 WebkitTextFillColor: "transparent",
                               }}
                             >
-                              {post.vehicle?.price
-                                ? post.vehicle.price.toLocaleString()
-                                : "Liên hệ"}
+                              {formatPrice(post.battery?.price)}
                             </Text>
-                            {post.vehicle?.price && (
+                            {post.battery?.price !== undefined && (
                               <Text className="text-sm font-semibold text-gray-500">
                                 VND
                               </Text>
@@ -227,10 +230,20 @@ const PostList: React.FC = () => {
                           </div>
                         </div>
 
-                        {/* Vehicle Details */}
+                        {/* Battery Details */}
                         <div className="space-y-3">
-                          <div className="flex items-center gap-3 p-3 bg-blue-50/50 rounded-xl hover:bg-blue-50 transition-colors group/item">
-                            <div className="flex-shrink-0 w-9 h-9 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md group-hover/item:scale-110 transition-transform">
+                          <div className="flex items-center gap-3 p-3 bg-emerald-50/50 rounded-xl hover:bg-emerald-50 transition-colors group/item">
+                            <div className="flex-shrink-0 w-9 h-9 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-md group-hover/item:scale-110 transition-transform">
+                              <Battery className="w-5 h-5 text-white" />
+                            </div>
+                            <Text className="text-sm font-semibold text-gray-700 flex-1">
+                              {post.battery?.brand || "N/A"}{" "}
+                              ({post.battery?.capacity || "N/A"} Ah)
+                            </Text>
+                          </div>
+
+                          <div className="flex items-center gap-3 p-3 bg-green-50/50 rounded-xl hover:bg-green-50 transition-colors group/item">
+                            <div className="flex-shrink-0 w-9 h-9 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-md group-hover/item:scale-110 transition-transform">
                               <svg
                                 className="w-5 h-5 text-white"
                                 fill="none"
@@ -241,40 +254,17 @@ const PostList: React.FC = () => {
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
                                   strokeWidth={2}
-                                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                                  d="M13 10V3L4 14h7v7l9-11h-7z" // Biểu tượng sét/điện áp
                                 />
                               </svg>
                             </div>
                             <Text className="text-sm font-semibold text-gray-700 flex-1">
-                              {post.vehicle?.brand || "N/A"}{" "}
-                              {post.vehicle?.model || ""}
+                              Điện áp: {post.battery?.voltage || "N/A"} V
                             </Text>
                           </div>
 
-                          <div className="flex items-center gap-3 p-3 bg-purple-50/50 rounded-xl hover:bg-purple-50 transition-colors group/item">
-                            <div className="flex-shrink-0 w-9 h-9 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md group-hover/item:scale-110 transition-transform">
-                              <svg
-                                className="w-5 h-5 text-white"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                />
-                              </svg>
-                            </div>
-                            <Text className="text-sm font-semibold text-gray-700 flex-1">
-                              Năm {post.vehicle?.year || "N/A"} •{" "}
-                              {post.vehicle?.color || "N/A"}
-                            </Text>
-                          </div>
-
-                          <div className="flex items-center gap-3 p-3 bg-indigo-50/50 rounded-xl hover:bg-indigo-50 transition-colors group/item">
-                            <div className="flex-shrink-0 w-9 h-9 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-md group-hover/item:scale-110 transition-transform">
+                          <div className="flex items-center gap-3 p-3 bg-teal-50/50 rounded-xl hover:bg-teal-50 transition-colors group/item">
+                            <div className="flex-shrink-0 w-9 h-9 bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl flex items-center justify-center shadow-md group-hover/item:scale-110 transition-transform">
                               <svg
                                 className="w-5 h-5 text-white"
                                 fill="none"
@@ -290,7 +280,7 @@ const PostList: React.FC = () => {
                               </svg>
                             </div>
                             <Text className="text-sm font-semibold text-gray-700 flex-1">
-                              {post.vehicle?.bodyType || "N/A"}
+                              BH: {post.battery?.warrantyMonths || 0} tháng
                             </Text>
                           </div>
                         </div>
@@ -322,7 +312,7 @@ const PostList: React.FC = () => {
                         <span
                           style={{
                             background:
-                              "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
+                              "linear-gradient(135deg, #059669 0%, #10b981 100%)",
                             WebkitBackgroundClip: "text",
                             WebkitTextFillColor: "transparent",
                             fontWeight: 800,
@@ -359,4 +349,4 @@ const PostList: React.FC = () => {
   );
 };
 
-export default PostList;
+export default BatteryPostList;

@@ -2,6 +2,7 @@ import { message } from "antd";
 import type {
   AuctionCustom,
   AuctionVehicleDetails,
+  AuctionWinnerDto,
 } from "../../entities/Auction";
 import type { PaginatedResult, ResponseDTO } from "../../entities/Response.js";
 import api from "../../shared/api/axios";
@@ -29,6 +30,7 @@ export const auctionApi = {
     }
   },
 
+   
   async getAuctionById(id: number): Promise<AuctionCustom | null> {
     try {
       const response = await api.get<ResponseDTO<AuctionCustom>>(
@@ -45,7 +47,21 @@ export const auctionApi = {
       return null;
     }
   },
+
+async getAuctionWinner(auctionId: number): Promise<AuctionWinnerDto | null> {
+    try {
+      const response = await api.get<ResponseDTO<AuctionWinnerDto>>(`/auctions/${auctionId}/winner`);
+      if (response.data.isSuccess) return response.data.result;
+      message.error(response.data.message || "Không thể lấy người thắng đấu giá");
+      return null;
+    } catch (error: any) {
+      message.error(error?.response?.data?.message || "Lỗi khi lấy người thắng đấu giá");
+      return null;
+    }
+  },
 };
+
+
 
 export const vehicleApi = {
   async getVehicleById(

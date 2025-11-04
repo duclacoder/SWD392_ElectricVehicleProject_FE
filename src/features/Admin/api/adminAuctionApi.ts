@@ -113,7 +113,8 @@ export interface CreateAuctionWithAutoFeeFormData {
   userName: string;
   vehicleId: number;
   endTime: string;
-  entryFee: number; // This will be the base for calculating auction fee entry fee (1%)
+  entryFee: number;
+  startPrice: number; // This will be the base for calculating auction fee entry fee (1%)
 }
 
 export const createAuctionWithAutoFee = async (
@@ -128,7 +129,7 @@ export const createAuctionWithAutoFee = async (
       feePerMinute: 0, // Fixed value
       openFee: 0, // Fixed value
       entryFee: auctionData.entryFee,
-      startPrice: 0, // Fixed value
+      startPrice: auctionData.startPrice, // Fixed value
     };
 
     console.log("Creating auction with data:", auctionPayload);
@@ -149,7 +150,7 @@ export const createAuctionWithAutoFee = async (
       auctionsId: createdAuction.auctionId, // Use the auction ID from step 1
       description: "Phí tham gia",
       feePerMinute: 0, // Fixed value
-      entryFee: Math.round(auctionData.entryFee * 0.01), // 1% of auction entryFee
+      entryFee: Math.round(auctionData.startPrice * 0.01), // 1% of auction startPrice
       currency: "VND", // Fixed value
       type: "Phí tham gia", // Fixed value
       status: "Active", // Fixed value
