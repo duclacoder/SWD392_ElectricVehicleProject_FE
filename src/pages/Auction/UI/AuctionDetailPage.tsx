@@ -111,6 +111,26 @@ const AuctionDetail: React.FC<AuctionDetailProps> = ({ onTimeLeftChange }) => {
     }
   };
 
+
+  useEffect(() => {
+  if (!auction?.auctionId || !auction?.endTime) return;
+
+  if (timeLeft === "00:00:00" && auctionStatus !== "ĐÃ HOÀN TIỀN") {
+    console.log("Phiên đấu giá đã hết hạn, tiến hành hoàn tiền...");
+    setAuctionStatus("ĐANG HOÀN TIỀN");
+
+    (async () => {
+      const success = await auctionApi.refundAuction(auction.auctionId);
+      if (success) {
+        setAuctionStatus("ĐÃ HOÀN TIỀN");
+      } else {
+        setAuctionStatus("LỖI HOÀN TIỀN");
+      }
+    })();
+  }
+}, [timeLeft]);
+
+
   const fetchAuctionDetail = async () => {
     try {
       setLoading(true);

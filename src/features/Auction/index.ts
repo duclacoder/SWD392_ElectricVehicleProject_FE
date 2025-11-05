@@ -2,7 +2,7 @@ import { message } from "antd";
 import type {
   AuctionCustom,
   AuctionVehicleDetails,
-  AuctionWinnerDto,
+  // AuctionWinnerDto,
 } from "../../entities/Auction";
 import type { PaginatedResult, ResponseDTO } from "../../entities/Response.js";
 import api from "../../shared/api/axios";
@@ -47,18 +47,43 @@ export const auctionApi = {
       return null;
     }
   },
-
-async getAuctionWinner(auctionId: number): Promise<AuctionWinnerDto | null> {
+  async refundAuction(auctionId: number): Promise<boolean> {
     try {
-      const response = await api.get<ResponseDTO<AuctionWinnerDto>>(`/auctions/${auctionId}/winner`);
-      if (response.data.isSuccess) return response.data.result;
-      message.error(response.data.message || "Không thể lấy người thắng đấu giá");
-      return null;
+      const response = await api.get<ResponseDTO<any>>(
+        `/Auctions/Refund?auctionId=${auctionId}`
+      );
+      const data = response.data;
+
+      if (data.isSuccess) {
+        message.success(
+          data.message || "Hoàn tiền và kết thúc phiên đấu giá thành công!"
+        );
+        return true;
+      } else {
+        message.error(data.message || "Không thể hoàn tiền phiên đấu giá.");
+        return false;
+      }
     } catch (error: any) {
-      message.error(error?.response?.data?.message || "Lỗi khi lấy người thắng đấu giá");
-      return null;
+      message.error(
+        error?.response?.data?.message ||
+          "Lỗi khi gọi API hoàn tiền đấu giá."
+      );
+      return false;
     }
   },
+
+
+// async getAuctionWinner(auctionId: number): Promise<AuctionWinnerDto | null> {
+//     try {
+//       const response = await api.get<ResponseDTO<AuctionWinnerDto>>(`/auctions/${auctionId}/winner`);
+//       if (response.data.isSuccess) return response.data.result;
+//       message.error(response.data.message || "Không thể lấy người thắng đấu giá");
+//       return null;
+//     } catch (error: any) {
+//       message.error(error?.response?.data?.message || "Lỗi khi lấy người thắng đấu giá");
+//       return null;
+//     }
+//   },
 };
 
 

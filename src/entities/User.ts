@@ -24,3 +24,33 @@ export interface UserPackage {
   purchased_at: string;
   status: string;
 }
+
+export interface UserVehicle {
+  vehiclesId: number;
+  vehicleName: string;
+  brand: string;
+  model: string;
+  year?: number;
+  color?: string;
+  price?: number;
+  bodyType?: string;
+  rangeKm?: number;
+  motorPowerKw?: number;
+  imageUrl?: string;
+  km?: number;
+  seats?: number;
+  status?: string;
+}
+
+export interface UserBattery {
+  batteriesId: number;
+  batteryName: string;
+  brand: string;
+  capacity: number; // Ah
+  voltage: number; // V
+  price: number;
+  description: string;
+  warrantyMonths: number;
+  status: string;
+  imageUrl?: string;
+}
