@@ -9,6 +9,7 @@ import {
   Plus,
   RefreshCw,
   Search,
+  Battery
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +20,7 @@ import { Footer } from "../../Widgets/Footers/Footer.tsx";
 import { Header } from "../../Widgets/Headers/Header.tsx";
 import UserSidebar from "../../Widgets/UserSidebar/UserSidebar.tsx";
 import VehiclePostForm from "../../Widgets/components/CreateVehiclePostForm.tsx";
+import BatteryPostForm from "../../Widgets/components/CreateBatteryPostForm.tsx";
 
 const MyPostsManagement: React.FC = () => {
   const navigate = useNavigate();
@@ -33,6 +35,10 @@ const MyPostsManagement: React.FC = () => {
   const [showSoldModal, setShowSoldModal] = useState(false);
   const [selectedPost, setSelectedPost] = useState<UserPostCustom | null>(null);
   const [showAddPostModal, setShowAddPostModal] = useState(false);
+  const [showPostTypeModal, setShowPostTypeModal] = useState(false);
+  const [showVehiclePostModal, setShowVehiclePostModal] = useState(false);
+  const [showBatteryPostModal, setShowBatteryPostModal] = useState(false);
+
 
   useEffect(() => {
     fetchUserPosts();
@@ -108,6 +114,16 @@ const MyPostsManagement: React.FC = () => {
     }
   };
 
+  const handleSelectPostType = (type: "vehicle" | "battery") => {
+    setShowPostTypeModal(false);
+    if (type === "vehicle") {
+      setShowVehiclePostModal(true);
+    } else {
+      setShowBatteryPostModal(true);
+    }
+  };
+
+
   const formatPrice = (price?: number) =>
     price ? new Intl.NumberFormat("vi-VN").format(price) : "—";
   const formatDate = (dateString: string) =>
@@ -134,12 +150,12 @@ const MyPostsManagement: React.FC = () => {
                       Bài viết của tôi
                     </h1>
                     <p className="text-gray-500 mt-1">
-                      Quản lý tất cả bài đăng bán xe của bạn
+                      Quản lý tất cả bài đăng bán xe và pin của bạn
                     </p>
                   </div>
                  <button
                     className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-cyan-700 transition-all shadow-lg shadow-blue-200"
-                    onClick={() => setShowAddPostModal(true)}
+                    onClick={() => setShowPostTypeModal(true)}
                   >
                     <Plus className="w-5 h-5" />
                     Đăng bài mới
@@ -215,10 +231,10 @@ const MyPostsManagement: React.FC = () => {
                     Chưa có bài viết nào
                   </h3>
                   <p className="text-gray-500 mb-6">
-                    Bắt đầu đăng bài để bán xe của bạn
+                    Bắt đầu đăng bài để bán xe hoặc pin của bạn
                   </p>
                   <button
-                    onClick={() => navigate("/AddPost")}
+                    onClick={() => setShowPostTypeModal(true)}
                     className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all"
                   >
                     <Plus className="w-5 h-5" />
@@ -293,6 +309,26 @@ const MyPostsManagement: React.FC = () => {
                               )}
                             </div>
                           )}
+                            {post.battery && (
+                            <div className="space-y-2 mb-4">
+                              <div className="flex items-center gap-2 text-sm text-gray-600">
+                                <Battery className="w-4 h-4" />
+                                <span>
+                                  {post.battery.brand} - {post.battery.capacity}Ah
+                                </span>
+                              </div>
+
+                              {post.battery.price && (
+                                <div className="flex items-center gap-2 text-green-600 font-bold">
+                                  <DollarSign className="w-4 h-4" />
+                                  <span>
+                                    {formatPrice(post.battery.price)} VNĐ
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
 
                           <div className="flex items-center gap-4 text-xs text-gray-500 mb-4 pb-4 border-b border-gray-100">
                             <div className="flex items-center gap-1">
@@ -369,6 +405,64 @@ const MyPostsManagement: React.FC = () => {
               )}
             </div>
 
+
+  <Modal
+              title={
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold text-gray-900">
+                    Chọn loại bài đăng
+                  </h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Bạn muốn đăng bán xe hay pin?
+                  </p>
+                </div>
+              }
+              open={showPostTypeModal}
+              onCancel={() => setShowPostTypeModal(false)}
+              footer={null}
+              width={600}
+              centered
+              destroyOnClose
+            >
+              <div className="grid grid-cols-2 gap-4 p-4">
+                <button
+                  onClick={() => handleSelectPostType("vehicle")}
+                  className="group relative overflow-hidden rounded-2xl border-2 border-gray-200 hover:border-blue-500 transition-all duration-300 p-6 bg-gradient-to-br from-blue-50 to-cyan-50 hover:shadow-xl"
+                >
+                  <div className="relative z-10 flex flex-col items-center">
+                    <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                      <Car className="w-10 h-10 text-blue-600" />
+                    </div>
+                    <h4 className="text-xl font-bold text-gray-900 mb-2">
+                      Đăng bài bán xe
+                    </h4>
+                    <p className="text-sm text-gray-600 text-center">
+                      Đăng tin bán xe điện của bạn
+                    </p>
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-cyan-500 opacity-0 group-hover:opacity-10 transition-opacity" />
+                </button>
+
+                <button
+                  onClick={() => handleSelectPostType("battery")}
+                  className="group relative overflow-hidden rounded-2xl border-2 border-gray-200 hover:border-green-500 transition-all duration-300 p-6 bg-gradient-to-br from-green-50 to-emerald-50 hover:shadow-xl"
+                >
+                  <div className="relative z-10 flex flex-col items-center">
+                    <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                      <Battery className="w-10 h-10 text-green-600" />
+                    </div>
+                    <h4 className="text-xl font-bold text-gray-900 mb-2">
+                      Đăng bài bán pin
+                    </h4>
+                    <p className="text-sm text-gray-600 text-center">
+                      Đăng tin bán pin xe điện
+                    </p>
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-green-500 to-emerald-500 opacity-0 group-hover:opacity-10 transition-opacity" />
+                </button>
+              </div>
+            </Modal>
+
             <SoldConfirmModal
               visible={showSoldModal}
               post={selectedPost}
@@ -378,21 +472,41 @@ const MyPostsManagement: React.FC = () => {
 
             <Modal
               title="Đăng bài bán xe"
-              open={showAddPostModal}
-              onCancel={() => setShowAddPostModal(false)}
+              open={showVehiclePostModal}
+              onCancel={() => setShowVehiclePostModal(false)}
               footer={null}
-              width={800}
+              width={900}
               centered
               destroyOnClose
             >
               <VehiclePostForm
                 onSuccess={() => {
-                  setShowAddPostModal(false);
+                  setShowVehiclePostModal(false);
                   fetchUserPosts();
                 }}
-                onCancel={() => setShowAddPostModal(false)}
+                onCancel={() => setShowVehiclePostModal(false)}
               />
             </Modal>
+
+
+            <Modal
+              title="Đăng bài bán pin"
+              open={showBatteryPostModal}
+              onCancel={() => setShowBatteryPostModal(false)}
+              footer={null}
+              width={900}
+              centered
+              destroyOnClose
+            >
+              <BatteryPostForm
+                onSuccess={() => {
+                  setShowBatteryPostModal(false);
+                  fetchUserPosts();
+                }}
+                onCancel={() => setShowBatteryPostModal(false)}
+              />
+            </Modal>
+
 
           </div>
         </div>

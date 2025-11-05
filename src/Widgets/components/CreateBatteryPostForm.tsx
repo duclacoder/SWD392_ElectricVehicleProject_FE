@@ -9,105 +9,101 @@ import {
   Row,
   Col,
   Divider,
+  Select,
   Radio,
   Card,
   Spin,
-  Empty,
-  Select,
+  Empty
 } from "antd";
-import { UploadOutlined, CheckCircleOutlined, CarOutlined } from "@ant-design/icons";
+import {
+  UploadOutlined,
+  CheckCircleOutlined,
+  ThunderboltOutlined,
+} from "@ant-design/icons";
 import { createUserPost } from "../../features/Post/index";
-import type { CreateUserPostDTO } from "../../entities/UserPost";
+import type { CreateBatteryPostDTOWithId, CreateUserPostDTO } from "../../entities/UserPost";
 import { useNavigate } from "react-router-dom";
-import type {
-  CreateVehiclePostDTOWithId,
-} from "../../entities/UserPost";
+import type { UserBattery } from "../../entities/User";
 import { apiRoot } from "../../shared/api/axios";
-import type { UserVehicle } from "../../entities/User";
 
 interface Props {
   onSuccess?: () => void;
   onCancel?: () => void;
 }
-const VehiclePostForm: React.FC<Props> = ({ onSuccess, onCancel }) => {
+
+const BatteryPostForm: React.FC<Props> = ({ onSuccess, onCancel }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [fileList, setFileList] = useState<any[]>([]);
   const [inputMode, setInputMode] = useState<"select" | "manual">("manual");
-  const [userVehicles, setUserVehicles] = useState<UserVehicle[]>([]);
-  const [loadingVehicles, setLoadingVehicles] = useState(false);
-  const [selectedVehicleId, setSelectedVehicleId] = useState<number | null>(
-    null
-  );
+  const [userBatteries, setUserBatteries] = useState<UserBattery[]>([]);
+  const [loadingBatteries, setLoadingBatteries] = useState(false);
+  const [selectedBatteryId, setSelectedBatteryId] = useState<number | null>(null);
   const navigate = useNavigate();
 
-
   useEffect(() => {
-    fetchUserVehicles();
+    fetchUserBatteries();
   }, []);
 
-const fetchUserVehicles = async () => {
-    setLoadingVehicles(true);
+  const fetchUserBatteries = async () => {
+    setLoadingBatteries(true);
     try {
       const userId = localStorage.getItem("userId");
       if (!userId) {
         message.error("Vui lòng đăng nhập!");
         return;
       }
-      const response = await apiRoot.get("/GetAllCars", {
-        params: { UserId: parseInt(userId), Page: 1, PageSize: 100 },
+
+      const response = await apiRoot.get("/GetAllBattery", {
+        params: { 
+          UserId: parseInt(userId), 
+          Page: 1, 
+          PageSize: 100 
+        },
       });
+
       if (response.data.isSuccess && response.data.result?.items) {
-        const availableVehicles = response.data.result.items.filter(
-          (v: UserVehicle) => v.status !== "Đã bán"
+        const availableBatteries = response.data.result.items.filter(
+          (b: UserBattery) => b.status !== "Sold"
         );
-        setUserVehicles(availableVehicles);
+        setUserBatteries(availableBatteries);
       }
     } catch (error) {
-      console.error("Lỗi khi tải xe:", error);
-      message.error("Không thể tải danh sách xe");
+      console.error("Lỗi khi tải pin:", error);
+      message.error("Không thể tải danh sách Pin/Ắc quy");
     } finally {
-      setLoadingVehicles(false);
+      setLoadingBatteries(false);
     }
   };
 
-   const handleVehicleSelect = (vehicleId: number) => {
-    const selectedVehicle = userVehicles.find(
-      (v) => v.vehiclesId === vehicleId
-    );
-    if (selectedVehicle) {
-      setSelectedVehicleId(vehicleId);
+  const handleBatterySelect = (batteryId: number) => {
+    const selectedBattery = userBatteries.find((b) => b.batteriesId === batteryId);
+    if (selectedBattery) {
+      setSelectedBatteryId(batteryId);
       form.setFieldsValue({
-        title:
-          selectedVehicle.vehicleName ||
-          `${selectedVehicle.brand} ${selectedVehicle.model} ${selectedVehicle.year}`,
-        vehicleBrand: selectedVehicle.brand,
-        vehicleModel: selectedVehicle.model,
-        vehicleYear: selectedVehicle.year,
-        vehicleColor: selectedVehicle.color,
-        vehiclePrice: selectedVehicle.price,
-        vehicleBodyType: selectedVehicle.bodyType,
-        vehicleRangeKm: selectedVehicle.rangeKm,
-        vehicleMotorPowerKw: selectedVehicle.motorPowerKw,
+        title: selectedBattery.batteryName || `${selectedBattery.brand} Battery`,
+        batteryName: selectedBattery.batteryName,
+        batteryBrand: selectedBattery.brand,
+        batteryCapacity: selectedBattery.capacity,
+        batteryVoltage: selectedBattery.voltage,
+        batteryWarrantyMonths: selectedBattery.warrantyMonths,
+        batteryPrice: selectedBattery.price,
+        batteryDescription: selectedBattery.description,
       });
     }
   };
 
   const handleInputModeChange = (mode: "select" | "manual") => {
     setInputMode(mode);
-    setSelectedVehicleId(null);
+    setSelectedBatteryId(null);
     form.resetFields();
     setFileList([]);
   };
 
-
-
-
   const uploadProps = {
     fileList,
     multiple: true,
-    // Using picture-card layout for better preview in modal
-    listType: "picture-card" as const, 
+    listType: "picture-card" as const,
     beforeUpload: (file: any) => {
       const isImage = file.type.startsWith("image/");
       if (!isImage) {
@@ -138,41 +134,40 @@ const fetchUserVehicles = async () => {
       }
 
       if (fileList.length === 0) {
-        message.warning("Vui lòng tải lên ít nhất 1 ảnh xe!");
+        message.warning("Vui lòng tải lên ít nhất 1 ảnh Pin/Ắc quy!");
         setLoading(false);
         return;
       }
 
-      // Format price before sending (remove commas if formatter was used)
-      const rawPrice = typeof values.vehiclePrice === 'string'
-        ? parseInt(values.vehiclePrice.replace(/,/g, ''), 10)
-        : values.vehiclePrice;
+      const rawPrice =
+        typeof values.batteryPrice === "string"
+          ? parseInt(values.batteryPrice.replace(/,/g, ""), 10)
+          : values.batteryPrice;
 
-      const postData: CreateVehiclePostDTOWithId = {
+      const postData: CreateBatteryPostDTOWithId = {
         userId: parseInt(userId),
-        title: values.title || `${values.vehicleBrand} ${values.vehicleModel}`,
+        title: values.title || `${values.batteryBrand} ${values.batteryName}`,
         userPackageId: 1,
-        year: values.vehicleYear,
-        vehicle: {
-          brand: values.vehicleBrand,
-          model: values.vehicleModel,
-          year: values.vehicleYear,
-          color: values.vehicleColor,
+        battery: {
+          batteryName: values.batteryName,
+          brand: values.batteryBrand,
+          description: values.batteryDescription,
+          capacity: values.batteryCapacity,
+          voltage: values.batteryVoltage,
+          warrantyMonths: values.batteryWarrantyMonths,
           price: rawPrice,
-          description: values.vehicleDescription,
-          bodyType: values.vehicleBodyType,
-          rangeKm: values.vehicleRangeKm,
-          motorPowerKw: values.vehicleMotorPowerKw,
+          currency: "VND",
         },
+        description: values.batteryDescription || values.title,
       };
 
-       if (inputMode === "select" && selectedVehicleId) {
-        postData.vehicleId = selectedVehicleId;
+      if (inputMode === "select" && selectedBatteryId) {
+        postData.batteryId = selectedBatteryId;
       }
 
-
       const imageFiles = fileList.map((f) => f.originFileObj || f);
-      const result = await createUserPost(postData, imageFiles);
+      const result = await createUserPost(postData as CreateUserPostDTO, imageFiles);
+
       if (result) {
         message.success("✅ Đăng bài thành công!");
         form.resetFields();
@@ -180,15 +175,15 @@ const fetchUserVehicles = async () => {
         onSuccess?.();
       } else {
         message.warning({
-          content: "⚠️ Bạn không có gói đăng bài nào hợp lệ hoặc đã sử dụng hết. Đang chuyển đến trang mua gói...",
+          content:
+            "⚠️ Bạn không có gói đăng bài nào hợp lệ hoặc đã sử dụng hết. Đang chuyển đến trang mua gói...",
           duration: 3,
         });
         setTimeout(() => {
           navigate("/packages");
         }, 1500);
       }
-    }
-    catch (e) {
+    } catch (e) {
       console.error(e);
       message.error("Lỗi khi đăng bài! Vui lòng kiểm tra lại thông tin.");
     } finally {
@@ -197,11 +192,11 @@ const fetchUserVehicles = async () => {
   };
 
   return (
-      <div className="max-h-[70vh] overflow-y-auto p-4">
+    <div className="max-h-[70vh] overflow-y-auto p-4">
       {/* Input Mode Selection */}
       <Card className="mb-6 border-2 border-blue-100 shadow-sm">
         <h4 className="text-lg font-bold text-gray-800 mb-3 flex items-center">
-          <CarOutlined className="mr-2 text-blue-600" /> Chọn cách nhập thông tin
+          <ThunderboltOutlined className="mr-2 text-blue-600" /> Chọn cách nhập thông tin
         </h4>
         <Radio.Group
           value={inputMode}
@@ -213,9 +208,9 @@ const fetchUserVehicles = async () => {
             className="!h-auto !py-4 !px-4 !rounded-xl border-2"
           >
             <div className="text-center">
-              <div className="font-semibold text-base">Chọn từ xe đã có</div>
+              <div className="font-semibold text-base">Chọn từ Pin đã có</div>
               <div className="text-xs text-gray-500 mt-1">
-                Sử dụng xe đã lưu trong hệ thống
+                Sử dụng Pin đã lưu trong hệ thống
               </div>
             </div>
           </Radio.Button>
@@ -233,46 +228,46 @@ const fetchUserVehicles = async () => {
         </Radio.Group>
       </Card>
 
-      {/* Vehicle Selector */}
+      {/* Battery Selector */}
       {inputMode === "select" && (
         <Card className="mb-4">
           <Divider />
-          {loadingVehicles ? (
+          {loadingBatteries ? (
             <div className="text-center py-8">
               <Spin size="large" />
-              <p className="text-gray-500 mt-3">Đang tải danh sách xe...</p>
+              <p className="text-gray-500 mt-3">Đang tải danh sách Pin/Ắc quy...</p>
             </div>
-          ) : userVehicles.length === 0 ? (
+          ) : userBatteries.length === 0 ? (
             <Empty
               description={
                 <div>
                   <p className="text-gray-600 mb-2">
-                    Bạn chưa có xe nào có thể đăng bài.
+                    Bạn chưa có Pin/Ắc quy nào có thể đăng bài.
                   </p>
                   <p className="text-sm text-gray-500">
-                    Vui lòng thêm xe hoặc chọn "Nhập thông tin mới".
+                    Vui lòng thêm Pin hoặc chọn "Nhập thông tin mới".
                   </p>
                 </div>
               }
             />
           ) : (
             <Form.Item
-              label="Chọn một chiếc xe để đăng bài"
-              name="selectedVehicle"
+              label="Chọn một Pin/Ắc quy để đăng bài"
+              name="selectedBattery"
             >
               <Select
                 showSearch
                 optionFilterProp="children"
-                placeholder="Chọn xe..."
-                value={selectedVehicleId || undefined}
-                onChange={handleVehicleSelect}
+                placeholder="Chọn Pin/Ắc quy..."
+                value={selectedBatteryId || undefined}
+                onChange={handleBatterySelect}
               >
-                {userVehicles.map((vehicle) => (
+                {userBatteries.map((battery) => (
                   <Select.Option
-                    key={vehicle.vehiclesId}
-                    value={vehicle.vehiclesId}
+                    key={battery.batteriesId}
+                    value={battery.batteriesId}
                   >
-                    {`${vehicle.brand} ${vehicle.model} (${vehicle.year})`}
+                    {`${battery.brand} ${battery.batteryName} (${battery.capacity}Ah)`}
                   </Select.Option>
                 ))}
               </Select>
@@ -282,7 +277,7 @@ const fetchUserVehicles = async () => {
       )}
 
       {/* Form */}
-      {(inputMode === "manual" || selectedVehicleId) && (
+      {(inputMode === "manual" || selectedBatteryId) && (
         <Form form={form} layout="vertical" onFinish={onFinish}>
           <Card className="mb-4 shadow-sm">
             <h4 className="text-lg font-bold mb-4 text-blue-600">
@@ -294,7 +289,7 @@ const fetchUserVehicles = async () => {
               rules={[{ required: true, message: "Vui lòng nhập tiêu đề" }]}
             >
               <Input
-                placeholder="VD: Tesla Model 3 2024 - Như mới, full option"
+                placeholder="VD: Pin GS 12V 65Ah - Còn mới 95%"
                 size="large"
               />
             </Form.Item>
@@ -302,20 +297,20 @@ const fetchUserVehicles = async () => {
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item
-                  name="vehicleBrand"
-                  label="Hãng xe"
-                  rules={[{ required: true, message: "Nhập hãng xe" }]}
+                  name="batteryName"
+                  label="Tên Pin/Ắc quy"
+                  rules={[{ required: true, message: "Nhập tên Pin" }]}
                 >
-                  <Input placeholder="Tesla, VinFast..." size="large" />
+                  <Input placeholder="VD: NS70" size="large" />
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item
-                  name="vehicleModel"
-                  label="Mẫu xe"
-                  rules={[{ required: true, message: "Nhập mẫu xe" }]}
+                  name="batteryBrand"
+                  label="Thương hiệu"
+                  rules={[{ required: true, message: "Nhập thương hiệu" }]}
                 >
-                  <Input placeholder="Model 3, VF8..." size="large" />
+                  <Input placeholder="GS, Rocket, Bosch..." size="large" />
                 </Form.Item>
               </Col>
             </Row>
@@ -323,34 +318,44 @@ const fetchUserVehicles = async () => {
             <Row gutter={16}>
               <Col span={8}>
                 <Form.Item
-                  name="vehicleYear"
-                  label="Năm sản xuất"
-                  rules={[{ required: true, message: "Nhập năm sản xuất" }]}
+                  name="batteryCapacity"
+                  label="Dung lượng (Ah)"
+                  rules={[{ required: true, message: "Nhập dung lượng" }]}
                 >
                   <InputNumber
-                    min={2000}
-                    max={new Date().getFullYear() + 1}
+                    min={0}
                     style={{ width: "100%" }}
                     size="large"
+                    placeholder="65"
                   />
                 </Form.Item>
               </Col>
               <Col span={8}>
                 <Form.Item
-                  name="vehicleColor"
-                  label="Màu sắc"
-                  rules={[{ required: true, message: "Nhập màu xe" }]}
+                  name="batteryVoltage"
+                  label="Điện áp (V)"
+                  rules={[{ required: true, message: "Nhập điện áp" }]}
                 >
-                  <Input placeholder="Trắng, Đen..." size="large" />
+                  <InputNumber
+                    min={0}
+                    style={{ width: "100%" }}
+                    size="large"
+                    placeholder="12"
+                  />
                 </Form.Item>
               </Col>
               <Col span={8}>
                 <Form.Item
-                  name="vehicleBodyType"
-                  label="Dòng xe"
-                  rules={[{ required: true, message: "Nhập dòng xe" }]}
+                  name="batteryWarrantyMonths"
+                  label="Bảo hành (tháng)"
+                  rules={[{ required: true, message: "Nhập bảo hành" }]}
                 >
-                  <Input placeholder="Sedan, SUV..." size="large" />
+                  <InputNumber
+                    min={0}
+                    style={{ width: "100%" }}
+                    size="large"
+                    placeholder="12"
+                  />
                 </Form.Item>
               </Col>
             </Row>
@@ -358,72 +363,40 @@ const fetchUserVehicles = async () => {
 
           <Card className="mb-4 shadow-sm">
             <h4 className="text-lg font-bold mb-4 text-blue-600">
-              Thông số kỹ thuật & Giá
+              Giá & Mô tả
             </h4>
-            <Row gutter={16}>
-              <Col span={8}>
-                <Form.Item
-                  name="vehicleRangeKm"
-                  label="Quãng đường (km)"
-                  rules={[{ required: true, message: "Nhập quãng đường" }]}
-                >
-                  <InputNumber
-                    min={0}
-                    style={{ width: "100%" }}
-                    size="large"
-                    placeholder="500"
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={8}>
-                <Form.Item
-                  name="vehicleMotorPowerKw"
-                  label="Công suất (kW)"
-                  rules={[{ required: true, message: "Nhập công suất" }]}
-                >
-                  <InputNumber
-                    min={0}
-                    style={{ width: "100%" }}
-                    size="large"
-                    placeholder="150"
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={8}>
-                <Form.Item
-                  name="vehiclePrice"
-                  label="Giá bán (VND)"
-                  rules={[{ required: true, message: "Nhập giá bán" }]}
-                >
-                  <InputNumber
-                    min={0}
-                    style={{ width: "100%" }}
-                    size="large"
-                    placeholder="1,000,000,000"
-                    formatter={(v) =>
-                      `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                    }
-                    parser={(v) => v!.replace(/\$\s?|(,*)/g, "")}
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
+            <Form.Item
+              name="batteryPrice"
+              label="Giá bán (VND)"
+              rules={[{ required: true, message: "Nhập giá bán" }]}
+            >
+              <InputNumber
+                min={0}
+                style={{ width: "100%" }}
+                size="large"
+                placeholder="1,500,000"
+                formatter={(v) =>
+                  `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+                parser={(v) => v!.replace(/\$\s?|(,*)/g, "")}
+              />
+            </Form.Item>
 
             <Form.Item
-              name="vehicleDescription"
+              name="batteryDescription"
               label="Mô tả chi tiết"
               rules={[{ required: true, message: "Nhập mô tả" }]}
             >
               <Input.TextArea
                 rows={4}
-                placeholder="Mô tả tình trạng xe, lịch sử bảo dưỡng..."
+                placeholder="Mô tả tình trạng, nguồn gốc, lý do bán..."
               />
             </Form.Item>
           </Card>
 
           <Card className="mb-6 shadow-sm">
             <Form.Item
-              label="Hình ảnh xe (tối thiểu 1 ảnh)"
+              label="Hình ảnh Pin/Ắc quy (tối thiểu 1 ảnh)"
               required
               className="mb-0"
             >
@@ -460,5 +433,4 @@ const fetchUserVehicles = async () => {
   );
 };
 
-
-export default VehiclePostForm;
+export default BatteryPostForm;
