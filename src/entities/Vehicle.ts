@@ -15,3 +15,30 @@ export interface Vehicle {
   status: string;
   images?: string[];
 }
+
+export interface VehiclePostDTO {
+  brand?: string;
+  model?: string;
+  color?: string;
+  year?: number;
+  price?: number;
+  description?: string;
+  bodyType?: string;
+  rangeKm?: number;
+  motorPowerKw?: number;
+}
+
+export interface VehicleUserPost {
+  vehicleId?: number;
+  brand?: string;
+  model?: string;
+  color?: string;
+  year: number;
+  price: number;
+  description?: string;
+  bodyType?: string;
+  rangeKm: number;
+  motorPowerKw: number;
+  createdAt: string;
+  status: string;
+}

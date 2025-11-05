@@ -23,7 +23,7 @@ import AddCar from "../../pages/Profile/AddCar";
 import InspectionFee from "../../pages/Profile/InspectionFee.tsx";
 import MyPostsManagement from "../../pages/Profile/PostManagement.tsx";
 import ProfilePage from "../../pages/Profile/Profile";
-import TransactionHistory from "../../pages/Profile/TransactionHistory";
+import {TransactionHistory} from "../../pages/Profile/TransactionHistory";
 import UpdateCar from "../../pages/Profile/UpdateCar.tsx";
 import ViewBattery from "../../pages/Profile/ViewBattery";
 import ViewBatteryDetails from "../../pages/Profile/ViewBatteryDetails.tsx";
@@ -31,6 +31,8 @@ import ViewCar from "../../pages/Profile/ViewCar";
 import ViewCarDetails from "../../pages/Profile/ViewCarDetails.tsx";
 import ViewInspectionFee from "../../pages/Profile/ViewInspectionFee.tsx";
 import { AdminLayout } from "../layouts/AdminLayout";
+import PostBatterySale from "../../pages/Post/PostBattery.tsx";
+import BatteryPostList from "../../pages/Post/BatteryPostList.tsx";
 
 export const AppRoutes = () => {
   return (
@@ -126,6 +128,9 @@ export const AppRoutes = () => {
       />
       <Route path="/packages" element={<PackagePricingPage />} />
       <Route path="/ViewPost" element={<MyPostsManagement />} />
+      <Route path="/post/battery" element={<PostBatterySale />} />
+      <Route path="/post/listBattery" element={<BatteryPostList />} />
+
     </Routes>
   );
 };

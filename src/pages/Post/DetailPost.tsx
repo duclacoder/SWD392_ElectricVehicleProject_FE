@@ -77,9 +77,30 @@ const PostDetail: React.FC = () => {
     }).format(price);
   };
 
-  const formatPriceShort = (price: number) => {
-    return Math.floor(price / 1000000);
+  const formatDetailPost = (price: number): string => {
+  if (price === undefined || price === null || isNaN(price) || price === 0) {
+    return "0";
+  }
+  if (price >= 1_000_000_000_000) {
+    return (price / 1_000_000_000_000).toFixed(1).replace(/\.0$/, "") + " nghìn tỷ";
+  } else if (price >= 1_000_000_000) {
+    return (price / 1_000_000_000).toFixed(1).replace(/\.0$/, "") + " tỷ";
+  } else if (price >= 1_000_000) {
+    return (price / 1_000_000).toFixed(1).replace(/\.0$/, "") + " triệu";
+  } else if (price >= 1_000) {
+    return (price / 1_000).toFixed(1).replace(/\.0$/, "") + " nghìn";
+  } else {
+    return price.toString();
+  }
+};
+
+
+  const getPostPrice = (post: UserPostCustom | null): number | undefined => {
+    if (!post) return undefined;
+    return post.vehicle?.price ?? post.battery?.price;
   };
+
+const price = getPostPrice(post);
 
   return (
     <>
@@ -309,12 +330,7 @@ const PostDetail: React.FC = () => {
                   <div className="text-center mb-6">
                     <div className="text-sm text-gray-600 mb-2">Giá bán</div>
                     <div className="text-5xl font-bold text-blue-600 mb-1">
-                      {post.vehicle?.price
-                        ? formatPriceShort(post.vehicle.price)
-                        : "Liên hệ"}
-                      {post.vehicle?.price && (
-                        <span className="text-2xl"> triệu</span>
-                      )}
+                      {price ? formatDetailPost(price) : "Liên hệ"}
                     </div>
                     {post.vehicle?.price && (
                       <div className="text-sm text-gray-500">

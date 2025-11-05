@@ -110,10 +110,10 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions, auctionTimeL
 
 
  const calculateTimeLeft = (endTime?: string) => {
-  if (!endTime) return { hours: 0, minutes: 0 }; // thêm dòng này
+  if (!endTime) return { hours: 0, minutes: 0 }; 
 
   const end = new Date(endTime).getTime();
-  if (isNaN(end)) return { hours: 0, minutes: 0 }; // kiểm tra định dạng sai
+  if (isNaN(end)) return { hours: 0, minutes: 0 }; 
 
   const now = Date.now();
   const timeLeft = Math.max(0, end - now);
@@ -143,9 +143,9 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({ auctions, auctionTimeL
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {localAuctions.map(({ auction, vehicle }) => {
-const { hours, minutes } = calculateTimeLeft(auction.end_time || auction.endTime || "");
+const { hours, minutes } = calculateTimeLeft(auction.endTime || auction.endTime || "");
         // Sử dụng currentPrice nếu có, không thì dùng start_price
-        const currentPrice = auction.currentPrice || auction.start_price ||  0;
+        const currentPrice = auction.currentPrice || auction.startPrice ||  0;
 
         return (
           <article
@@ -213,12 +213,6 @@ const { hours, minutes } = calculateTimeLeft(auction.end_time || auction.endTime
                 >
                   Tham gia đấu giá
                 </button>
-                <Link
-                  to={`/auction/${auction.auctionId}`}
-                  className="flex-1 border border-blue-600 text-blue-600 font-semibold py-2 rounded-xl text-center hover:bg-blue-50 transition"
-                >
-                  Xem chi tiết
-                </Link>
               </div>
             </div>
           </article>
