@@ -55,10 +55,10 @@ const BatteryPostForm: React.FC<Props> = ({ onSuccess, onCancel }) => {
       }
 
       const response = await apiRoot.get("/GetAllBattery", {
-        params: { 
-          UserId: parseInt(userId), 
-          Page: 1, 
-          PageSize: 100 
+        params: {
+          UserId: parseInt(userId),
+          Page: 1,
+          PageSize: 100
         },
       });
 
@@ -165,7 +165,9 @@ const BatteryPostForm: React.FC<Props> = ({ onSuccess, onCancel }) => {
         postData.batteryId = selectedBatteryId;
       }
 
-      const imageFiles = fileList.map((f) => f.originFileObj || f);
+      const imageFiles = fileList
+        .map((file) => file.originFileObj)
+        .filter((file) => file instanceof File);
       const result = await createUserPost(postData as CreateUserPostDTO, imageFiles);
 
       if (result) {

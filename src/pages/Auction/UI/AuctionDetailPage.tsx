@@ -20,6 +20,9 @@ import { getConnection, startConnection } from "../../../shared/api/signalR";
 import { Footer } from "../../../Widgets/Footers/Footer";
 import { Header } from "../../../Widgets/Headers/Header";
 import { getBidsByAuctionId } from "../../../features/Auction/AuctionBids";
+import WinnerModal from "../../../Widgets/components/WinnerAuctionModal";
+import type { AuctionWinnerDTO } from "../../../entities/AuctionWinnerDto";
+
 
 
 type AuctionDetailProps = {
@@ -40,9 +43,10 @@ const AuctionDetail: React.FC<AuctionDetailProps> = ({ onTimeLeftChange }) => {
   const [timeLeft, setTimeLeft] = useState<string>("");
   const [auctionStatus, setAuctionStatus] = useState<string>("ĐANG DIỄN RA");
   const [userInfor, setUserInfor] = useState<Map<number, string>>(new Map());
-  // const [winnerModalOpen, setWinnerModalOpen] = useState(false);
-  // const [auctionWinner, setAuctionWinner] = useState<AuctionWinnerDto | null>(null);
-
+  const [showShareLink, setShowShareLink] = useState(false);
+  const [copied, setCopied] = useState(false);
+const [winnerModalOpen, setWinnerModalOpen] = useState(false);
+const [auctionWinner, setAuctionWinner] = useState<AuctionWinnerDTO | null>(null);
   useEffect(() => {
     if (id) {
       fetchAuctionDetail();
@@ -111,24 +115,66 @@ const AuctionDetail: React.FC<AuctionDetailProps> = ({ onTimeLeftChange }) => {
     }
   };
 
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+
+  // useEffect(() => {
+  //   if (!auction?.auctionId || !auction?.endTime) return;
+
+  //   if (timeLeft === "00:00:00" && auctionStatus !== "ĐÃ HOÀN TIỀN") {
+  //     console.log("Phiên đấu giá đã hết hạn, tiến hành hoàn tiền...");
+  //     setAuctionStatus("ĐANG HOÀN TIỀN");
+
+  //     (async () => {
+  //       const success = await auctionApi.refundAuction(auction.auctionId);
+  //       if (success) {
+  //         setAuctionStatus("ĐÃ HOÀN TIỀN");
+  //       } else {
+  //         setAuctionStatus("LỖI HOÀN TIỀN");
+  //       }
+  //     })();
+  //   }
+  // }, [timeLeft]);
 
   useEffect(() => {
   if (!auction?.auctionId || !auction?.endTime) return;
 
-  if (timeLeft === "00:00:00" && auctionStatus !== "ĐÃ HOÀN TIỀN") {
-    console.log("Phiên đấu giá đã hết hạn, tiến hành hoàn tiền...");
-    setAuctionStatus("ĐANG HOÀN TIỀN");
+  // Khi hết thời gian
+  if (timeLeft === "00:00:00" && auctionStatus !== "KẾT THÚC") {
+    console.log("Phiên đấu giá đã hết hạn, tiến hành xác định người thắng...");
 
     (async () => {
-      const success = await auctionApi.refundAuction(auction.auctionId);
-      if (success) {
-        setAuctionStatus("ĐÃ HOÀN TIỀN");
-      } else {
-        setAuctionStatus("LỖI HOÀN TIỀN");
+      try {
+        // Gọi hoàn tiền
+        const refundSuccess = await auctionApi.refundAuction(auction.auctionId);
+
+        if (refundSuccess) {
+          setAuctionStatus("KẾT THÚC");
+
+          // Gọi API lấy người thắng
+          const winnerData = await auctionApi.getAuctionWinner(auction.auctionId);
+
+          if (winnerData) {
+            setAuctionWinner(winnerData);
+            setWinnerModalOpen(true);
+          } else {
+            console.warn("Không tìm thấy người thắng cuộc!");
+          }
+        } else {
+          setAuctionStatus("LỖI HOÀN TIỀN");
+        }
+      } catch (error) {
+        console.error("Lỗi khi xác định người thắng:", error);
+        setAuctionStatus("LỖI");
       }
     })();
   }
 }, [timeLeft]);
+
 
 
   const fetchAuctionDetail = async () => {
@@ -257,10 +303,10 @@ const AuctionDetail: React.FC<AuctionDetailProps> = ({ onTimeLeftChange }) => {
 
   const retryFetch = () => fetchAuctionDetail();
 
-   const formatPriceAuction = (price: number): string => {
-     if (price === undefined || price === null || isNaN(price) || price === 0) {
-    return "0";
-  }
+  const formatPriceAuction = (price: number): string => {
+    if (price === undefined || price === null || isNaN(price) || price === 0) {
+      return "0";
+    }
     if (price >= 1_000_000_000_000) {
       return (price / 1_000_000_000_000).toFixed(1).replace(/\.0$/, '') + " nghìn tỷ";
     } else if (price >= 1_000_000_000) {
@@ -536,10 +582,67 @@ const AuctionDetail: React.FC<AuctionDetailProps> = ({ onTimeLeftChange }) => {
                   </div>
                 </div>
 
-                <button className="w-full mt-4 h-10 border-2 border-gray-200 rounded-xl hover:bg-white hover:border-blue-400 transition flex items-center justify-center gap-2 text-gray-700 font-medium">
-                  <Share2 className="w-4 h-4" />
-                  Chia sẻ phiên
-                </button>
+                {/* <div className="relative">
+  <button
+    onClick={() => setShowShareLink(!showShareLink)}
+    className="w-full mt-4 h-10 border-2 border-gray-200 rounded-xl hover:bg-white hover:border-blue-400 transition flex items-center justify-center gap-2 text-gray-700 font-medium"
+  >
+    <Share2 className="w-4 h-4" />
+    Chia sẻ phiên
+  </button>
+
+  {showShareLink && (
+    <div className="absolute top-12 left-0 w-full bg-white border border-gray-200 rounded-xl shadow-lg p-3 z-50 animate-fadeIn">
+      <div className="text-sm text-gray-600 mb-2">Link chia sẻ:</div>
+      <div className="flex items-center gap-2">
+        <input
+          type="text"
+          value={window.location.href}
+          readOnly
+          className="flex-1 px-3 py-2 border rounded-lg text-sm text-gray-700 bg-gray-50"
+        />
+        <button
+          onClick={handleCopyLink}
+          className="px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition"
+        >
+          {copied ? "✅ Copied" : "Copy"}
+        </button>
+      </div>
+    </div>
+  )}
+</div> */}
+
+                <div className="relative mt-5 border-t border-gray-200 pt-4">
+                  <button
+                    onClick={() => setShowShareLink(!showShareLink)}
+                    className="w-full h-10 border-2 border-amber-200 rounded-xl hover:bg-amber-50 hover:border-amber-500 transition flex items-center justify-center gap-2 text-amber-600 font-semibold shadow-sm"
+                  >
+                    <Share2 className="w-4 h-4 text-amber-500" />
+                    Chia sẻ phiên
+                  </button>
+
+                 {showShareLink && (
+  <div className="mt-3 w-full bg-white border border-gray-200 rounded-xl shadow-lg p-3 animate-fadeIn">
+                      <div className="text-sm text-gray-700 mb-1 font-medium">
+                        🔗 Link chia sẻ
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={window.location.href}
+                          readOnly
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-800 bg-gray-50 font-mono focus:outline-none focus:ring-2 focus:ring-amber-400"
+                        />
+                        <button
+                          onClick={handleCopyLink}
+                          className="px-3 py-2 bg-amber-500 text-white text-sm rounded-lg hover:bg-amber-600 transition font-semibold shadow-md"
+                        >
+                          {copied ? "Copied" : "Copy"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
 
                 {bids.length > 0 && (
                   <div className="bg-white rounded-xl shadow p-4 mt-6 max-h-60 overflow-y-auto">
@@ -562,6 +665,12 @@ const AuctionDetail: React.FC<AuctionDetailProps> = ({ onTimeLeftChange }) => {
           </div>
         </div>
       </div>
+
+      <WinnerModal
+  auctionId={auction.auctionId}
+  isOpen={winnerModalOpen}
+  onClose={() => setWinnerModalOpen(false)}
+/>
       <Footer />
     </>
   );
