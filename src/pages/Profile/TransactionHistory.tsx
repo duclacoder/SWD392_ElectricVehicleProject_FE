@@ -24,7 +24,7 @@ export const TransactionHistory = () => {
   const [stats, setStats] = useState({
     total: 0,
     paid: 0,
-    pending: 0,
+    refunded: 0,
     totalAmount: 0,
   });
 
@@ -51,17 +51,21 @@ export const TransactionHistory = () => {
 
         // Calculate statistics
         const paid = sortedPayments.filter((p) => p.status === "Paid").length;
-        const pending = sortedPayments.filter(
-          (p) => p.status === "Pending"
-        ).length;
+        // const refunded = sortedPayments.filter(
+        //   (p) => p.status === "Refunded"
+        // ).length;
         const totalAmount = sortedPayments
           .filter((p) => p.status === "Paid")
+          .reduce((sum, p) => sum + p.transferAmount, 0);
+
+        const totalRefunded = sortedPayments
+          .filter((p) => p.status === "Refunded")
           .reduce((sum, p) => sum + p.transferAmount, 0);
 
         setStats({
           total: sortedPayments.length,
           paid,
-          pending,
+          refunded: totalRefunded,
           totalAmount,
         });
       }
@@ -94,14 +98,14 @@ export const TransactionHistory = () => {
     switch (status) {
       case "Paid":
         return (
-          <Tag icon={<CheckCircleOutlined />} color="success" className="px-3 py-1 text-sm font-medium">
+          <Tag icon={<CheckCircleOutlined />} color="success" className="px-2 py-1 text-sm font-medium">
             Đã thanh toán
           </Tag>
         );
-      case "Pending":
+      case "Refunded":
         return (
-          <Tag icon={<ClockCircleOutlined />} color="warning" className="px-3 py-1 text-sm font-medium">
-            Chờ thanh toán
+          <Tag icon={<DollarOutlined/>} color="warning" className="px-2 py-1 text-sm font-medium ">
+            Đã hoàn tiền
           </Tag>
         );
       default:
@@ -197,8 +201,8 @@ export const TransactionHistory = () => {
           <Card className="shadow-lg hover:shadow-xl transition-all duration-300 border-0 rounded-xl overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-500 to-yellow-600"></div>
             <Statistic
-              title={<span className="text-gray-600 font-medium">Chờ thanh toán</span>}
-              value={stats.pending}
+              title={<span className="text-gray-600 font-medium">Được hoàn trả</span>}
+              value={stats.refunded}
               prefix={<ClockCircleOutlined className="text-yellow-500 text-2xl" />}
               valueStyle={{ color: "#f59e0b", fontWeight: "bold", fontSize: "28px" }}
             />
@@ -237,6 +241,7 @@ export const TransactionHistory = () => {
                   className="shadow-md hover:shadow-2xl transition-all duration-300 border-0 rounded-xl overflow-hidden"
                   style={{
                     borderLeft: "6px solid #3b82f6",
+                    marginBottom: "6px",
                     animation: `fadeIn 0.3s ease-in-out ${index * 0.1}s both`
                   }}
                 >

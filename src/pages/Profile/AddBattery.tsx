@@ -14,6 +14,7 @@ import { useState } from "react";
 import { Footer } from "../../Widgets/Footers/Footer";
 import { Header } from "../../Widgets/Headers/Header";
 import UserSidebar from "../../Widgets/UserSidebar/UserSidebar";
+import { CheckWithGemini } from "../../shared/api/GeminiApi";
 
 const { Title, Paragraph } = Typography;
 const { TextArea } = Input;
@@ -68,19 +69,26 @@ const AddBattery = () => {
     }
 
     try {
-      const response = await fetch("https://localhost:7000/AddBattery", {
-        method: "POST",
-        body: formData,
-      });
+      const description = (formData.get("description") as string) || values.description || "";
+      const check = await CheckWithGemini(description);
 
-      const result = await response.json();
-
-      if (result.isSuccess) {
-        message.success(result.message || "Battery added successfully!");
-        form.resetFields();
-        setPreviewImage(null);
+      if (check === "Invalid") {
+        message.warning("Nội dung không hợp lệ")
       } else {
-        message.error(result.message || "Failed to add battery.");
+        const response = await fetch("https://localhost:7000/AddBattery", {
+          method: "POST",
+          body: formData,
+        });
+
+        const result = await response.json();
+
+        if (result.isSuccess) {
+          message.success(result.message || "Battery added successfully!");
+          form.resetFields();
+          setPreviewImage(null);
+        } else {
+          message.error(result.message || "Failed to add battery.");
+        }
       }
     } catch (error) {
       console.error("Error adding battery:", error);

@@ -455,33 +455,14 @@ const [auctionWinner, setAuctionWinner] = useState<AuctionWinnerDTO | null>(null
                       <Gauge className="text-blue-600 w-5 h-5" />
                     </div>
                     <div>
-                      <div className="text-gray-500 text-sm">Nhiên liệu</div>
-                      <div className="font-semibold text-gray-900">
-                        Xăng 1.5 L
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-                      <Gauge className="text-blue-600 w-5 h-5" />
-                    </div>
-                    <div>
-                      <div className="text-gray-500 text-sm">Hộp số</div>
-                      <div className="font-semibold text-gray-900">
-                        Số tự động
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-                      <Gauge className="text-blue-600 w-5 h-5" />
-                    </div>
-                    <div>
                       <div className="text-gray-500 text-sm">Kiểu dáng</div>
                       <div className="font-semibold text-gray-900">
                         {vehicle.bodyType || "Sedan"}
                       </div>
                     </div>
+                  </div>
+                  <div>
+                    <div className="flex items-start gap-3">{vehicle.description}</div>
                   </div>
                 </div>
               </div>
@@ -556,14 +537,14 @@ const [auctionWinner, setAuctionWinner] = useState<AuctionWinnerDTO | null>(null
                           }
                         }}
                         className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 transition bg-white"
-                        placeholder="Nhập bình luận..."
+                        placeholder="Nhập giá tiền"
                       />
                       <button
                         onClick={handleBid}
                         disabled={!bidPrice || connectionStatus !== "Connected"}
                         className="w-full h-12 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        Gửi
+                        Đặt giá
                       </button>
                     </div>
                   )}

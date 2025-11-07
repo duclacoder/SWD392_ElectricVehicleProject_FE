@@ -173,25 +173,6 @@ export const AuctionFormModal: FC<AuctionFormModalProps> = ({
             </Col>
             <Col span={12}>
               <Form.Item
-                name="entryFee"
-                label="Entry Fee (Phí khởi điểm)"
-                rules={[{ required: true, message: "Please enter entry fee" }]}
-              >
-                <InputNumber
-                  style={{ width: "100%" }}
-                  min={0}
-                  disabled={isEditing} // Disable entry fee when editing
-                  formatter={(value) =>
-                    `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  }
-                  parser={(value: string | undefined) =>
-                    value ? parseFloat(value.replace(/,/g, "")) : 0
-                  }
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
                 name="endTime"
                 label="End Time"
                 rules={[{ required: true }]}

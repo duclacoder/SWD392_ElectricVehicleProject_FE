@@ -1,6 +1,7 @@
 import { Facebook, Linkedin, Mail, MessageCircle, Phone } from "lucide-react";
 import type { FC } from "react";
 import logo from "../../shared/assets/logo.png";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const serviceLinks = [
   { name: "Mua xe", href: "/#" },
@@ -30,28 +31,29 @@ const contactLinks = [
     icon: <Phone size={16} />,
   },
   {
-    name: "TáiNổ Zalo",
+    name: "Tái Nổ Zalo",
     href: "/#",
     icon: <MessageCircle size={16} />,
   },
   {
-    name: "TáiNổ Fanpage",
+    name: "Tái Nổ Fanpage",
     href: "/#",
     icon: <Facebook size={16} />,
   },
   {
-    name: "TáiNổ Linkedin",
+    name: "Tái Nổ Linkedin",
     href: "/#",
     icon: <Linkedin size={16} />,
   },
   {
-    name: "hello@TáiNổ.net",
-    href: "mailto:hello@TáiNổ.net",
+    name: "taino@gmail.com",
+    href: "mailto:taino@gmail.com",
     icon: <Mail size={16} />,
   },
 ];
 
 export const Footer: FC = () => {
+  const navigate = useNavigate();
   return (
     <footer className="w-full bg-white text-gray-700 py-12 mt-16">
       <div className="max-w-7xl mx-auto px-4">
@@ -59,8 +61,8 @@ export const Footer: FC = () => {
           <div className="col-span-2 md:col-span-4 lg:col-span-1">
             <img src={logo} alt="logo" className="h-10 w-auto mb-4" />
             <h3 className="font-bold mb-2">Tài khoản</h3>
-            <button className="bg-sky-500 text-white font-semibold text-sm px-4 py-2 rounded-lg hover:bg-sky-600 transition">
-              Tạo tài khoản
+            <button onClick={() => navigate("/register")} className="bg-sky-500 text-white font-semibold text-sm px-4 py-2 rounded-lg hover:bg-sky-600 transition">
+              <div className="text-white">Tạo tài khoản</div>
             </button>
           </div>
 
@@ -141,9 +143,10 @@ export const Footer: FC = () => {
               />
               <button
                 type="submit"
-                className="bg-sky-500 text-white font-semibold text-sm px-4 rounded-r-md hover:bg-sky-600 transition"
+                className="bg-sky-500 p-2 text-white font-semibold text-sm px-4 rounded-r-md hover:bg-sky-600 transition"
+                onClick={() => navigate("/register")}
               >
-                Đăng ký
+                <div className="text-white">Tạo tài khoản</div>
               </button>
             </form>
           </div>
