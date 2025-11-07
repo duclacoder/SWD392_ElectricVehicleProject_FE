@@ -1,5 +1,5 @@
-import { X, DollarSign, AlertCircle, Sparkles, Zap, ChevronRight, Gavel } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import { X, DollarSign, AlertCircle, Sparkles, Zap, ChevronRight } from "lucide-react";
+import  { useEffect, useState } from "react";
 import { getAuctionFee } from "../../../features/Auction/AuctionFee";
 import type { CreatePaymentRequest } from "../../../entities/Payment";
 import { CreatePayment, VnPayPayment } from "../../../features/Payment";
@@ -21,7 +21,6 @@ export default function PayAuctionFeeModal({
   const [auctionFee, setAuctionFee] = useState<AuctionsFee | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [auctionDetail, setAuctionDetail] = useState<any | null>(null);
 
 
   useEffect(() => {
@@ -40,7 +39,6 @@ export default function PayAuctionFeeModal({
 
       const auction = await auctionApi.getAuctionById(auctionId);
       if (auction) {
-      setAuctionDetail(auction);
     }
     } catch (err) {
       setError("Không thể tải thông tin phí đấu giá. Vui lòng thử lại.");
@@ -96,9 +94,6 @@ export default function PayAuctionFeeModal({
         onClick={(e) => e.stopPropagation()} // Ngăn click backdrop khi click modal
       >
 
-        {/* Decorative Top Bar: Subtle Blue/Gold Gradient */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 via-sky-300 to-yellow-400 dark:from-blue-600 dark:via-sky-500 dark:to-amber-600" />
-
         {/* Header */}
         <div className="relative p-6 pt-8 dark:text-white">
           <button
@@ -109,19 +104,14 @@ export default function PayAuctionFeeModal({
             <X className="w-5 h-5" />
           </button>
 
-          <div className="flex items-start gap-4 mb-2">
+          <div className="flex gap-4 mb-2 items-center">
             {/* Icon Circle - Vibrant Blue Gradient */}
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-sky-500 dark:from-blue-600 dark:to-sky-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/40 flex-shrink-0">
               <DollarSign className="w-6 h-6 text-white" />
             </div>
-            <div>
-              <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white">
-                Thanh Toán Phí
-              </h2>
-              <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-0.5">
-                Tham gia Đấu Giá **VIP**
-              </p>
-            </div>
+              <div className="text-2xl font-semibold text-gray-900 dark:text-white flex items-center">
+                Thanh toán phí tham gia
+              </div>
           </div>
         </div>
 
@@ -164,9 +154,9 @@ export default function PayAuctionFeeModal({
               {/* Transaction Detail Card: Sạch sẽ, Tối giản, White Space */}
               <div className="bg-white dark:bg-gray-700 rounded-xl p-5 border border-gray-200 dark:border-gray-700 space-y-4 shadow-inner">
                 {/* Fee Per Minute (Detail) */}
-                <div className="flex justify-between items-center pt-2 border-t border-gray-100 dark:border-gray-600">
+                <div className="flex justify-between items-center pt-2  border-gray-100 dark:border-gray-600">
                   <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                    Phí mở phiên
+                    Phí Tham Gia
                   </p>
                   <p className="text-base font-semibold text-gray-800 dark:text-gray-200">
                     {auctionFee?.entryFee ? formatPrice(auctionFee.entryFee) : '0'} VNĐ
@@ -175,11 +165,11 @@ export default function PayAuctionFeeModal({
 
                 {/* TOTAL AMOUNT - High Contrast, Blue Theme */}
                 <div className="flex justify-between items-center pt-4 border-t border-dashed border-gray-300 dark:border-gray-600">
-                  <p className="text-xl font-extrabold text-gray-800 dark:text-gray-200">
+                  <p className="text-2xl font-bold text-gray-800 dark:text-gray-200">
                     TỔNG CỘNG
                   </p>
                   <div className="flex items-baseline">
-                    <p className="text-4xl font-extrabold text-blue-600 dark:text-blue-400">
+                    <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
                       {auctionFee ? formatPrice(auctionFee.entryFee || 0) : "0"}
                     </p>
                     <p className="text-lg font-semibold text-blue-600 dark:text-blue-400 ml-1.5">
@@ -194,9 +184,9 @@ export default function PayAuctionFeeModal({
               <div className="bg-yellow-50 dark:bg-gray-700 rounded-xl p-5 space-y-3 border border-yellow-200 dark:border-yellow-800/50 shadow-sm">
                 <div className="flex items-center gap-3">
                   <Zap className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0" />
-                  <p className="text-yellow-800 dark:text-yellow-300 font-bold text-base">
+                  <div className="text-yellow-800 dark:text-yellow-300 font-bold text-base">
                     Lưu Ý Quan Trọng
-                  </p>
+                  </div>
                 </div>
 
                 <ul className="text-yellow-800 dark:text-gray-300 text-sm space-y-2 ml-1">
@@ -246,16 +236,15 @@ export default function PayAuctionFeeModal({
               onClick={onClose}
               className="flex-1 w-full sm:w-auto px-5 py-3 border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 font-semibold rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200"
             >
-              <span className="text-white">Hủy</span>
+              <span>Hủy</span>
             </button>
 
             {/* Pay Button: Primary Action - Bright Gradient */}
             <button
               onClick={handlePayment}
               className="flex-1 w-full sm:w-auto px-5 py-3 
-                         bg-gradient-to-r from-blue-500 to-sky-500 
-                         text-white font-extrabold text-base rounded-xl 
-                         hover:from-blue-600 hover:to-sky-600 
+                         bg-blue-500 rounded-xl
+                         hover:bg-blue-600
                          transition-all duration-300 
                          shadow-lg shadow-blue-500/50 
                          hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
@@ -267,7 +256,7 @@ export default function PayAuctionFeeModal({
         )}
       </div>
 
-      <style jsx global>{`
+      <style>{`
         /* Giữ lại animation để đảm bảo tính mượt mà */
         .transition-opacity { transition: opacity 0.3s ease-in-out; }
         .transition-transform { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); } /* Hiệu ứng springy nhẹ */

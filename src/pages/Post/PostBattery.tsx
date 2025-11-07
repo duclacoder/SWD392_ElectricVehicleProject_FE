@@ -26,6 +26,7 @@ import { createUserPost } from "../../features/Post";
 import { Battery, Zap } from "lucide-react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import { CheckWithGemini } from "../../shared/api/GeminiApi";
 const { Title, Text } = Typography;
 
 const PostBatterySale: React.FC = () => {
@@ -116,13 +117,21 @@ const PostBatterySale: React.FC = () => {
         },
       };
 
-      const result = await createUserPost(postData, filesToUpload);
+      const check = await CheckWithGemini(values.batteryDescription);
+      if (check === "Invalid") {
+        message.warning("Đăng cái nội dung cho đàng hoàng vào");
+      } else {
+        const result = await createUserPost(postData, filesToUpload);
+        if (result) {
+          form.resetFields();
+          setFileList([]);
+          message.success("Đăng bài bán pin thành công! Bài đăng đang chờ duyệt.");
+          navigate("/");
+        } else {
+          window.open("/packages");
+          message.warning("bạn cần mua gói đăng bài trước");
+        }
 
-      if (result) {
-        form.resetFields();
-        setFileList([]);
-        message.success("Đăng bài bán pin thành công! Bài đăng đang chờ duyệt.");
-        navigate("/");
       }
 
     } catch (error) {

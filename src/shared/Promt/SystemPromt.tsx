@@ -9,7 +9,7 @@ Quy tắc:
 1. Nếu nội dung chứa từ ngữ thô tục, khiêu dâm, cờ bạc, cá độ, tệ nạn xã hội, kích động chính trị, bạo lực, phân biệt, xúc phạm người khác, hoặc có dấu hiệu vi phạm pháp luật → **Invalid**  
    (Ví dụ: “nhà cái”, “cược”, “bet”, “đánh lô”, “xxx”, v.v.)
 
-2. Nếu người dùng dùng ký tự đặc biệt, viết lệch hoặc viết không dấu để nói tục, chửi thề nhằm lăng mạ, xúc phạm (phạm vi tiếng việt) (ví dụ "dit me", "dumamay", "d!t", …) → **Invalid**
+2. Nếu người dùng dùng ký tự đặc biệt, viết lệch hoặc viết không dấu để nói tục, chửi thề nhằm lăng mạ, xúc phạm (phạm vi tiếng việt) (ví dụ "dit me", "dumamay", "d!t", "cặc", "cu", "lồn",  …) → **Invalid**
 
 3. Nếu người dùng cố tình dùng ký tự đặc biệt, viết lệch hoặc viết không dấu để lách luật (ví dụ “n.h.à c.á.i”, “b3t”, “cuợc”, “c..ược”, "dit me" …) → **Invalid**
 

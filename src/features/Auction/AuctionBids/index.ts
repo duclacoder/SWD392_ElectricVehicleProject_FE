@@ -18,15 +18,15 @@ export const getBidsByAuctionId = async (
     if (data.isSuccess && data.result) {
       return data.result;
     } else {
-      message.error(data.message || "Không thể tải danh sách bids.");
+      // message.error(data.message || "Không thể tải danh sách bids.");
       return null;
     }
   } catch (error: any) {
-    message.error(
-      error?.response?.data?.message ||
-        "Đã xảy ra lỗi không mong muốn khi tải danh sách bids."
-    );
-    console.error("Get bids by auction ID error:", error);
+    // message.error(
+    //   error?.response?.data?.message ||
+    //     "Đã xảy ra lỗi không mong muốn khi tải danh sách bids."
+    // );
+    // console.error("Get bids by auction ID error:", error);
     return null;
   }
 };

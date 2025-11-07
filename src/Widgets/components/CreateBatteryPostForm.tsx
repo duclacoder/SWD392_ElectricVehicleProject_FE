@@ -25,6 +25,7 @@ import type { CreateBatteryPostDTOWithId, CreateUserPostDTO } from "../../entiti
 import { useNavigate } from "react-router-dom";
 import type { UserBattery } from "../../entities/User";
 import { apiRoot } from "../../shared/api/axios";
+import { CheckWithGemini } from "../../shared/api/GeminiApi";
 
 interface Props {
   onSuccess?: () => void;
@@ -168,22 +169,29 @@ const BatteryPostForm: React.FC<Props> = ({ onSuccess, onCancel }) => {
       const imageFiles = fileList
         .map((file) => file.originFileObj)
         .filter((file) => file instanceof File);
-      const result = await createUserPost(postData as CreateUserPostDTO, imageFiles);
 
-      if (result) {
-        message.success("✅ Đăng bài thành công!");
-        form.resetFields();
-        setFileList([]);
-        onSuccess?.();
+      const check = await CheckWithGemini(values.batteryDescription);
+
+      if (check === "Invalid") {
+        message.warning("Nội dung không hợp lệ")
       } else {
-        message.warning({
-          content:
-            "⚠️ Bạn không có gói đăng bài nào hợp lệ hoặc đã sử dụng hết. Đang chuyển đến trang mua gói...",
-          duration: 3,
-        });
-        setTimeout(() => {
-          navigate("/packages");
-        }, 1500);
+        const result = await createUserPost(postData as CreateUserPostDTO, imageFiles);
+
+        if (result) {
+          message.success("✅ Đăng bài thành công!");
+          form.resetFields();
+          setFileList([]);
+          onSuccess?.();
+        } else {
+          message.warning({
+            content:
+              "⚠️ Bạn không có gói đăng bài nào hợp lệ hoặc đã sử dụng hết. Đang chuyển đến trang mua gói...",
+            duration: 3,
+          });
+          setTimeout(() => {
+            window.open("/packages");
+          }, 1500);
+        }
       }
     } catch (e) {
       console.error(e);

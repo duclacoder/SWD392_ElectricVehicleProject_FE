@@ -119,7 +119,7 @@ function handleAxiosError(error: any): never {
 // Main function with reduced cognitive complexity
 export async function CheckWithGemini(prompt: string): Promise<string> {
   // validateInputs(prompt);
-  const DataRequest = SystemPrompt + "   \n  User's content: " + prompt;
+  const DataRequest = SystemPrompt + "  Nội dung của người dùng: " + prompt;
 
   try {
     const body = createRequestBody(DataRequest);

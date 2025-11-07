@@ -28,8 +28,8 @@ export const HeroSection: React.FC = () => {
 
           {/* CTA */}
           <div className="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
-            <button className="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold shadow hover:bg-green-700 transition">
-              Nhận ưu đãi ngay
+            <button className="bg-green-600  px-8 py-3 rounded-lg font-semibold shadow hover:bg-green-700 transition">
+              <div className="text-white">Nhận ưu đãi ngay</div>
             </button>
             <button className="bg-white border border-green-600 text-green-600 px-8 py-3 rounded-lg font-semibold shadow hover:bg-green-50 transition">
               Tìm hiểu thêm
