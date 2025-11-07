@@ -25,7 +25,8 @@ import { Header } from "../../Widgets/Headers/Header";
 import { useAuth } from "../../Widgets/hooks/useAuth";
 import type { CreateUserPostDTO } from "../../entities/UserPost";
 import { createUserPost } from "../../features/Post";
-import { CheckWithGemini } from "../../shared/api/GeminiApi";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 const { Title, Text } = Typography;
 
@@ -38,85 +39,44 @@ const PostVehicleSale: React.FC = () => {
   const [userInfo, setUserInfo] = useState<{ fullName: string } | null>(null);
   const [fileList, setFileList] = useState<any[]>([]);
 
-  // const uploadProps = {
-  //   name: "file",
-  //   headers: { authorization: "authorization-text" },
-  //   multiple: true,
-  //   fileList: fileList,
-  //   beforeUpload: (file: any) => {
-  //     const isImage = file.type.startsWith('image/');
-  //     if (!isImage) {
-  //       message.error('Chỉ được upload file ảnh!');
-  //       return Upload.LIST_IGNORE;
-  //     }
-      
-  //     const isLt5M = file.size / 1024 / 1024 < 5;
-  //     if (!isLt5M) {
-  //       message.error('Ảnh phải nhỏ hơn 5MB!');
-  //       return Upload.LIST_IGNORE;
-  //     }
-
-  //     const reader = new FileReader();
-  //     reader.readAsDataURL(file);
-  //     reader.onload = () => {
-  //     setFileList((prev) => [
-  //       ...prev,
-  //       {
-  //         uid: file.uid,
-  //         status: "done",
-  //         url: reader.result, 
-  //         originFileObj: file,
-  //       },
-  //     ]);
-  //   };
-
-  //     setFileList((prev) => [...prev, file]);
-  //     return false;
-  //   },
-  //   onRemove: (file: any) => {
-  //     setFileList((prev) => prev.filter((f) => f.uid !== file.uid));
-  //   },
-  //   listType: "picture-card" as const,
-  // };
-
   const uploadProps = {
-      name: "file",
-      headers: { authorization: "authorization-text" },
-      multiple: true,
-      fileList: fileList,
-      beforeUpload: (file: any) => {
-        const isImage = file.type.startsWith("image/");
-        if (!isImage) {
-          message.error("Chỉ được upload file ảnh!");
-          return Upload.LIST_IGNORE;
-        }
-  
-        const isLt5M = file.size / 1024 / 1024 < 5;
-        if (!isLt5M) {
-          message.error("Ảnh phải nhỏ hơn 5MB!");
-          return Upload.LIST_IGNORE;
-        }
-  
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => {
-          setFileList((prev) => [
-            ...prev,
-            {
-              uid: file.uid,
-              status: "done",
-              url: reader.result,
-              originFileObj: file,
-            },
-          ]);
-        };
-        return false;
-      },
-      onRemove: (file: any) => {
-        setFileList((prev) => prev.filter((f) => f.uid !== file.uid));
-      },
-      listType: "picture-card" as const,
-    };
+    name: "file",
+    headers: { authorization: "authorization-text" },
+    multiple: true,
+    fileList: fileList,
+    beforeUpload: (file: any) => {
+      const isImage = file.type.startsWith("image/");
+      if (!isImage) {
+        message.error("Chỉ được upload file ảnh!");
+        return Upload.LIST_IGNORE;
+      }
+
+      const isLt5M = file.size / 1024 / 1024 < 5;
+      if (!isLt5M) {
+        message.error("Ảnh phải nhỏ hơn 5MB!");
+        return Upload.LIST_IGNORE;
+      }
+
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        setFileList((prev) => [
+          ...prev,
+          {
+            uid: file.uid,
+            status: "done",
+            url: reader.result,
+            originFileObj: file,
+          },
+        ]);
+      };
+      return false;
+    },
+    onRemove: (file: any) => {
+      setFileList((prev) => prev.filter((f) => f.uid !== file.uid));
+    },
+    listType: "picture-card" as const,
+  };
 
   const onFinish = async (values: any) => {
     setLoading(true);
@@ -136,8 +96,11 @@ const PostVehicleSale: React.FC = () => {
         setLoading(false);
         return;
       }
-      
-      const imageFiles = fileList.map((file) => file.url || file);
+
+      // !!!!!
+      const imageFiles = fileList
+        .map((file) => file.originFileObj)
+        .filter((file) => file instanceof File);
 
       const postData: CreateUserPostDTO = {
         userId: parseInt(userId),
@@ -157,22 +120,16 @@ const PostVehicleSale: React.FC = () => {
         },
       };
 
-      const checkValid : string = await CheckWithGemini(postData.description);
-      if(checkValid === "Invalid")
-      {
-        message.warning("Nội dung không hợp lệ");        
-      } else {
-        const result = await createUserPost(postData, imageFiles);
-        if (result) {
-          form.resetFields();
-          setUploadedFiles([]);
-          navigate("/");
+      const result = await createUserPost(postData, imageFiles);
+      if (result) {
+        form.resetFields();
+        setUploadedFiles([]);
+        navigate("/");
       }
       else {
-      window.open("/packages");
-      message.warning("Bạn không có gói đăng bài nào hợp lệ hoặc đã sử dụng hết. Vui lòng mua gói mới để đăng bài.", 5000);
-      }      
-    }
+        // message.warning("Bạn không có gói đăng bài nào hợp lệ hoặc đã sử dụng hết. Vui lòng mua gói mới để đăng bài.");
+        navigate("/packages");
+      }
     } catch (error) {
       console.error("Failed to create user post:", error);
       message.error("❌ Đã xảy ra lỗi khi đăng bài bán xe.");
@@ -532,24 +489,42 @@ const PostVehicleSale: React.FC = () => {
                     </span>
                   }
                   rules={[
-                    {
-                      required: true,
-                      message: "Vui lòng nhập mô tả chi tiết!",
-                    },
+                    { required: true, message: "Vui lòng nhập mô tả chi tiết!" },
                   ]}
                 >
-                  <Input.TextArea
-                    rows={6}
-                    placeholder="Mô tả tình trạng xe, lý do bán, các nâng cấp, bảo hành còn lại..."
-                    className="rounded-2xl text-base font-medium"
+                  <ReactQuill
+                    theme="snow"
+                    placeholder="Mô tả tình trạng xe, lý do bán, nâng cấp, bảo hành..."
+                    className="rounded-2xl text-base font-medium bg-white"
                     style={{
-                      resize: "none",
-                      background: "white",
+                      height: "300px",
                       border: "2px solid #0284c7",
+                      borderRadius: "16px",
                       boxShadow: "0 4px 12px rgba(2,132,199,0.1)",
+                      overflow: "hidden",
                     }}
+                    modules={{
+                      toolbar: [
+                        [{ 'font': [] }, { 'size': [] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'align': [] }],
+                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                        ['link', 'image'],
+                        ['clean']
+                      ],
+                    }}
+                    formats={[
+                      'font', 'size',
+                      'bold', 'italic', 'underline', 'strike',
+                      'color', 'background',
+                      'align', 'list', 'bullet',
+                      'link', 'image'
+                    ]}
+                    onChange={(value) => form.setFieldValue("vehicleDescription", value)}
                   />
                 </Form.Item>
+
 
                 <Form.Item
                   label={

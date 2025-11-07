@@ -46,7 +46,7 @@ const VehiclePostForm: React.FC<Props> = ({ onSuccess, onCancel }) => {
     fetchUserVehicles();
   }, []);
 
-const fetchUserVehicles = async () => {
+  const fetchUserVehicles = async () => {
     setLoadingVehicles(true);
     try {
       const userId = localStorage.getItem("userId");
@@ -71,7 +71,7 @@ const fetchUserVehicles = async () => {
     }
   };
 
-   const handleVehicleSelect = (vehicleId: number) => {
+  const handleVehicleSelect = (vehicleId: number) => {
     const selectedVehicle = userVehicles.find(
       (v) => v.vehiclesId === vehicleId
     );
@@ -107,7 +107,7 @@ const fetchUserVehicles = async () => {
     fileList,
     multiple: true,
     // Using picture-card layout for better preview in modal
-    listType: "picture-card" as const, 
+    listType: "picture-card" as const,
     beforeUpload: (file: any) => {
       const isImage = file.type.startsWith("image/");
       if (!isImage) {
@@ -148,6 +148,7 @@ const fetchUserVehicles = async () => {
         ? parseInt(values.vehiclePrice.replace(/,/g, ''), 10)
         : values.vehiclePrice;
 
+
       const postData: CreateVehiclePostDTOWithId = {
         userId: parseInt(userId),
         title: values.title || `${values.vehicleBrand} ${values.vehicleModel}`,
@@ -166,12 +167,14 @@ const fetchUserVehicles = async () => {
         },
       };
 
-       if (inputMode === "select" && selectedVehicleId) {
+      if (inputMode === "select" && selectedVehicleId) {
         postData.vehicleId = selectedVehicleId;
       }
 
+      const imageFiles = fileList
+        .map((file) => file.originFileObj)
+        .filter((file) => file instanceof File);
 
-      const imageFiles = fileList.map((f) => f.originFileObj || f);
       const result = await createUserPost(postData, imageFiles);
       if (result) {
         message.success("✅ Đăng bài thành công!");
@@ -197,7 +200,7 @@ const fetchUserVehicles = async () => {
   };
 
   return (
-      <div className="max-h-[70vh] overflow-y-auto p-4">
+    <div className="max-h-[70vh] overflow-y-auto p-4">
       {/* Input Mode Selection */}
       <Card className="mb-6 border-2 border-blue-100 shadow-sm">
         <h4 className="text-lg font-bold text-gray-800 mb-3 flex items-center">

@@ -6,6 +6,7 @@ import type {
 } from "../../entities/Auction";
 import type { PaginatedResult, ResponseDTO } from "../../entities/Response.js";
 import api from "../../shared/api/axios";
+import type { AuctionWinnerDTO } from "../../entities/AuctionWinnerDto.js";
 
 export const auctionApi = {
   async getAllAuctions(
@@ -29,6 +30,17 @@ export const auctionApi = {
       return null;
     }
   },
+  async getAuctionWinner(auctionId: number): Promise<AuctionWinnerDTO | null> {
+  try {
+    const response = await api.get(`/auction/winner/${auctionId}`);
+    return response.data;
+  } catch (error: any) {
+    const errorMsg =
+      error?.response?.data?.message || "Lỗi khi lấy người thắng đấu giá.";
+    message.error(errorMsg);
+    return null;
+  }
+},
 
    
   async getAuctionById(id: number): Promise<AuctionCustom | null> {

@@ -24,7 +24,8 @@ import { useAuth } from "../../Widgets/hooks/useAuth";
 import type { CreateUserPostDTO } from "../../entities/UserPost";
 import { createUserPost } from "../../features/Post";
 import { Battery, Zap } from "lucide-react";
-
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 const { Title, Text } = Typography;
 
 const PostBatterySale: React.FC = () => {
@@ -100,9 +101,9 @@ const PostBatterySale: React.FC = () => {
       const postData: CreateUserPostDTO = {
         userId: parseInt(userId),
         title:
-        values.title || `${values.batteryBrand} ${values.batteryName}`,
+          values.title || `${values.batteryBrand} ${values.batteryName}`,
         userPackageId: userPackageId, // Sử dụng package ID giả lập
-        vehicle: null,  
+        vehicle: null,
         battery: {
           batteryName: values.batteryName,
           brand: values.batteryBrand,
@@ -122,8 +123,8 @@ const PostBatterySale: React.FC = () => {
         setFileList([]);
         message.success("Đăng bài bán pin thành công! Bài đăng đang chờ duyệt.");
         navigate("/");
-      } 
-      
+      }
+
     } catch (error) {
       console.error("Failed to create battery post:", error);
       message.error("Đã xảy ra lỗi khi đăng bài bán pin.");
@@ -462,25 +463,38 @@ const PostBatterySale: React.FC = () => {
                     </span>
                   }
                   rules={[
-                    {
-                      required: true,
-                      message: "Vui lòng nhập mô tả chi tiết!",
-                    },
+                    { required: true, message: "Vui lòng nhập mô tả chi tiết!" },
                   ]}
                 >
-                  <Input.TextArea
-                    rows={6}
-                    placeholder="Mô tả tình trạng pin, lý do bán, bảo hành còn lại, xe nào tương thích..."
-                    className="rounded-2xl text-base font-medium"
+                  <ReactQuill
+                    theme="snow"
+                    placeholder="Mô tả tình trạng pin, lý do bán, xe tương thích, thời gian sử dụng, bảo hành..."
+                    className="rounded-2xl text-base font-medium bg-white"
                     style={{
-                      resize: "none",
-                      background: "white",
+                      height: "300px",
                       border: "2px solid #0284c7",
+                      borderRadius: "16px",
                       boxShadow: "0 4px 12px rgba(2,132,199,0.1)",
+                      overflow: "hidden",
                     }}
+                    modules={{
+                      toolbar: [
+                        [{ 'font': [] }, { 'size': [] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'align': [] }],
+                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                        ['link', 'image'],
+                        ['clean']
+                      ],
+                    }}
+                    formats={[
+                      'font', 'size', 'bold', 'italic', 'underline', 'strike',
+                      'color', 'background', 'align', 'list', 'bullet', 'link', 'image'
+                    ]}
+                    onChange={(value) => form.setFieldValue("batteryDescription", value)}
                   />
                 </Form.Item>
-
                 <Form.Item
                   label={
                     <span className="font-bold text-blue-900 text-base">
@@ -512,7 +526,7 @@ const PostBatterySale: React.FC = () => {
                   size="large"
                   icon={loading ? null : <CheckCircleOutlined />}
                   className="h-16 px-16 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-xl transition-all transform hover:-translate-y-1"
-                  style={{ background: "#0ea5e9", borderColor: "#0ea5e9" }} 
+                  style={{ background: "#0ea5e9", borderColor: "#0ea5e9" }}
                 >
                   Đăng bài
                 </Button>

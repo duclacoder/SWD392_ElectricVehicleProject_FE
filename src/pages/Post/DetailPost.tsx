@@ -2,6 +2,7 @@ import {
   ArrowLeftOutlined,
   CalendarOutlined,
   CarOutlined,
+  CheckOutlined,
   EyeOutlined,
   HeartOutlined,
   HomeOutlined,
@@ -30,6 +31,10 @@ import { getUserPostById } from "../../features/Post";
 import { getUserById } from "../../features/Post/UserPost";
 import { Footer } from "../../Widgets/Footers/Footer";
 import { Header } from "../../Widgets/Headers/Header";
+import { motion } from "framer-motion";
+import { HeartFilled } from "@ant-design/icons";
+import type { User } from "../../entities/User";
+
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -40,6 +45,21 @@ const PostDetail: React.FC = () => {
   const [post, setPost] = useState<UserPostCustom | null>(null);
   const [userInfo, setUserInfo] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
+  const [liked, setLiked] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = async () => {
+    try {
+      const shareUrl = window.location.href; // lấy URL hiện tại
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      message.success("Đã sao chép liên kết chia sẻ!");
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Lỗi khi sao chép link:", err);
+      message.error("Không thể sao chép liên kết.");
+    }
+  };
 
   const fetchPost = async () => {
     try {
@@ -78,21 +98,21 @@ const PostDetail: React.FC = () => {
   };
 
   const formatDetailPost = (price: number): string => {
-  if (price === undefined || price === null || isNaN(price) || price === 0) {
-    return "0";
-  }
-  if (price >= 1_000_000_000_000) {
-    return (price / 1_000_000_000_000).toFixed(1).replace(/\.0$/, "") + " nghìn tỷ";
-  } else if (price >= 1_000_000_000) {
-    return (price / 1_000_000_000).toFixed(1).replace(/\.0$/, "") + " tỷ";
-  } else if (price >= 1_000_000) {
-    return (price / 1_000_000).toFixed(1).replace(/\.0$/, "") + " triệu";
-  } else if (price >= 1_000) {
-    return (price / 1_000).toFixed(1).replace(/\.0$/, "") + " nghìn";
-  } else {
-    return price.toString();
-  }
-};
+    if (price === undefined || price === null || isNaN(price) || price === 0) {
+      return "0";
+    }
+    if (price >= 1_000_000_000_000) {
+      return (price / 1_000_000_000_000).toFixed(1).replace(/\.0$/, "") + " nghìn tỷ";
+    } else if (price >= 1_000_000_000) {
+      return (price / 1_000_000_000).toFixed(1).replace(/\.0$/, "") + " tỷ";
+    } else if (price >= 1_000_000) {
+      return (price / 1_000_000).toFixed(1).replace(/\.0$/, "") + " triệu";
+    } else if (price >= 1_000) {
+      return (price / 1_000).toFixed(1).replace(/\.0$/, "") + " nghìn";
+    } else {
+      return price.toString();
+    }
+  };
 
 
   const getPostPrice = (post: UserPostCustom | null): number | undefined => {
@@ -100,7 +120,7 @@ const PostDetail: React.FC = () => {
     return post.vehicle?.price ?? post.battery?.price;
   };
 
-const price = getPostPrice(post);
+  const price = getPostPrice(post);
 
   return (
     <>
@@ -277,12 +297,12 @@ const price = getPostPrice(post);
                               post.vehicle?.color?.toLowerCase() === "xanh lam"
                                 ? "#1890ff"
                                 : post.vehicle?.color?.toLowerCase() === "đỏ"
-                                ? "#ff4d4f"
-                                : post.vehicle?.color?.toLowerCase() === "trắng"
-                                ? "#ffffff"
-                                : post.vehicle?.color?.toLowerCase() === "đen"
-                                ? "#000000"
-                                : "#d9d9d9",
+                                  ? "#ff4d4f"
+                                  : post.vehicle?.color?.toLowerCase() === "trắng"
+                                    ? "#ffffff"
+                                    : post.vehicle?.color?.toLowerCase() === "đen"
+                                      ? "#000000"
+                                      : "#d9d9d9",
                           }}
                         />
                         <div>
@@ -305,12 +325,19 @@ const price = getPostPrice(post);
                   }
                   className="!rounded-xl shadow-md"
                 >
-                  <Paragraph className="text-gray-700 leading-relaxed text-justify whitespace-pre-line">
-                    {post.vehicle?.description &&
-                    post.vehicle.description !== "Chưa có mô tả chi tiết."
-                      ? post.vehicle.description
-                      : "Xe đã qua sử dụng, bảo dưỡng định kỳ đầy đủ. Xe được bảo quản tốt, sạch sẽ, động cơ hoạt động ổn định. Liên hệ trực tiếp để biết thêm thông tin chi tiết và đặt lịch xem xe."}
-                  </Paragraph>
+
+
+                  <div
+                    className="text-gray-800 leading-relaxed text-justify prose max-w-none"
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        post.vehicle?.description &&
+                          post.vehicle.description !== "Chưa có mô tả chi tiết."
+                          ? post.vehicle.description
+                          : `<p>Xe đã qua sử dụng, bảo dưỡng định kỳ đầy đủ. Xe được bảo quản tốt, sạch sẽ, động cơ hoạt động ổn định. Liên hệ trực tiếp để biết thêm thông tin chi tiết và đặt lịch xem xe.</p>`,
+                    }}
+                  />
+
 
                   <Divider />
 
@@ -362,15 +389,35 @@ const price = getPostPrice(post);
 
                   <Row gutter={8}>
                     <Col span={12}>
-                      <Button
-                        block
-                        icon={<HeartOutlined />}
-                        className="!h-10 !rounded-lg"
+                      <motion.div
+                        whileTap={{ scale: 0.9 }}
+                        className="relative"
                       >
-                        Yêu thích
-                      </Button>
+                        <Button
+                          block
+                          icon={liked ? <HeartFilled className="text-red-500" /> : <HeartOutlined />}
+                          className="!h-10 !rounded-lg"
+                          onClick={() => setLiked(!liked)}
+                        >
+                          {liked ? "Đã yêu thích" : "Yêu thích"}
+                        </Button>
+
+                        {/* Hiệu ứng tim bay lên */}
+                        {liked && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 20, scale: 0.5 }}
+                            animate={{ opacity: 1, y: -40, scale: 1.2 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.6 }}
+                            className="absolute left-1/2 -translate-x-1/2 text-pink-500 text-2xl select-none"
+                          >
+                            ❤️
+                          </motion.div>
+                        )}
+                      </motion.div>
                     </Col>
-                    <Col span={12}>
+
+                    {/* <Col span={12}>
                       <Button
                         block
                         icon={<ShareAltOutlined />}
@@ -378,7 +425,19 @@ const price = getPostPrice(post);
                       >
                         Chia sẻ
                       </Button>
+                    </Col> */}
+
+                    <Col span={12}>
+                      <Button
+                        block
+                        icon={copied ? <CheckOutlined /> : <ShareAltOutlined />}
+                        className="!h-10 !rounded-lg"
+                        onClick={handleShare}
+                      >
+                        {copied ? "Đã sao chép" : "Chia sẻ"}
+                      </Button>
                     </Col>
+
                   </Row>
 
                   <Divider />

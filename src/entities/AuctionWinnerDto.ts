@@ -1,4 +1,5 @@
-export interface AuctionWinerDTO{
-    bidderFullName: string,
-    bidderAmount: number
+export interface AuctionWinnerDTO {
+  fullName: string;
+  email: string;
+  phone: string;
 }
