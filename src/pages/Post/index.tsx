@@ -25,6 +25,7 @@ import { Header } from "../../Widgets/Headers/Header";
 import { useAuth } from "../../Widgets/hooks/useAuth";
 import type { CreateUserPostDTO } from "../../entities/UserPost";
 import { createUserPost } from "../../features/Post";
+import { CheckWithGemini } from "../../shared/api/GeminiApi";
 
 const { Title, Text } = Typography;
 
@@ -156,15 +157,21 @@ const PostVehicleSale: React.FC = () => {
         },
       };
 
-      const result = await createUserPost(postData, imageFiles);
-      if (result) {
-        form.resetFields();
-        setUploadedFiles([]);
-        navigate("/");
+      const checkValid : string = await CheckWithGemini(postData.description);
+      if(checkValid === "Invalid")
+      {
+        message.warning("Nội dung không hợp lệ");        
+      } else {
+        const result = await createUserPost(postData, imageFiles);
+        if (result) {
+          form.resetFields();
+          setUploadedFiles([]);
+          navigate("/");
       }
       else {
-      // message.warning("Bạn không có gói đăng bài nào hợp lệ hoặc đã sử dụng hết. Vui lòng mua gói mới để đăng bài.");
-      navigate("/packages");
+      window.open("/packages");
+      message.warning("Bạn không có gói đăng bài nào hợp lệ hoặc đã sử dụng hết. Vui lòng mua gói mới để đăng bài.", 5000);
+      }      
     }
     } catch (error) {
       console.error("Failed to create user post:", error);
