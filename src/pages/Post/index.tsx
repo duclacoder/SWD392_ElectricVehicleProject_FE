@@ -125,7 +125,7 @@ const PostVehicleSale: React.FC = () => {
         const result = await createUserPost(postData, imageFiles);
         if (result) {
           form.resetFields();
-          setUploadedFiles([]);
+          // setUploadedFiles([]);
           navigate("/");
         }
         else {

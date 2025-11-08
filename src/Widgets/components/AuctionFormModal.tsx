@@ -46,7 +46,7 @@ export const AuctionFormModal: FC<AuctionFormModalProps> = ({
         // Set form values for editing
         form.setFieldsValue({
           vehicleId: initialValues.vehicleId,
-          entryFee: initialValues.entryFee,
+          entryFee: initialValues.startPrice,
           endTime: initialValues.endTime ? dayjs(initialValues.endTime) : null,
         });
       } else {
