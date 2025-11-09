@@ -4,7 +4,6 @@ import {
   Gauge,
   TrendingUp,
   ArrowRight,
-  Shield,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -39,7 +38,7 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({
         await startConnection();
         const conn = getConnection();
 
-        conn.on("ReceiveBid", (auctionId: number, bidderId: string, bidderAmount: number) => {
+        conn.on("ReceiveBid", (auctionId: number, bidderAmount: number) => {
           setLocalAuctions((prev) =>
             prev.map((item) =>
               item.auction.auctionId === auctionId
@@ -226,15 +225,6 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({
                    <span className="text-white">Tham gia đấu giá</span>
                   <ArrowRight className="w-5 h-5" />
                 </button>
-
-                {/* Footer */}
-                {/* <div className="flex justify-between items-center pt-3 border-t border-gray-100 text-xs text-gray-500">
-                  {auction.entryFee && (
-                    <span className="font-semibold text-amber-600 bg-amber-50 px-3 py-1 rounded-full">
-                      Phí: {formatPrice(auction.entryFee)} VNĐ
-                    </span>
-                  )}
-                </div> */}
               </div>
             </article>
           );

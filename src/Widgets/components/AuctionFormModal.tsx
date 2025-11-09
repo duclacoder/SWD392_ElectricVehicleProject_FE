@@ -46,7 +46,7 @@ export const AuctionFormModal: FC<AuctionFormModalProps> = ({
         // Set form values for editing
         form.setFieldsValue({
           vehicleId: initialValues.vehicleId,
-          entryFee: initialValues.entryFee,
+          entryFee: initialValues.startPrice,
           endTime: initialValues.endTime ? dayjs(initialValues.endTime) : null,
         });
       } else {
@@ -156,25 +156,6 @@ export const AuctionFormModal: FC<AuctionFormModalProps> = ({
               <Form.Item
                 name="startPrice"
                 label="Start Price (Giá khởi điểm)"
-                rules={[{ required: true, message: "Please enter entry fee" }]}
-              >
-                <InputNumber
-                  style={{ width: "100%" }}
-                  min={0}
-                  disabled={isEditing} // Disable entry fee when editing
-                  formatter={(value) =>
-                    `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  }
-                  parser={(value: string | undefined) =>
-                    value ? parseFloat(value.replace(/,/g, "")) : 0
-                  }
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="entryFee"
-                label="Entry Fee (Phí khởi điểm)"
                 rules={[{ required: true, message: "Please enter entry fee" }]}
               >
                 <InputNumber

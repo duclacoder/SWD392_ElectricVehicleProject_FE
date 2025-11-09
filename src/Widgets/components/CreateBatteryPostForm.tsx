@@ -13,7 +13,8 @@ import {
   Radio,
   Card,
   Spin,
-  Empty
+  Empty,
+  type UploadFile
 } from "antd";
 import {
   UploadOutlined,
@@ -25,6 +26,7 @@ import type { CreateBatteryPostDTOWithId, CreateUserPostDTO } from "../../entiti
 import { useNavigate } from "react-router-dom";
 import type { UserBattery } from "../../entities/User";
 import { apiRoot } from "../../shared/api/axios";
+import { CheckWithGemini } from "../../shared/api/GeminiApi";
 
 interface Props {
   onSuccess?: () => void;
@@ -101,27 +103,41 @@ const BatteryPostForm: React.FC<Props> = ({ onSuccess, onCancel }) => {
   };
 
   const uploadProps = {
-    fileList,
-    multiple: true,
-    listType: "picture-card" as const,
-    beforeUpload: (file: any) => {
-      const isImage = file.type.startsWith("image/");
-      if (!isImage) {
-        message.error("Chỉ được tải ảnh!");
-        return Upload.LIST_IGNORE;
-      }
-      const isLt5M = file.size / 1024 / 1024 < 5;
-      if (!isLt5M) {
-        message.error("Ảnh phải nhỏ hơn 5MB!");
-        return Upload.LIST_IGNORE;
-      }
-      setFileList((prev) => [...prev, file]);
-      return false;
-    },
-    onRemove: (file: any) => {
-      setFileList((prev) => prev.filter((f) => f.uid !== file.uid));
-    },
-  };
+      fileList,
+      multiple: true,
+      listType: "picture-card" as const,
+      beforeUpload: (file: File) => {
+        const isImage = file.type.startsWith("image/");
+        if (!isImage) {
+          message.error("Chỉ được tải ảnh!");
+          return Upload.LIST_IGNORE;
+        }
+        const isLt5M = file.size / 1024 / 1024 < 5;
+        if (!isLt5M) {
+          message.error("Ảnh phải nhỏ hơn 5MB!");
+          return Upload.LIST_IGNORE;
+        }
+        
+        // Add file to list with proper structure
+        setFileList((prev) => [
+          ...prev,
+          {
+            uid: `${Date.now()}-${file.name}`,
+            name: file.name,
+            status: 'done',
+            originFileObj: file,
+          } as UploadFile,
+        ]);
+        
+        return false; // Prevent auto upload
+      },
+      onRemove: (file: UploadFile) => {
+        setFileList((prev) => prev.filter((f) => f.uid !== file.uid));
+      },
+    };
+  
+  
+
 
   const onFinish = async (values: any) => {
     setLoading(true);
@@ -165,25 +181,33 @@ const BatteryPostForm: React.FC<Props> = ({ onSuccess, onCancel }) => {
         postData.batteryId = selectedBatteryId;
       }
 
-      const imageFiles = fileList
+ 
+
+      const check = await CheckWithGemini(values.batteryDescription);
+
+      if (check === "Invalid") {
+        message.warning("Nội dung không hợp lệ")
+      } else {
+             const imageFiles = fileList
         .map((file) => file.originFileObj)
         .filter((file) => file instanceof File);
-      const result = await createUserPost(postData as CreateUserPostDTO, imageFiles);
+        const result = await createUserPost(postData as CreateUserPostDTO, imageFiles);
 
-      if (result) {
-        message.success("✅ Đăng bài thành công!");
-        form.resetFields();
-        setFileList([]);
-        onSuccess?.();
-      } else {
-        message.warning({
-          content:
-            "⚠️ Bạn không có gói đăng bài nào hợp lệ hoặc đã sử dụng hết. Đang chuyển đến trang mua gói...",
-          duration: 3,
-        });
-        setTimeout(() => {
-          navigate("/packages");
-        }, 1500);
+        if (result) {
+          message.success("✅ Đăng bài thành công!");
+          form.resetFields();
+          setFileList([]);
+          onSuccess?.();
+        } else {
+          message.warning({
+            content:
+              "⚠️ Bạn không có gói đăng bài nào hợp lệ hoặc đã sử dụng hết. Đang chuyển đến trang mua gói...",
+            duration: 3,
+          });
+          setTimeout(() => {
+            window.open("/packages");
+          }, 1500);
+        }
       }
     } catch (e) {
       console.error(e);

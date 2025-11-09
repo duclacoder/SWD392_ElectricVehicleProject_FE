@@ -15,7 +15,6 @@ import logo from "../../shared/assets/logo.png";
 export const Header: FC = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const token = localStorage.getItem("token");
   const [userImageUrl, setUserImageUrl] = useState(
@@ -40,7 +39,7 @@ export const Header: FC = () => {
   const navItems = [
     { name: "Mua xe", href: "/auction" },
     { name: "Bán xe", href: "/#", hasDropdown: true },
-    { name: "Thông tin & Sự kiện", href: "/#" },
+    { name: "Các gói đăng bài", href: "/packages" },
   ];
 
   return (
@@ -112,13 +111,13 @@ export const Header: FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center space-x-6">
+        <div className="flex items-center content-center space-x-6">
           {!token && (
-            <Link to="/login" className="hidden md:flex items-center space-x-2">
+            <Link to="/login" className="hidden md:flex items-center space-x-2 border-2 p-2 rounded-md border-blue-500 hover:bg-blue-100">
               <User className="w-5 h-5 text-gray-600" />
-              <span className="text-gray-700 font-medium hover:text-blue-600 transition">
+              <div className="text-gray-700 flex items-center font-medium hover:text-blue-600 transition">
                 Đăng nhập
-              </span>
+              </div>
             </Link>
           )}
 
@@ -213,9 +212,6 @@ export const Header: FC = () => {
           )}
         </div>
       </div>
-      {isAuthModalOpen && (
-        <AuthModal onClose={() => setIsAuthModalOpen(false)} />
-      )}
     </header>
   );
 };

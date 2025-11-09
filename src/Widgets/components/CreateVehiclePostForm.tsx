@@ -14,6 +14,7 @@ import {
   Spin,
   Empty,
   Select,
+  type UploadFile,
 } from "antd";
 import { UploadOutlined, CheckCircleOutlined, CarOutlined } from "@ant-design/icons";
 import { createUserPost } from "../../features/Post/index";
@@ -24,6 +25,7 @@ import type {
 } from "../../entities/UserPost";
 import { apiRoot } from "../../shared/api/axios";
 import type { UserVehicle } from "../../entities/User";
+import { CheckWithGemini } from "../../shared/api/GeminiApi";
 
 interface Props {
   onSuccess?: () => void;
@@ -106,9 +108,8 @@ const VehiclePostForm: React.FC<Props> = ({ onSuccess, onCancel }) => {
   const uploadProps = {
     fileList,
     multiple: true,
-    // Using picture-card layout for better preview in modal
     listType: "picture-card" as const,
-    beforeUpload: (file: any) => {
+    beforeUpload: (file: File) => {
       const isImage = file.type.startsWith("image/");
       if (!isImage) {
         message.error("Chỉ được tải ảnh!");
@@ -119,10 +120,21 @@ const VehiclePostForm: React.FC<Props> = ({ onSuccess, onCancel }) => {
         message.error("Ảnh phải nhỏ hơn 5MB!");
         return Upload.LIST_IGNORE;
       }
-      setFileList((prev) => [...prev, file]);
-      return false;
+      
+      // Add file to list with proper structure
+      setFileList((prev) => [
+        ...prev,
+        {
+          uid: `${Date.now()}-${file.name}`,
+          name: file.name,
+          status: 'done',
+          originFileObj: file,
+        } as UploadFile,
+      ]);
+      
+      return false; // Prevent auto upload
     },
-    onRemove: (file: any) => {
+    onRemove: (file: UploadFile) => {
       setFileList((prev) => prev.filter((f) => f.uid !== file.uid));
     },
   };
@@ -171,24 +183,32 @@ const VehiclePostForm: React.FC<Props> = ({ onSuccess, onCancel }) => {
         postData.vehicleId = selectedVehicleId;
       }
 
-      const imageFiles = fileList
+     
+
+
+      const check = await CheckWithGemini(values.vehicleDescription);
+
+      if (check === "Invalid") {
+        message.warning("Nội dung không hợp lệ")
+      } else {
+         const imageFiles = fileList
         .map((file) => file.originFileObj)
         .filter((file) => file instanceof File);
-
-      const result = await createUserPost(postData, imageFiles);
-      if (result) {
-        message.success("✅ Đăng bài thành công!");
-        form.resetFields();
-        setFileList([]);
-        onSuccess?.();
-      } else {
-        message.warning({
-          content: "⚠️ Bạn không có gói đăng bài nào hợp lệ hoặc đã sử dụng hết. Đang chuyển đến trang mua gói...",
-          duration: 3,
-        });
-        setTimeout(() => {
-          navigate("/packages");
-        }, 1500);
+        const result = await createUserPost(postData, imageFiles);
+        if (result) {
+          message.success("✅ Đăng bài thành công!");
+          form.resetFields();
+          setFileList([]);
+          onSuccess?.();
+        } else {
+          message.warning({
+            content: "⚠️ Bạn không có gói đăng bài nào hợp lệ hoặc đã sử dụng hết. Đang chuyển đến trang mua gói...",
+            duration: 3,
+          });
+          setTimeout(() => {
+            window.open("/packages");
+          }, 1500);
+        }
       }
     }
     catch (e) {

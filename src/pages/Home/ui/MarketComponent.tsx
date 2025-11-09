@@ -13,7 +13,7 @@ const Marketing = () => {
         </p>
         <div className="flex flex-col sm:flex-row items-center gap-4 justify-center">
           <button className="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold shadow hover:bg-green-700 transition">
-            Đăng ký ngay
+            <div className="text-white">Đăng kí ngay</div>
           </button>
           <button className="bg-white border border-green-600 text-green-600 px-8 py-3 rounded-lg font-semibold shadow hover:bg-green-50 transition">
             Tìm hiểu thêm

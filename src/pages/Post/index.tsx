@@ -22,21 +22,18 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Footer } from "../../Widgets/Footers/Footer";
 import { Header } from "../../Widgets/Headers/Header";
-import { useAuth } from "../../Widgets/hooks/useAuth";
 import type { CreateUserPostDTO } from "../../entities/UserPost";
 import { createUserPost } from "../../features/Post";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import { CheckWithGemini } from "../../shared/api/GeminiApi";
 
 const { Title, Text } = Typography;
 
 const PostVehicleSale: React.FC = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
   const navigate = useNavigate();
-  const { isLoggedIn } = useAuth();
-  const [userInfo, setUserInfo] = useState<{ fullName: string } | null>(null);
   const [fileList, setFileList] = useState<any[]>([]);
 
   const uploadProps = {
@@ -120,16 +117,24 @@ const PostVehicleSale: React.FC = () => {
         },
       };
 
-      const result = await createUserPost(postData, imageFiles);
-      if (result) {
-        form.resetFields();
-        setUploadedFiles([]);
-        navigate("/");
+      const check = await CheckWithGemini(values.vehicleDescription);
+
+      if (check === "Invalid") {
+        message.warning("Đăng cái nội dung cho đàng hoàng vào");
+      } else {
+        const result = await createUserPost(postData, imageFiles);
+        if (result) {
+          form.resetFields();
+          // setUploadedFiles([]);
+          navigate("/");
+        }
+        else {
+          window.open("/packages");
+          message.warning("Bạn cần mua 1 gói đăng bài trước");
+        }
       }
-      else {
-        // message.warning("Bạn không có gói đăng bài nào hợp lệ hoặc đã sử dụng hết. Vui lòng mua gói mới để đăng bài.");
-        navigate("/packages");
-      }
+
+
     } catch (error) {
       console.error("Failed to create user post:", error);
       message.error("❌ Đã xảy ra lỗi khi đăng bài bán xe.");
