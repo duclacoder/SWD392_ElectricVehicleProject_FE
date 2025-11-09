@@ -32,7 +32,7 @@ export const auctionApi = {
   },
   async getAuctionWinner(auctionId: number): Promise<AuctionWinnerDTO | null> {
   try {
-    const response = await api.get(`/auction/winner/${auctionId}`);
+    const response = await api.get(`/AuctionBid/winner/${auctionId}`);
     return response.data;
   } catch (error: any) {
     const errorMsg =
