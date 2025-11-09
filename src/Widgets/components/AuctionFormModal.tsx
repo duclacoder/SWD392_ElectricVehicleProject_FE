@@ -81,7 +81,8 @@ export const AuctionFormModal: FC<AuctionFormModalProps> = ({
         const finalValues: CreateAuctionWithAutoFeeFormData = {
           userName: currentUserId || "",
           vehicleId: values.vehicleId,
-          endTime: values.endTime.toISOString(),
+          // endTime: values.endTime.toISOString(),
+          endTime: values.endTime.format("YYYY-MM-DDTHH:mm:ss"),
           entryFee: values.entryFee,
           startPrice: values.startPrice,
         };
