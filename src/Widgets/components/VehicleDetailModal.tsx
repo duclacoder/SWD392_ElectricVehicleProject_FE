@@ -169,7 +169,7 @@ export const VehicleDetailModal: FC<VehicleDetailModalProps> = ({
                 <DetailItem
                   icon={<SafetyCertificateOutlined />}
                   label="Verified"
-                  value={renderVerifiedTag(vehicle.verified)}
+                  value={renderVerifiedTag(true)}
                 />
               </Col>
             </Row>

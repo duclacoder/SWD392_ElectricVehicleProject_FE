@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { getConnection, startConnection } from "../../shared/api/signalR.js";
 import type { CombinedData, AuctionCustom } from "../../entities/Auction.ts";
-import { auctionApi } from "../../features/Auction";
+import { auctionApi, closeAuction } from "../../features/Auction";
 import { vehicleApi } from "../../features/Vehicle/vehicleApi";
 
 import { Spin, message, Select, Input, Button } from "antd";
@@ -47,6 +47,7 @@ const AuctionPage: React.FC = () => {
       }
     }
     initSignalR();
+    closeAuction();
   }, []);
 
   const fetchVehiclesForAuctions = useCallback(async (fetchedAuctions: AuctionCustom[]) => {
