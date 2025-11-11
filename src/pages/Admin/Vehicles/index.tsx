@@ -65,10 +65,12 @@ const AdminVehiclePage = () => {
 
   const fetchVehicles = useCallback(async () => {
     setLoading(true);
+    const currentPage = pagination.current;
+    const currentSize = pagination.pageSize;
     try {
       const result = await getAllAdminVehicles(
-        pagination.current,
-        pagination.pageSize
+        currentPage,
+        currentSize
       );
       if (result) {
         setVehicles(result.items);
@@ -264,16 +266,16 @@ const AdminVehiclePage = () => {
           },
           isDeleted
             ? {
-                key: "3",
-                label: "Undelete",
-                icon: <RollbackOutlined />,
-              }
+              key: "3",
+              label: "Undelete",
+              icon: <RollbackOutlined />,
+            }
             : {
-                key: "3",
-                label: "Delete",
-                icon: <DeleteOutlined />,
-                danger: true,
-              },
+              key: "3",
+              label: "Delete",
+              icon: <DeleteOutlined />,
+              danger: true,
+            },
         ];
 
         return (
@@ -327,7 +329,7 @@ const AdminVehiclePage = () => {
     setPagination({
       ...pagination,
       current: newPagination.current || 1,
-      pageSize: newPagination.pageSize || 8,
+      pageSize: newPagination.pageSize || 10,
     });
   };
 
@@ -352,8 +354,10 @@ const AdminVehiclePage = () => {
             placeholder="Search vehicles..."
             prefix={<SearchOutlined className="text-gray-400" />}
             value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            style={{ width: 300 }}
+            onChange={(e) => {
+              setSearchText(e.target.value);
+              setPagination((prev) => ({ ...prev, current: 1 }));
+            }} style={{ width: 300 }}
           />
           <Button
             type="primary"
@@ -371,8 +375,12 @@ const AdminVehiclePage = () => {
         dataSource={filteredVehicles}
         rowKey="vehiclesId"
         loading={loading}
-        pagination={pagination}
-        onChange={handleTableChange}
+        pagination={{
+            ...pagination,
+            showSizeChanger: true,
+            pageSizeOptions: ['10', '20', '50', '100'],
+            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+        }}        onChange={handleTableChange}
         onRow={(record) => {
           return {
             onClick: () => {
