@@ -27,12 +27,12 @@ export interface AuctionCustom {
   startPrice: number;
   startTime: string;
   endTime: string;
-  status: string;
   auctionsFeeId?: number;
   feePerMinute?: number;
   openFee?: number;
   entryFee?: number;
   bids?: AuctionBidCustom[];
+  status?: string;
   images?: string[];
 }
 

@@ -196,19 +196,19 @@ const AdminVehiclePage = () => {
       render: (price, record) => `${price.toLocaleString()} ${record.currency}`,
       sorter: (a, b) => a.price - b.price,
     },
-    {
-      title: "Verified",
-      key: "verified",
-      dataIndex: "verified",
-      render: (verified) => (
-        <Tag
-          icon={verified ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
-          color={verified ? "success" : "error"}
-        >
-          {verified ? "Verified" : "Not Verified"}
-        </Tag>
-      ),
-    },
+    // {
+    //   title: "Verified",
+    //   key: "verified",
+    //   dataIndex: "verified",
+    //   render: (verified) => (
+    //     <Tag
+    //       icon={verified ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
+    //       color={verified ? "success" : "error"}
+    //     >
+    //       {verified ? "Verified" : "Not Verified"}
+    //     </Tag>
+    //   ),
+    // },
     {
       title: "Status",
       key: "status",

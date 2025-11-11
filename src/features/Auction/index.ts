@@ -31,18 +31,18 @@ export const auctionApi = {
     }
   },
   async getAuctionWinner(auctionId: number): Promise<AuctionWinnerDTO | null> {
-  try {
-    const response = await api.get(`/AuctionBid/winner/${auctionId}`);
-    return response.data;
-  } catch (error: any) {
-    const errorMsg =
-      error?.response?.data?.message || "Lỗi khi lấy người thắng đấu giá.";
-    message.error(errorMsg);
-    return null;
-  }
-},
+    try {
+      const response = await api.get(`AuctionBid/winner/${auctionId}`);
+      return response.data;
+    } catch (error: any) {
+      const errorMsg =
+        error?.response?.data?.message || "Lỗi khi lấy người thắng đấu giá.";
+      message.error(errorMsg);
+      return null;
+    }
+  },
 
-   
+
   async getAuctionById(id: number): Promise<AuctionCustom | null> {
     try {
       const response = await api.get<ResponseDTO<AuctionCustom>>(
@@ -62,7 +62,7 @@ export const auctionApi = {
   async refundAuction(auctionId: number): Promise<boolean> {
     try {
       const response = await api.get<ResponseDTO<any>>(
-        `/Auctions/Refund?auctionId=${auctionId}`
+        `Auctions/Refund?auctionId=${auctionId}`
       );
       const data = response.data;
 
@@ -78,25 +78,50 @@ export const auctionApi = {
     } catch (error: any) {
       message.error(
         error?.response?.data?.message ||
-          "Lỗi khi gọi API hoàn tiền đấu giá."
+        "Lỗi khi gọi API hoàn tiền đấu giá."
       );
       return false;
     }
   },
 
 
-// async getAuctionWinner(auctionId: number): Promise<AuctionWinnerDto | null> {
-//     try {
-//       const response = await api.get<ResponseDTO<AuctionWinnerDto>>(`/auctions/${auctionId}/winner`);
-//       if (response.data.isSuccess) return response.data.result;
-//       message.error(response.data.message || "Không thể lấy người thắng đấu giá");
-//       return null;
-//     } catch (error: any) {
-//       message.error(error?.response?.data?.message || "Lỗi khi lấy người thắng đấu giá");
-//       return null;
-//     }
-//   },
+  // async getAuctionWinner(auctionId: number): Promise<AuctionWinnerDto | null> {
+  //     try {
+  //       const response = await api.get<ResponseDTO<AuctionWinnerDto>>(`/auctions/${auctionId}/winner`);
+  //       if (response.data.isSuccess) return response.data.result;
+  //       message.error(response.data.message || "Không thể lấy người thắng đấu giá");
+  //       return null;
+  //     } catch (error: any) {
+  //       message.error(error?.response?.data?.message || "Lỗi khi lấy người thắng đấu giá");
+  //       return null;
+  //     }
+  //   },
 };
+
+export const closeAuction = async () => {
+  try {
+    const response = await api.get("Auctions");
+    const data: ResponseDTO<AuctionCustom[]> = response.data;
+    const result: AuctionCustom[] = data.result;
+
+    const validItems = result.filter(item =>
+      item.status !== "ended" &&
+      item.endTime &&
+      new Date(item.endTime).getTime() >= Date.now()
+    );
+
+    for (const item of validItems) {
+      refund(item.auctionId.toString());
+    }
+
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+const refund = async (auctionId : string) => {
+  await api.get(`Auctions/Refund?auctionId=${auctionId}`);
+}
 
 
 
