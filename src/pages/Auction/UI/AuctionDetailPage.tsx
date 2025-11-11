@@ -497,13 +497,12 @@ const AuctionDetail: React.FC<AuctionDetailProps> = ({ onTimeLeftChange }) => {
                     Hiện cao nhất
                   </div>
                   <div className="text-4xl md:text-5xl font-bold text-blue-600 mb-1">
-                    {formatPriceShort(currentPrice)}{" "}
-                    <span className="text-xl md:text-2xl">triệu</span>
+                    {formatPriceAuction(currentPrice)}{" "}
                   </div>
                   <div className="text-sm text-gray-600 mt-1">
                     Khởi điểm:{" "}
                     <span className="font-medium">
-                      {formatPriceShort(auction.startPrice)} triệu
+                      {formatPriceAuction(auction.startPrice)}
                     </span>
                   </div>
                 </div>
