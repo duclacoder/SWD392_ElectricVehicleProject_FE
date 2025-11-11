@@ -28,15 +28,11 @@ const AdminAuctionPage = () => {
   const [auctions, setAuctions] = useState<AuctionCustom[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
-
-  // State cho modal Cập nhật/Tạo mới
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingAuction, setEditingAuction] = useState<AuctionCustom | null>(
     null
   );
   const [submitLoading, setSubmitLoading] = useState(false);
-
-  // State cho modal Chi tiết
   const [isDetailVisible, setIsDetailVisible] = useState(false);
   const [selectedAuction, setSelectedAuction] = useState<AuctionCustom | null>(
     null
@@ -50,10 +46,12 @@ const AdminAuctionPage = () => {
 
   const fetchAuctions = useCallback(async () => {
     setLoading(true);
+    const currentPage = pagination.current;
+    const currentSize = pagination.pageSize;
     try {
       const result = await getAllAuctions(
-        pagination.current,
-        pagination.pageSize
+        currentPage,
+        currentSize
       );
       if (result) {
         setAuctions(result.items);
@@ -70,7 +68,6 @@ const AdminAuctionPage = () => {
     fetchAuctions();
   }, [fetchAuctions]);
 
-  // --- Handlers cho modal Cập nhật/Tạo mới ---
   const handleShowAddModal = () => {
     setEditingAuction(null);
     setIsModalVisible(true);
@@ -96,13 +93,11 @@ const AdminAuctionPage = () => {
     let success = false;
 
     if (editingAuction) {
-      // Update existing auction - only endTime and status
       success = await updateAuction(editingAuction.auctionId, {
         endTime: values.endTime,
-        status: "Active", // Fixed status for update
+        status: "Active",
       });
     } else {
-      // Create new auction
       success = await createAuctionWithAutoFee(values);
     }
 
@@ -114,7 +109,6 @@ const AdminAuctionPage = () => {
     setSubmitLoading(false);
   };
 
-  // --- Handlers cho modal Chi tiết ---
   const handleShowDetailModal = (auction: AuctionCustom) => {
     setSelectedAuction(auction);
     setIsDetailVisible(true);
@@ -124,7 +118,6 @@ const AdminAuctionPage = () => {
     setIsDetailVisible(false);
     setSelectedAuction(null);
   };
-
   // Cập nhật columns cho Auctions
   const columns: TableProps<AuctionCustom>["columns"] = [
     {
@@ -267,7 +260,10 @@ const AdminAuctionPage = () => {
             placeholder="Search by seller..."
             prefix={<SearchOutlined className="text-gray-400" />}
             value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
+              onChange={(e) => {
+                setSearchText(e.target.value);
+                setPagination(prev => ({...prev, current: 1}));
+            }}
             style={{ width: 300 }}
           />
           <Button
@@ -282,10 +278,15 @@ const AdminAuctionPage = () => {
 
       <Table
         columns={columns}
-        dataSource={filteredAuctions}
+        dataSource={auctions}
         rowKey="auctionId"
         loading={loading}
-        pagination={pagination}
+        pagination={{
+            ...pagination,
+            showSizeChanger: true,
+            pageSizeOptions: ['10', '20', '50', '100'],
+            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+        }}
         onChange={handleTableChange}
         rowClassName="cursor-pointer"
       />
